@@ -1,0 +1,5 @@
+Project organisation:
+All header files are in the subfolder include. All source file are in the folder src.
+
+Project dependencies:
+The yaml-cpp from spack doesn't work. They provide a *.so library and it couldn't compile. If the master from github is downloaded, compiled and installed, a *.a library is copied to usr/local and this works.
