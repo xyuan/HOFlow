@@ -3,6 +3,7 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "LinearSolver.h"
+#include "TpetraLinearSolverConfig.h"
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 
@@ -14,25 +15,19 @@ LinearSolver::~LinearSolver() {
 }
 
 void LinearSolver::load(const YAML::Node& node) {
-    const YAML::Node nodes = node["linear_solvers"];
+    const YAML::Node nodes = node["linear_solvers"]; // extract the part about linear solver from the input file
     if ( nodes ) {
-        
-        // loop through the linear solvers specified in the input file
-        for ( size_t inode = 0; inode <  nodes.size(); ++inode ) {
-            const YAML::Node linear_solver_node = nodes[inode];
-            std::string solver_type = "tpetra";
-            //get_if_present_no_default(linear_solver_node, "type", solver_type);      
+        const YAML::Node linear_solver_node = nodes[0]; // get the first linear solver declared in the input file
+        std::string solver_type = linear_solver_node["type"]; // get the solver type specified in the input file
             
-            if (solver_type == "tpetra") {
-                //TpetraLinearSolverConfig * linearSolverConfig = new TpetraLinearSolverConfig();
-                //linearSolverConfig->load(linear_solver_node);
-                //solverTpetraConfig_[linearSolverConfig->name()] = linearSolverConfig; 
-            }
-            // add elseif here if another solver should also be supported
-            else {
-                throw std::runtime_error("unknown solver type");
-            }
+        if (solver_type == "tpetra") {
+            TpetraLinearSolverConfig * linearSolverConfig = new TpetraLinearSolverConfig();
+            linearSolverConfig->load(linear_solver_node);
+            solverTpetraConfig_[linearSolverConfig->name()] = linearSolverConfig; 
+        }
+        // add elseif here if another solver should also be supported
+        else {
+            throw std::runtime_error("unknown solver type");
         }
     }
 }
-
