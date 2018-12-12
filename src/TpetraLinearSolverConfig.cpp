@@ -3,8 +3,15 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "TpetraLinearSolverConfig.h"
+#include <HOFlowEnv.h>
+#include <HOFlowParsing.h>
 #include <yaml-cpp/yaml.h>
 #include <Teuchos_ParameterList.hpp>
+#include <Teuchos_RCP.hpp>
+#include <BelosTypes.hpp>
+
+#include <string>
+#include <iostream>
 
 TpetraLinearSolverConfig::TpetraLinearSolverConfig() {
 }
@@ -12,9 +19,9 @@ TpetraLinearSolverConfig::TpetraLinearSolverConfig() {
 TpetraLinearSolverConfig::~TpetraLinearSolverConfig() {
 }
 
-TpetraLinearSolverConfig::load(const YAML::Node& node) {
-    name_ = node["name"].as<std::string>() ;
-    method_ = node["method"].as<std::string>() ;
+void TpetraLinearSolverConfig::load(const YAML::Node& node) {
+    name_ = node["name"].as<std::string>();
+    method_ = node["method"].as<std::string>();
     get_if_present(node, "preconditioner", precond_, std::string("default"));
     solverType_ = "tpetra";
 
@@ -29,17 +36,17 @@ TpetraLinearSolverConfig::load(const YAML::Node& node) {
 
     tol = tolerance_;
 
-    //Teuchos::RCP<Teuchos::ParameterList> params = Teuchos::params();
+    //Teuchos::RCP<Teuchos::ParameterList> params = Teuchos::params(); // Commented out from Nalu
     params_->set("Convergence Tolerance", tol);
     params_->set("Maximum Iterations", max_iterations);
     if (output_level > 0)
     {
-      params_->set("Verbosity", Belos::Errors + Belos::Warnings + Belos::StatusTestDetails);
-      params_->set("Output Style",Belos::Brief); 
+        params_->set("Verbosity", Belos::Errors + Belos::Warnings + Belos::StatusTestDetails);
+        params_->set("Output Style",Belos::Brief); 
     }
 
     params_->set("Output Frequency", output_level);
-    Teuchos::RCP<std::ostream> belosOutputStream = Teuchos::rcpFromRef (NaluEnv::self().naluOutputP0());
+    Teuchos::RCP<std::ostream> belosOutputStream = Teuchos::rcpFromRef (HOFlowEnv::self().HOFlowOutputP0());
     params_->set("Output Stream", belosOutputStream);
     params_->set("Num Blocks", kspace);
     params_->set("Maximum Restarts", std::max(1,max_iterations/kspace));
@@ -48,39 +55,33 @@ TpetraLinearSolverConfig::load(const YAML::Node& node) {
     params_->set("Implicit Residual Scaling", "Norm of Preconditioned Initial Residual");
 
     if (precond_ == "sgs") {
-      preconditionerType_ = "RELAXATION";
-      paramsPrecond_->set("relaxation: type","Symmetric Gauss-Seidel");
-      paramsPrecond_->set("relaxation: sweeps",1);
+        preconditionerType_ = "RELAXATION";
+        paramsPrecond_->set("relaxation: type","Symmetric Gauss-Seidel");
+        paramsPrecond_->set("relaxation: sweeps",1);
     }
     else if (precond_ == "mt_sgs") {
-      preconditionerType_ = "RELAXATION";
-      paramsPrecond_->set("relaxation: type","MT Symmetric Gauss-Seidel");
-      paramsPrecond_->set("relaxation: sweeps",1);
+        preconditionerType_ = "RELAXATION";
+        paramsPrecond_->set("relaxation: type","MT Symmetric Gauss-Seidel");
+        paramsPrecond_->set("relaxation: sweeps",1);
     }
     else if (precond_ == "jacobi" || precond_ == "default") {
-      preconditionerType_ = "RELAXATION";
-      paramsPrecond_->set("relaxation: type","Jacobi");
-      paramsPrecond_->set("relaxation: sweeps",1);
+        preconditionerType_ = "RELAXATION";
+        paramsPrecond_->set("relaxation: type","Jacobi");
+        paramsPrecond_->set("relaxation: sweeps",1);
     }
     else if (precond_ == "ilut" ) {
-      preconditionerType_ = "ILUT";
+        preconditionerType_ = "ILUT";
     }
     else if (precond_ == "riluk" ) {
-      preconditionerType_ = "RILUK";
-    }
-    else if (precond_ == "muelu") {
-      muelu_xml_file_ = std::string("milestone.xml");
-      get_if_present(node, "muelu_xml_file_name", muelu_xml_file_, muelu_xml_file_);
-      useMueLu_ = true;
+        preconditionerType_ = "RILUK";
     }
     else {
       throw std::runtime_error("invalid linear solver preconditioner specified ");
     }
-
-    get_if_present(node, "write_matrix_files", writeMatrixFiles_, writeMatrixFiles_);
-    get_if_present(node, "summarize_muelu_timer", summarizeMueluTimer_, summarizeMueluTimer_);
-
+    
     get_if_present(node, "recompute_preconditioner", recomputePreconditioner_, recomputePreconditioner_);
     get_if_present(node, "reuse_preconditioner",     reusePreconditioner_,     reusePreconditioner_);
+    // Deleted the reading parameters for writeMatrixFiles. 
+    // Always use the value defined in LinearSolverConfig.h
 }
 

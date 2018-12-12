@@ -7,15 +7,14 @@
 
 #include <yaml-cpp/yaml.h>
 
-class YAML::Node;
 class Realm;
-class LinearSolver;
+class LinearSolvers;
 
 class Simulation {
 public:
     const YAML::Node& m_root_node;
     Realm *realm_;
-    LinearSolver *linearSolver_;
+    LinearSolvers *linearSolvers_;
     
     Simulation(const YAML::Node& root_node);
     ~Simulation();

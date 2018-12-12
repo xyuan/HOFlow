@@ -2,10 +2,11 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "LinearSolver.h"
+#include "TpetraLinearSolver.h"
 
-LinearSolver::LinearSolver() {
+TpetraLinearSolver::TpetraLinearSolver() {
 }
 
-LinearSolver::~LinearSolver() {
+TpetraLinearSolver::~TpetraLinearSolver() {
 }
+

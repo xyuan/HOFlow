@@ -5,15 +5,12 @@
 #ifndef LINEARSOLVER_H
 #define LINEARSOLVER_H
 
-#include <yaml-cpp/yaml.h>
-
-class YAML::Node;
+#include <TpetraLinearSolver.h>
 
 class LinearSolver {
 public:
     LinearSolver();
     ~LinearSolver();
-    void load(const YAML::Node & node);
 };
 
 #endif /* LINEARSOLVER_H */

@@ -2,10 +2,11 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "LinearSolver.h"
+#include "HOFlowParsing.h"
 
-LinearSolver::LinearSolver() {
+HOFlowParsing::HOFlowParsing() {
 }
 
-LinearSolver::~LinearSolver() {
+HOFlowParsing::~HOFlowParsing() {
 }
+

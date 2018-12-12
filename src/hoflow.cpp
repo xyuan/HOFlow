@@ -14,12 +14,16 @@
 #include <boost/program_options.hpp>
 
 #include <Simulation.h>
+#include <HOFlowEnv.h>
 
 namespace po = boost::program_options;
 
 int main(int argc, char** argv) {
     const std::string VERSION = "0.0.1";
     std::string inputFileName;
+    
+    // HOFlowEnv singleton
+    HOFlowEnv & hoflowEnv = HOFlowEnv::self();
     
     // command line options.
     bool debug = false;
@@ -64,8 +68,11 @@ int main(int argc, char** argv) {
     Simulation sim(doc);
     
     // load the data specified in the input file
+    std::cout << "load input file.." << std::endl;
     sim.load(doc);
+    std::cout << "initialize classes.." << std::endl;
     sim.initialize();
+    std::cout << "run simulation.." << std::endl;
     sim.run();
  
     return 0;

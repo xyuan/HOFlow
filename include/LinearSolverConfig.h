@@ -5,10 +5,14 @@
 #ifndef LINEARSOLVERCONFIG_H
 #define LINEARSOLVERCONFIG_H
 
+#include <string>
+#include <Teuchos_ParameterList.hpp>
+#include <Teuchos_RCP.hpp>
+
 class LinearSolverConfig {
 public:
     LinearSolverConfig();
-    ~LinearSolverConfig();
+    virtual ~LinearSolverConfig();
     
     inline std::string name() const
     { return name_ ; }

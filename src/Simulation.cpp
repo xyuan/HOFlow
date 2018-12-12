@@ -9,25 +9,23 @@
 
 #include <Simulation.h>
 #include <Realm.h>
-#include <LinearSolver.h>
+#include <LinearSolvers.h>
 
 Simulation::Simulation(const YAML::Node& root_node) :
     m_root_node(root_node),
     realm_(NULL),
-    linearSolver_(NULL)
+    linearSolvers_(NULL)
 {
-    
 }
 
-Simulation::~Simulation() {
-    
+Simulation::~Simulation() { 
 }
 
 void Simulation::load(const YAML::Node& node) {
     
     // load the linear solver configs
-    linearSolver_ = new LinearSolver();
-    linearSolver_->load(node);
+    linearSolvers_ = new LinearSolvers(*this);
+    linearSolvers_->load(node);
 
     // create the realms
     realm_ = new Realm();

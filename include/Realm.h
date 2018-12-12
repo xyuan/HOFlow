@@ -7,8 +7,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-class YAML::Node;
-
 class Realm {
 public:
     Realm();

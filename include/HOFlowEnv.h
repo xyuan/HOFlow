@@ -2,10 +2,20 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "LinearSolver.h"
+#ifndef HOFLOWENV_H
+#define HOFLOWENV_H
 
-LinearSolver::LinearSolver() {
-}
+#include<iostream>
 
-LinearSolver::~LinearSolver() {
-}
+class HOFlowEnv {
+public:
+    HOFlowEnv();
+    ~HOFlowEnv();
+    static HOFlowEnv & self();
+    std::ostream & HOFlowOutputP0();
+    
+    std::ostream *HOFlowLogStream_;
+};
+
+#endif /* HOFLOWENV_H */
+
