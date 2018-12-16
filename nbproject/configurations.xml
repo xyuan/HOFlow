@@ -61,6 +61,10 @@
             <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.68.0-6sfdq2hey6zrvfozln6tekynrqdd7ilw/include</pElem>
             <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-cuwfubxtt2ngh5yb6pxqjb2pdaokophd/include</pElem>
             <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/include</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7/include</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.69.0-tumf2uczfthw45zseuvqymll2luapm6d/include</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/openmpi-3.1.3-tmla2fsjf3bb6nigart7qv265vovne2v/include</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/include</pElem>
           </incDir>
         </ccTool>
         <linkerTool>
@@ -68,6 +72,10 @@
             <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-cuwfubxtt2ngh5yb6pxqjb2pdaokophd/lib</pElem>
             <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/lib</pElem>
             <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.68.0-6sfdq2hey6zrvfozln6tekynrqdd7ilw/lib</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/lib</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7/lib</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.69.0-tumf2uczfthw45zseuvqymll2luapm6d/lib</pElem>
+            <pElem>../../spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/openmpi-3.1.3-tmla2fsjf3bb6nigart7qv265vovne2v/lib</pElem>
           </linkerAddLib>
           <commandlineTool>g++</commandlineTool>
           <linkerLibItems>
