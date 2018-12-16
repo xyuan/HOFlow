@@ -11,7 +11,7 @@
 #include <yaml-cpp/yaml.h>
 #include <iterator>
 
-LinearSolvers::LinearSolvers(Simulation& sim) :
+LinearSolvers::LinearSolvers(Simulation & sim) :
     sim_(sim)
 {
 }
@@ -25,7 +25,7 @@ LinearSolvers::~LinearSolvers() {
     }*/
 }
 
-void LinearSolvers::load(const YAML::Node& node) {
+void LinearSolvers::load(const YAML::Node & node) {
     const YAML::Node nodes = node["linear_solvers"]; // extract the part about linear solver from the input file
     if (nodes) {
         for ( size_t inode = 0; inode <  nodes.size(); ++inode ) { // loop through multiple defined linear solvers

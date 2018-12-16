@@ -2,26 +2,28 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#ifndef SIMULATION_H
-#define SIMULATION_H
+#ifndef REALMS_H
+#define REALMS_H
 
 #include <yaml-cpp/yaml.h>
+#include <Realm.h>
+#include <vector>
 
-class Realms;
-class LinearSolvers;
+class Simulation;
 
-class Simulation {
+class Realms {
 public:
-    const YAML::Node& m_root_node;
-    Realms *realms_;
-    LinearSolvers *linearSolvers_;
-    
-    Simulation(const YAML::Node& root_node);
-    ~Simulation();
-    void load(const YAML::Node& node);
+    Realms();
+    ~Realms();
+    void load(const YAML::Node & node);
     void initialize();
-    void run();
+    
+    size_t size() {return realmVector_.size();}
+    typedef std::vector<Realm *> RealmVector;
+    
+    //Simulation & simulation_;
+    RealmVector realmVector_;
 };
 
-#endif /* SIMULATION_H */
+#endif /* REALMS_H */
 

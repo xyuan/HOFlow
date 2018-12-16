@@ -12,9 +12,9 @@ public:
     HOFlowEnv();
     ~HOFlowEnv();
     static HOFlowEnv & self();
-    std::ostream & HOFlowOutputP0();
+    std::ostream & hoflowOutputP0();
     
-    std::ostream *HOFlowLogStream_;
+    std::ostream *hoflowLogStream_;
 };
 
 #endif /* HOFLOWENV_H */

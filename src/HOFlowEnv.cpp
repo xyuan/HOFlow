@@ -10,13 +10,13 @@ HOFlowEnv::HOFlowEnv() {
 HOFlowEnv::~HOFlowEnv() {
 }
 
-HOFlowEnv &HOFlowEnv::self()
+HOFlowEnv & HOFlowEnv::self()
 {
   static HOFlowEnv s;
   return s;
 }
 
-std::ostream & HOFlowEnv::HOFlowOutputP0() {
-    return *HOFlowLogStream_;
+std::ostream & HOFlowEnv::hoflowOutputP0() {
+    return *hoflowLogStream_;
 }
 

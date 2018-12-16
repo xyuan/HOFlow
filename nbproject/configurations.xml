@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>include/Enums.h</itemPath>
+      <itemPath>include/HOFlowEnv.h</itemPath>
+      <itemPath>include/HOFlowParsing.h</itemPath>
+      <itemPath>include/LinearSolver.h</itemPath>
+      <itemPath>include/LinearSolverConfig.h</itemPath>
+      <itemPath>include/LinearSolvers.h</itemPath>
+      <itemPath>include/Realm.h</itemPath>
+      <itemPath>include/Realms.h</itemPath>
+      <itemPath>include/Simulation.h</itemPath>
+      <itemPath>include/TpetraLinearSolver.h</itemPath>
+      <itemPath>include/TpetraLinearSolverConfig.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>src/HOFlowEnv.cpp</itemPath>
+      <itemPath>src/HOFlowParsing.cpp</itemPath>
+      <itemPath>src/LinearSolver.cpp</itemPath>
+      <itemPath>src/LinearSolverConfig.cpp</itemPath>
+      <itemPath>src/LinearSolvers.cpp</itemPath>
+      <itemPath>src/Realm.cpp</itemPath>
+      <itemPath>src/Realms.cpp</itemPath>
+      <itemPath>src/Simulation.cpp</itemPath>
+      <itemPath>src/TpetraLinearSolver.cpp</itemPath>
+      <itemPath>src/TpetraLinearSolverConfig.cpp</itemPath>
+      <itemPath>src/hoflow.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.68.0-6sfdq2hey6zrvfozln6tekynrqdd7ilw/include</pElem>
+            <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-cuwfubxtt2ngh5yb6pxqjb2pdaokophd/include</pElem>
+            <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/include</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-cuwfubxtt2ngh5yb6pxqjb2pdaokophd/lib</pElem>
+            <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/lib</pElem>
+            <pElem>../../spack/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.68.0-6sfdq2hey6zrvfozln6tekynrqdd7ilw/lib</pElem>
+          </linkerAddLib>
+          <commandlineTool>g++</commandlineTool>
+          <linkerLibItems>
+            <linkerLibLibItem>boost_program_options</linkerLibLibItem>
+            <linkerLibLibItem>yaml-cpp</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="include/Enums.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/HOFlowEnv.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/HOFlowParsing.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/LinearSolver.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/LinearSolverConfig.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/LinearSolvers.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Realm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Realms.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Simulation.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/TpetraLinearSolver.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/TpetraLinearSolverConfig.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/HOFlowEnv.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/HOFlowParsing.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/LinearSolver.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/LinearSolverConfig.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/LinearSolvers.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Realm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Realms.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Simulation.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/TpetraLinearSolver.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/TpetraLinearSolverConfig.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/hoflow.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+      <item path="include/Enums.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/HOFlowEnv.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/HOFlowParsing.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/LinearSolver.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/LinearSolverConfig.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/LinearSolvers.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Realm.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Realms.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/Simulation.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/TpetraLinearSolver.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/TpetraLinearSolverConfig.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/HOFlowEnv.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/HOFlowParsing.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/LinearSolver.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/LinearSolverConfig.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/LinearSolvers.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Realm.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Realms.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Simulation.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/TpetraLinearSolver.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/TpetraLinearSolverConfig.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/hoflow.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

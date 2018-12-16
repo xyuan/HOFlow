@@ -3,22 +3,19 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include <iostream>
-
-// yaml for parsing..
 #include <yaml-cpp/yaml.h>
 
 #include <Simulation.h>
-#include <Realm.h>
+#include <Realms.h>
 #include <LinearSolvers.h>
 
 Simulation::Simulation(const YAML::Node& root_node) :
     m_root_node(root_node),
-    realm_(NULL),
+    realms_(NULL),
     linearSolvers_(NULL)
-{
-}
+{}
 
-Simulation::~Simulation() { 
+Simulation::~Simulation() {
 }
 
 void Simulation::load(const YAML::Node& node) {
@@ -28,12 +25,12 @@ void Simulation::load(const YAML::Node& node) {
     linearSolvers_->load(node);
 
     // create the realms
-    realm_ = new Realm();
-    realm_->load(node);
+    realms_ = new Realms();
+    realms_->load(node);
 }
 
 void Simulation::initialize() {
-    realm_->initialize();
+    realms_->initialize();
 }
 
 void Simulation::run() {

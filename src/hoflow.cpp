@@ -6,11 +6,7 @@
 #include <iterator>
 #include <string>
 #include <fstream>
-
-// yaml for parsing..
 #include <yaml-cpp/yaml.h>
-
-// boost for input params
 #include <boost/program_options.hpp>
 
 #include <Simulation.h>
@@ -70,8 +66,10 @@ int main(int argc, char** argv) {
     // load the data specified in the input file
     std::cout << "load input file.." << std::endl;
     sim.load(doc);
+    
     std::cout << "initialize classes.." << std::endl;
     sim.initialize();
+    
     std::cout << "run simulation.." << std::endl;
     sim.run();
  

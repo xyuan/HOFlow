@@ -5,14 +5,67 @@
 #ifndef REALM_H
 #define REALM_H
 
+#include <stk_util/util/ParameterList.hpp>
 #include <yaml-cpp/yaml.h>
+
+class Realms;
+class stk::mesh::Part;
+class stk::io::StkMeshIoBroker;
 
 class Realm {
 public:
-    Realm();
-    ~Realm();
-    void load(const YAML::Node& node);
-    void initialize();
+    Realm(Realms & realms, const YAML::Node & node);
+    virtual ~Realm();
+    virtual void load(const YAML::Node & node);
+    virtual void initialize();
+    void create_mesh();
+    void setup_nodal_fields();
+    void setup_edge_fields();
+    void setup_element_fields();
+    void setup_interior_algorithms();
+    void setup_bc();
+    void setup_initial_conditions();
+    void setup_property();
+    void augment_property_map(PropertyIdentifier propID, ScalarFieldType *theField);
+    void output_converged_results();
+    void commit();
+    void create_output_mesh();
+    void input_variables_from_mesh();
+    void augment_output_variable_list(const std::string fieldName);
+    void register_interior_algorithm(stk::mesh::Part *part);
+    void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo);
+    void provide_output();
+    
+    virtual void evaluate_properties();
+    
+    std::string name();
+    
+    // get bulk and meta data
+    stk::mesh::BulkData & bulk_data();
+    const stk::mesh::BulkData & bulk_data() const;
+    stk::mesh::MetaData & meta_data();
+    const stk::mesh::MetaData & meta_data() const;
+        
+    // push back equation to equation systems vector
+    void push_equation_to_systems(EquationSystem *eqSystem);
+    
+    Realms & realms_;
+    std::string name_;
+    std::string type_;
+    std::string inputDBName_;
+    unsigned spatialDimension_;
+    int solveFrequency_;
+    stk::mesh::MetaData *metaData_;
+    stk::mesh::BulkData *bulkData_;
+    stk::io::StkMeshIoBroker *ioBroker_;
+    
+    BoundaryConditions boundaryConditions_;
+    InitialConditions initialConditions_;
+    MaterialPropertys materialPropertys_;
+
+    EquationSystems equationSystems_;
+    size_t inputMeshIdx_;
+    const YAML::Node & node_;
 };
 
 #endif /* REALM_H */
