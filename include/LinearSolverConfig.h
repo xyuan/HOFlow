@@ -9,6 +9,7 @@
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_RCP.hpp>
 
+//! Configuration of a linear solver
 class LinearSolverConfig {
 public:
     LinearSolverConfig();

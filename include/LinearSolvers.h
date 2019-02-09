@@ -15,6 +15,7 @@ class LinearSolver;
 class TpetraLinearSolverConfig;
 class Simulation;
 
+//! Stores one or multiple linear solvers (objects of the class LinearSolver)
 class LinearSolvers {
 public:
     LinearSolvers(Simulation& sim);

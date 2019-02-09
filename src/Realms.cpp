@@ -10,12 +10,15 @@
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 
+//! Constructor
 Realms::Realms() {
 }
 
+//! Destructor
 Realms::~Realms() {
 }
 
+//! Loops through all Realms defined in the input file create a object from class Realm for each
 void Realms::load(const YAML::Node & node) {
     const YAML::Node realms = node["realms"];
     if (realms) {
@@ -40,6 +43,7 @@ void Realms::load(const YAML::Node & node) {
     }
 }
 
+//! Loops through all Realms stored and initialize them
 void Realms::initialize() {
     for ( size_t irealm = 0; irealm < realmVector_.size(); ++irealm ) {
         realmVector_[irealm]->initialize();

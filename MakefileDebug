@@ -18,7 +18,7 @@ LDFLAGS=-lmuelu-adapters -lmuelu-interface -lmuelu -lifpack2 -lamesos2 -lml -lif
 #INCLUDES=-I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/openmpi-3.1.3-tmla2fsjf3bb6nigart7qv265vovne2v/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/mumps-5.1.1-anwbusiknws4fa64aab5ntpj5wgf3lrc/include
 
 # Header files path for pc
-INCLUDES=-I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/openmpi-3.1.3-tmla2fsjf3bb6nigart7qv265vovne2v/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/mumps-5.1.1-anwbusiknws4fa64aab5ntpj5wgf3lrc/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.69.0-tumf2uczfthw45zseuvqymll2luapm6d/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/zlib-1.2.11-av3mmgf66zwic2i34n7o2oxtp4quy6pi/include
+INCLUDES=-Iinclude -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/openmpi-3.1.3-tmla2fsjf3bb6nigart7qv265vovne2v/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/mumps-5.1.1-anwbusiknws4fa64aab5ntpj5wgf3lrc/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.69.0-tumf2uczfthw45zseuvqymll2luapm6d/include -I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/zlib-1.2.11-av3mmgf66zwic2i34n7o2oxtp4quy6pi/include
 
 # Lib path for notebook
 #LIBS=-L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/openmpi-3.1.3-tmla2fsjf3bb6nigart7qv265vovne2v/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/mumps-5.1.1-anwbusiknws4fa64aab5ntpj5wgf3lrc/lib
@@ -27,8 +27,8 @@ INCLUDES=-I/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilin
 LIBS=-L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/openmpi-3.1.3-tmla2fsjf3bb6nigart7qv265vovne2v/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/mumps-5.1.1-anwbusiknws4fa64aab5ntpj5wgf3lrc/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/boost-1.69.0-tumf2uczfthw45zseuvqymll2luapm6d/lib -L/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/zlib-1.2.11-av3mmgf66zwic2i34n7o2oxtp4quy6pi/lib
 
 #CXXOPTIONS= -fdiagnostics-color=auto -std=c++14 -O3 -ftree-vectorizer-verbose=2 -ffast-math -ftree-vectorize -g3
-CXXOPTIONS= -fdiagnostics-color=auto -std=c++17 -O3 
-COPTIONS= -O3 
+CXXOPTIONS= -fdiagnostics-color=auto -std=c++17 -g3 -ggdb3 -Wall
+COPTIONS= -g 
 
 CFLAGS =  -c  $(INCLUDES) $(COPTIONS) $(LIBS)
 CPPFLAGS =  -c  $(INCLUDES) $(CXXOPTIONS) $(LIBS)
@@ -37,8 +37,8 @@ executableName=hoflow
 
 RM=rm -fr
 Version=Opt
-ObjDir=./1_obj
-DepDir=./2_dep
+ObjDir=./1_obj_Dbg
+DepDir=./2_dep_Dbg
 
 COMMON_SRC := $(shell find . -name "*.cpp")
 

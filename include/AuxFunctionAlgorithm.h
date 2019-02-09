@@ -2,17 +2,14 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#ifndef LINEARSOLVER_H
-#define LINEARSOLVER_H
+#ifndef AUXFUNCTIONALGORITHM_H
+#define AUXFUNCTIONALGORITHM_H
 
-#include <TpetraLinearSolver.h>
-
-//! Stores a linear solver specified in the input file
-class LinearSolver {
+class AuxFunctionAlgorithm {
 public:
-    LinearSolver();
-    ~LinearSolver();
+    AuxFunctionAlgorithm();
+    ~AuxFunctionAlgorithm();
 };
 
-#endif /* LINEARSOLVER_H */
+#endif /* AUXFUNCTIONALGORITHM_H */
 

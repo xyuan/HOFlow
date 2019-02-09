@@ -5,15 +5,20 @@
 #ifndef HOFLOWENV_H
 #define HOFLOWENV_H
 
-#include<iostream>
+#include <iostream>
+#include <mpi.h>
 
+//! Stores globally used stuff
 class HOFlowEnv {
 public:
     HOFlowEnv();
     ~HOFlowEnv();
     static HOFlowEnv & self();
+    MPI_Comm parallel_comm();
+    MPI_Comm parallelCommunicator_;
+    int pSize_;
+    int pRank_;
     std::ostream & hoflowOutputP0();
-    
     std::ostream *hoflowLogStream_;
 };
 

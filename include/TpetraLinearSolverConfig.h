@@ -12,6 +12,7 @@
 
 class LinearSolverConfig;
 
+//! Configuration of the TpetraLinearSolver
 class TpetraLinearSolverConfig : public LinearSolverConfig {
 public:
     TpetraLinearSolverConfig();

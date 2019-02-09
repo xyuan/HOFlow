@@ -10,6 +10,7 @@
 class Realms;
 class LinearSolvers;
 
+//! Container that holds all data regearding the simulation and specifies the sequence of execution of the different methods
 class Simulation {
 public:
     const YAML::Node& m_root_node;

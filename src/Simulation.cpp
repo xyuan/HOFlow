@@ -9,15 +9,18 @@
 #include <Realms.h>
 #include <LinearSolvers.h>
 
+//! Constructor
 Simulation::Simulation(const YAML::Node& root_node) :
     m_root_node(root_node),
     realms_(NULL),
     linearSolvers_(NULL)
 {}
 
+//! Destructor
 Simulation::~Simulation() {
 }
 
+//! Loads the information necessary to do the simulation
 void Simulation::load(const YAML::Node& node) {
     
     // load the linear solver configs
@@ -29,10 +32,12 @@ void Simulation::load(const YAML::Node& node) {
     realms_->load(node);
 }
 
+//! Initializes all computational domains
 void Simulation::initialize() {
     realms_->initialize();
 }
 
+//! Run the simulation
 void Simulation::run() {
     
 }

@@ -13,12 +13,15 @@
 #include <string>
 #include <iostream>
 
+//! Constructor
 TpetraLinearSolverConfig::TpetraLinearSolverConfig() {
 }
 
+//! Destructor
 TpetraLinearSolverConfig::~TpetraLinearSolverConfig() {
 }
 
+//! Loads all parameters for the linear solver from the input file
 void TpetraLinearSolverConfig::load(const YAML::Node& node) {
     name_ = node["name"].as<std::string>();
     method_ = node["method"].as<std::string>();
@@ -46,7 +49,7 @@ void TpetraLinearSolverConfig::load(const YAML::Node& node) {
     }
 
     params_->set("Output Frequency", output_level);
-    Teuchos::RCP<std::ostream> belosOutputStream = Teuchos::rcpFromRef (HOFlowEnv::self().HOFlowOutputP0());
+    Teuchos::RCP<std::ostream> belosOutputStream = Teuchos::rcpFromRef (HOFlowEnv::self().hoflowOutputP0());
     params_->set("Output Stream", belosOutputStream);
     params_->set("Num Blocks", kspace);
     params_->set("Maximum Restarts", std::max(1,max_iterations/kspace));

@@ -1,2 +1,8 @@
 /1_obj
 /2_dep
+1_obj/
+1_obj_Dbg/
+2_dep/
+2_dep_Dbg/
+doc/html/
+doc/latex/

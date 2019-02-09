@@ -2,17 +2,16 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#ifndef LINEARSOLVER_H
-#define LINEARSOLVER_H
+#ifndef MATERIALPROPERTIES_H
+#define MATERIALPROPERTIES_H
 
-#include <TpetraLinearSolver.h>
-
-//! Stores a linear solver specified in the input file
-class LinearSolver {
+//! Stores one or multiple material properties (objects of the class MaterialProperty)
+class MaterialProperties {
 public:
-    LinearSolver();
-    ~LinearSolver();
+    MaterialProperties();
+    ~MaterialProperties();
+    void load(const YAML::Node & node);
 };
 
-#endif /* LINEARSOLVER_H */
+#endif /* MATERIALPROPERTIES_H */
 

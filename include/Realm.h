@@ -12,6 +12,7 @@ class Realms;
 class stk::mesh::Part;
 class stk::io::StkMeshIoBroker;
 
+//! Stores information and methods for a specific computational domain
 class Realm {
 public:
     Realm(Realms & realms, const YAML::Node & node);
@@ -35,6 +36,8 @@ public:
     void register_interior_algorithm(stk::mesh::Part *part);
     void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo);
     void provide_output();
+    void set_global_id();
+    void populate_boundary_data();
     
     virtual void evaluate_properties();
     
@@ -49,6 +52,9 @@ public:
     // push back equation to equation systems vector
     void push_equation_to_systems(EquationSystem *eqSystem);
     
+    // provide all of the physics target names
+    const std::vector<std::string> & get_physics_target_names();
+    
     Realms & realms_;
     std::string name_;
     std::string type_;
@@ -59,13 +65,19 @@ public:
     stk::mesh::BulkData *bulkData_;
     stk::io::StkMeshIoBroker *ioBroker_;
     
+    // hoflow field data
+    GlobalIdFieldType *hoflowGlobalId_;
+    
     BoundaryConditions boundaryConditions_;
     InitialConditions initialConditions_;
-    MaterialPropertys materialPropertys_;
+    MaterialProperties materialProperties_;
 
     EquationSystems equationSystems_;
     size_t inputMeshIdx_;
     const YAML::Node & node_;
+    
+    std::string physics_part_name(std::string) const;
+    std::vector<std::string> physics_part_names(std::vector<std::string>) const;
 };
 
 #endif /* REALM_H */

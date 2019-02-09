@@ -11,6 +11,7 @@
 
 class Simulation;
 
+//! Stores one or multiple Realms (objects of the class Realm)
 class Realms {
 public:
     Realms();

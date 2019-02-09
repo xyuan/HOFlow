@@ -7,7 +7,20 @@
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 #include <vector>
+#include <FieldTypeDef.h>
+#include <Enums.h>
+#include <BoundaryConditions.h>
+#include <InitialConditions.h>
+#include <InitialCondition.h>
+#include <MaterialProperties.h>
+#include <MaterialProperty.h>
+#include <EquationSystems.h>
+#include <EquationSystem.h>
 
+// STK
+#include <stk_io/StkMeshIoBroker.hpp>
+
+//! Constructor of a computational domain
 Realm::Realm(Realms & realms, const YAML::Node & node) :
     realms_(realms),
     name_("na"),
@@ -20,17 +33,19 @@ Realm::Realm(Realms & realms, const YAML::Node & node) :
     ioBroker_(NULL),
     boundaryConditions_(*this),
     initialConditions_(*this),
-    materialPropertys_(*this),
+    materialProperties_(*this),
     equationSystems_(*this),
     node_(node)
 {}
 
+//! Destructor of a computational domain
 Realm::~Realm() {
     delete bulkData_;
     delete metaData_;
     delete ioBroker_;
 }
 
+//! Initializes the computational domain with in the input file specified values
 void Realm::initialize() {
     HOFlowEnv::self().hoflowOutputP0() << "Realm::initialize() Begin " << std::endl;
     
@@ -64,14 +79,22 @@ void Realm::initialize() {
     ioBroker_->populate_field_data();
     HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_field_data() End" << std::endl;
     
+    // manage NaluGlobalId for linear system
+    set_global_id();
+    
     // output and restart files
     create_output_mesh();
     
     populate_boundary_data();
-    
+    equationSystems_.initialize();
     HOFlowEnv::self().hoflowOutputP0() << "Realm::initialize() End " << std::endl;
 }
 
+//! Loads information regarding the computational domain from the input file (also mesh file)
+
+//! Reads the mesh file name in the input file in order to read the mesh file.
+//! Reads all boundary and initial conditions as well as material properties.
+//! Reads all equation systems specified in the input file.
 void Realm::load(const YAML::Node& node) {
     name_ = node["name"].as<std::string>();
     inputDBName_ = node["mesh"].as<std::string>();
@@ -94,7 +117,7 @@ void Realm::load(const YAML::Node& node) {
         HOFlowEnv::self().hoflowOutputP0() << std::endl;
         HOFlowEnv::self().hoflowOutputP0() << "Material Prop Review:      " << std::endl;
         HOFlowEnv::self().hoflowOutputP0() << "===========================" << std::endl;
-        materialPropertys_.load(node);
+        materialProperties_.load(node);
         HOFlowEnv::self().hoflowOutputP0() << std::endl;
         HOFlowEnv::self().hoflowOutputP0() << "EqSys/options Review:      " << std::endl;
         HOFlowEnv::self().hoflowOutputP0() << "===========================" << std::endl;
@@ -107,8 +130,8 @@ void Realm::setup_nodal_fields() {
     const stk::mesh::PartVector parts = metaData_->get_parts();
     
     for ( size_t ipart = 0; ipart < parts.size(); ++ipart ) {
-        naluGlobalId_ = &(metaData_->declare_field<GlobalIdFieldType>(stk::topology::NODE_RANK, "nalu_global_id"));
-        stk::mesh::put_field_on_mesh(*naluGlobalId_, *parts[ipart], nullptr);
+        hoflowGlobalId_ = &(metaData_->declare_field<GlobalIdFieldType>(stk::topology::NODE_RANK, "hoflow_global_id"));
+        stk::mesh::put_field_on_mesh(*hoflowGlobalId_, *parts[ipart], nullptr);
     }
 
     // loop over all material props targets and register nodal fields
@@ -134,10 +157,11 @@ void Realm::setup_interior_algorithms() {
     equationSystems_.register_interior_algorithm(targetNames);
 }
 
+//! Sets the in the input file specified bc's to the computational domain
 void Realm::setup_bc() {
     // loop over all bcs and register
     for (size_t ibc = 0; ibc < boundaryConditions_.size(); ++ibc) {
-        BoundaryCondition& bc = *boundaryConditions_[ibc];
+        BoundaryCondition & bc = *boundaryConditions_[ibc];
         std::string name = physics_part_name(bc.targetName_);
 
         switch(bc.theBcType_) {
@@ -150,22 +174,25 @@ void Realm::setup_bc() {
     }
 }
 
+//! Sets the in the input file specified ic's to the computational domain
 void Realm::setup_initial_conditions() {
     // loop over all ics and register
     for (size_t j_ic = 0; j_ic < initialConditions_.size(); ++j_ic) {
         InitialCondition & initCond = *initialConditions_[j_ic];
         const std::vector<std::string> targetNames = initCond.targetNames_;
-
+        
+        // loop over all targetNames
         for (size_t itarget=0; itarget < targetNames.size(); ++itarget) {
             const std::string targetName = physics_part_name(targetNames[itarget]);
 
             // target need not be subsetted since nothing below will depend on topo
             stk::mesh::Part *targetPart = metaData_->get_part(targetName);
-
+            
+            // choose the defined ic type
             switch(initCond.theIcType_) {
                 case CONSTANT_UD:
                 {
-                    const ConstantInitialConditionData& genIC = *reinterpret_cast<const ConstantInitialConditionData *>(&initCond);
+                    const ConstantInitialConditionData & genIC = *reinterpret_cast<const ConstantInitialConditionData *>(&initCond);
                     ThrowAssert(genIC.data_.size() == genIC.fieldNames_.size());
                     
                     for (size_t ifield = 0; ifield < genIC.fieldNames_.size(); ++ifield) {
@@ -179,16 +206,17 @@ void Realm::setup_initial_conditions() {
 
                         std::vector<double> userGen = genSpec;
                         ConstantAuxFunction *theGenFunc = new ConstantAuxFunction(0, genSpec.size(), userGen);
-                        AuxFunctionAlgorithm *auxGen
-                          = new AuxFunctionAlgorithm( *this, targetPart,
-                                                      fieldWithState, theGenFunc, stk::topology::NODE_RANK);
+                        AuxFunctionAlgorithm *auxGen = new AuxFunctionAlgorithm(*this, targetPart,
+                                                                                fieldWithState, 
+                                                                                theGenFunc, 
+                                                                                stk::topology::NODE_RANK);
                         initCondAlg_.push_back(auxGen);
                     }
                 }
                 break;
                 case FUNCTION_UD:
                 {
-                    const UserFunctionInitialConditionData& fcnIC = *reinterpret_cast<const UserFunctionInitialConditionData *>(&initCond);
+                    const UserFunctionInitialConditionData & fcnIC = *reinterpret_cast<const UserFunctionInitialConditionData *>(&initCond);
                     equationSystems_.register_initial_condition_fcn(targetPart, fcnIC);
                 }
                 break;
@@ -268,17 +296,19 @@ void Realm::commit() {
     metaData_->commit();
 }
 
+//! Reads the exodus file specified in the input file
 void Realm::create_mesh() {
     HOFlowEnv::self().hoflowOutputP0() << "Realm::create_mesh(): Begin" << std::endl;
+    stk::ParallelMachine pm = HOFlowEnv::self().parallel_comm();
 
     // news for mesh constructs
     metaData_ = new stk::mesh::MetaData();
-    bulkData_ = new stk::mesh::BulkData(*metaData_, pm, activateAura_ ? stk::mesh::BulkData::AUTO_AURA : stk::mesh::BulkData::NO_AUTO_AURA);
+    bulkData_ = new stk::mesh::BulkData(*metaData_, pm, stk::mesh::BulkData::NO_AUTO_AURA);
     ioBroker_ = new stk::io::StkMeshIoBroker( pm );
     ioBroker_->set_bulk_data(*bulkData_);
 
     // Initialize meta data (from exodus file); can possibly be a restart file..
-    inputMeshIdx_ = ioBroker_->add_mesh_database( inputDBName_, restarted_simulation() ? stk::io::READ_RESTART : stk::io::READ_MESH );
+    inputMeshIdx_ = ioBroker_->add_mesh_database( inputDBName_, stk::io::READ_MESH );
     ioBroker_->create_input_mesh();
 
     HOFlowEnv::self().hoflowOutputP0() << "Realm::create_mesh() End" << std::endl;
@@ -361,8 +391,8 @@ void Realm::input_variables_from_mesh() {
     // check for periodic cycling of data based on start time and periodic time; scale time set to unity
     if ( solutionOptions_->inputVariablesPeriodicTime_ > 0.0 ) {
         ioBroker_->get_mesh_database(inputMeshIdx_).set_periodic_time(solutionOptions_->inputVariablesPeriodicTime_, 
-            solutionOptions_->inputVariablesRestorationTime_, 
-            stk::io::InputFile::CYCLIC).set_scale_time(1.0);
+                   solutionOptions_->inputVariablesRestorationTime_, 
+                   stk::io::InputFile::CYCLIC).set_scale_time(1.0);
     }
     
     std::map<std::string, std::string>::const_iterator iter;
@@ -480,4 +510,40 @@ void Realm::provide_output() {
             equationSystems_.provide_output();
         }
     }
+}
+
+void Realm::set_global_id()
+{
+    const stk::mesh::Selector s_universal = metaData_->universal_part();
+    stk::mesh::BucketVector const& buckets = bulkData_->get_buckets( stk::topology::NODE_RANK, s_universal );
+
+    for ( stk::mesh::BucketVector::const_iterator ib = buckets.begin(); ib != buckets.end(); ++ib ) {
+        const stk::mesh::Bucket & b = **ib;
+        const stk::mesh::Bucket::size_type length = b.size();
+        stk::mesh::EntityId *hoflowGlobalIds = stk::mesh::field_data(*hoflowGlobalId_, b);
+
+        for ( stk::mesh::Bucket::size_type k = 0; k < length; ++k ) {
+            hoflowGlobalIds[k] = bulkData_->identifier(b[k]);
+        }
+    }
+}
+
+const std::vector<std::string> & Realm::get_physics_target_names() {
+    return materialPropertys_.targetNames_;
+}
+
+void Realm::populate_boundary_data() {
+    // realm first
+    for ( size_t k = 0; k < bcDataAlg_.size(); ++k ) {
+        bcDataAlg_[k]->execute();
+    }
+    equationSystems_.populate_boundary_data();
+}
+
+std::string Realm::physics_part_name(std::string name) const {
+    return name;
+}
+
+std::vector<std::string> Realm::physics_part_names(std::vector<std::string> names) const {
+    return names;
 }

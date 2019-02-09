@@ -2,17 +2,14 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#ifndef LINEARSOLVER_H
-#define LINEARSOLVER_H
+#ifndef CONSTANTAUSFUNCTION_H
+#define CONSTANTAUSFUNCTION_H
 
-#include <TpetraLinearSolver.h>
-
-//! Stores a linear solver specified in the input file
-class LinearSolver {
+class ConstantAusFunction {
 public:
-    LinearSolver();
-    ~LinearSolver();
+    ConstantAusFunction();
+    ~ConstantAusFunction();
 };
 
-#endif /* LINEARSOLVER_H */
+#endif /* CONSTANTAUSFUNCTION_H */
 

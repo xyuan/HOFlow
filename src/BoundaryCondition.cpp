@@ -2,17 +2,13 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#ifndef LINEARSOLVER_H
-#define LINEARSOLVER_H
+#include "BoundaryCondition.h"
 
-#include <TpetraLinearSolver.h>
+BoundaryCondition::BoundaryCondition(BoundaryConditions& bcs) : 
+    boundaryConditions_(bcs)
+{
+}
 
-//! Stores a linear solver specified in the input file
-class LinearSolver {
-public:
-    LinearSolver();
-    ~LinearSolver();
-};
-
-#endif /* LINEARSOLVER_H */
+BoundaryCondition::~BoundaryCondition() {
+}
 
