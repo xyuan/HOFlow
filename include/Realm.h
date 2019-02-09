@@ -78,6 +78,7 @@ public:
     
     std::string physics_part_name(std::string) const;
     std::vector<std::string> physics_part_names(std::vector<std::string>) const;
+    std::vector<Algorithm *> initCondAlg_;
 };
 
 #endif /* REALM_H */

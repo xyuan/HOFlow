@@ -79,7 +79,7 @@ void Realm::initialize() {
     ioBroker_->populate_field_data();
     HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_field_data() End" << std::endl;
     
-    // manage NaluGlobalId for linear system
+    // manage HOFlowGlobalId for linear system
     set_global_id();
     
     // output and restart files
@@ -125,6 +125,7 @@ void Realm::load(const YAML::Node& node) {
     }
 }
 
+//! Sets material properties to the nodal field
 void Realm::setup_nodal_fields() {
     // register global id and rank fields on all parts
     const stk::mesh::PartVector parts = metaData_->get_parts();
