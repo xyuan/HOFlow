@@ -6,7 +6,10 @@
 #define SIMULATION_H
 
 #include <yaml-cpp/yaml.h>
+#include <stk_util/diag/PrintTimer.hpp>
+#include <stk_util/diag/Timer.hpp>
 
+class YAML::Node;
 class Realms;
 class LinearSolvers;
 
@@ -17,9 +20,9 @@ public:
     Realms *realms_;
     LinearSolvers *linearSolvers_;
     
-    Simulation(const YAML::Node& root_node);
+    Simulation(const YAML::Node & root_node);
     ~Simulation();
-    void load(const YAML::Node& node);
+    void load(const YAML::Node & node);
     void initialize();
     void run();
 };

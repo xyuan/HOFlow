@@ -5,9 +5,16 @@
 #ifndef BOUNDARYCONDITION_H
 #define BOUNDARYCONDITION_H
 
+#include <yaml-cpp/yaml.h>
+#include <Enums.h>
+#include <string>
+
+class BoundaryConditions;
+class YAML::Node;
+
 class BoundaryCondition {
 public:
-    BoundaryCondition(BoundaryConditions& bcs);
+    BoundaryCondition(BoundaryConditions & bcs);
     ~BoundaryCondition();
     BoundaryCondition * load(const YAML::Node & node);
     

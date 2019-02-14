@@ -2,18 +2,17 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#ifndef AUXFUNCTION_H
-#define AUXFUNCTION_H
+#ifndef PROPERTYEVALUATOR_H
+#define PROPERTYEVALUATOR_H
 
-class AuxFunction {
+//! Abstract class for various properties
+class PropertyEvaluator {
 public:
-    AuxFunction(const unsigned beginPos, const unsigned endPos);
-    ~AuxFunction();
+    PropertyEvaluator();
+    ~PropertyEvaluator();
     
-protected:
-    const unsigned beginPos_;
-    const unsigned endPos_;
+//    virtual double execute(double *indVarList, stk::mesh::Entity node = stk::mesh::Entity()) = 0;
 };
 
-#endif /* AUXFUNCTION_H */
+#endif /* PROPERTYEVALUATOR_H */
 

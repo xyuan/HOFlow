@@ -19,8 +19,3 @@ BoundaryConditions::~BoundaryConditions() {
 
 void BoundaryConditions::load(YAML::Node node) {
 }
-
-size_t BoundaryConditions::size() {
-    return boundaryConditionVector_.size();
-}
-

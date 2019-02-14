@@ -6,6 +6,11 @@
 #define INITIALCONDITIONS_H
 
 #include <vector>
+#include <yaml-cpp/yaml.h>
+#include <Enums.h>
+
+class InitialCondition;
+class Realm;
 
 typedef std::vector<InitialCondition *> InitialConditionVector;
 
@@ -14,8 +19,13 @@ class InitialConditions {
 public:
     InitialConditions(Realm & realm);
     ~InitialConditions();
-    void load(YAML::Node node);
-    size_t size();
+    InitialConditions * load(YAML::Node node);
+    
+    //! Ease of access function, an object of InitialConditions can treated like an array and checked for size
+    size_t size() { return initialConditionVector_.size(); }
+    
+    //! Ease of access function, an object of InitialConditions can treated like an array and its elements accessed
+    InitialCondition *operator[](int i) { return initialConditionVector_[i];}
     
     Realm & realm_;
     InitialConditionVector initialConditionVector_;

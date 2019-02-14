@@ -2,13 +2,14 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "BoundaryCondition.h"
+#include "MaterialPropertyData.h"
 
-BoundaryCondition::BoundaryCondition(BoundaryConditions & bcs) : 
-    boundaryConditions_(bcs)
+MaterialPropertyData::MaterialPropertyData() :
+    type_(MaterialPropertyType_END),
+    constValue_(0.0)
 {
 }
 
-BoundaryCondition::~BoundaryCondition() {
+MaterialPropertyData::~MaterialPropertyData() {
 }
 

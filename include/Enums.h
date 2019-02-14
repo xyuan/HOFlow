@@ -5,6 +5,8 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
+#include <string>
+
 enum EquationType {
     EQ_MOMENTUM = 0,
     EQ_CONTINUITY = 1,
@@ -40,6 +42,44 @@ enum UserDataType {
     FUNCTION_UD = 1,
     USER_SUB_UD = 2,
     UserDataType_END
+};
+
+// prop enum and name below
+enum PropertyIdentifier {
+    DENSITY_ID = 0,
+    VISCOSITY_ID = 1,
+    SPEC_HEAT_ID = 2,
+    THERMAL_COND_ID = 3,
+    ABSORBTION_COEFF_ID = 4,
+    ENTHALPY_ID = 5,
+    LAME_MU_ID = 6,
+    LAME_LAMBDA_ID = 7,
+    SCATTERING_COEFF_ID = 8,
+    PropertyIdentifier_END
+};
+
+// prop enum and name below
+enum  MaterialPropertyType {
+    CONSTANT_MAT = 0,
+    MIXFRAC_MAT = 1,
+    POLYNOMIAL_MAT = 2,
+    IDEAL_GAS_MAT = 3,
+    GEOMETRIC_MAT = 4,
+    HDF5_TABLE_MAT = 5,
+    GENERIC = 6,
+    MaterialPropertyType_END
+};
+
+static const std::string PropertyIdentifierNames[] = {
+    "density",
+    "viscosity",
+    "specific_heat",
+    "thermal_conductivity",
+    "absorption_coefficient",
+    "enthalpy",
+    "lame_mu",
+    "lame_lambda",
+    "scattering_coefficient"
 };
 
 #endif /* ENUMS_H */

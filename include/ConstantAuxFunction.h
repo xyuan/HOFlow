@@ -5,6 +5,10 @@
 #ifndef CONSTANTAUXFUNCTION_H
 #define CONSTANTAUXFUNCTION_H
 
+#include <AuxFunction.h>
+#include <vector>
+
+
 class ConstantAuxFunction : public AuxFunction {
 public:
     ConstantAuxFunction(const unsigned beginPos, const unsigned endPos, const std::vector<double> & values);

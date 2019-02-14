@@ -2,13 +2,18 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "BoundaryCondition.h"
+#ifndef SUPPLEMENTALALGORITHM_H
+#define SUPPLEMENTALALGORITHM_H
 
-BoundaryCondition::BoundaryCondition(BoundaryConditions & bcs) : 
-    boundaryConditions_(bcs)
-{
-}
+class Realm;
 
-BoundaryCondition::~BoundaryCondition() {
-}
+class SupplementalAlgorithm {
+public:
+    SupplementalAlgorithm(Realm & realm);
+    ~SupplementalAlgorithm();
+    
+    Realm & realm_;
+};
+
+#endif /* SUPPLEMENTALALGORITHM_H */
 

@@ -2,13 +2,11 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "BoundaryCondition.h"
+#include "PropertyEvaluator.h"
 
-BoundaryCondition::BoundaryCondition(BoundaryConditions & bcs) : 
-    boundaryConditions_(bcs)
-{
+PropertyEvaluator::PropertyEvaluator() {
 }
 
-BoundaryCondition::~BoundaryCondition() {
+PropertyEvaluator::~PropertyEvaluator() {
 }
 

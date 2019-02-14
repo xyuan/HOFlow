@@ -9,6 +9,7 @@
 #include <Realm.h>
 #include <vector>
 
+typedef std::vector<Realm *> RealmVector;
 class Simulation;
 
 //! Stores one or multiple Realms (objects of the class Realm)
@@ -20,7 +21,6 @@ public:
     void initialize();
     
     size_t size() {return realmVector_.size();}
-    typedef std::vector<Realm *> RealmVector;
     
     //Simulation & simulation_;
     RealmVector realmVector_;

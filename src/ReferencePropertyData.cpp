@@ -2,13 +2,13 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "BoundaryCondition.h"
+#include "ReferencePropertyData.h"
 
-BoundaryCondition::BoundaryCondition(BoundaryConditions & bcs) : 
-    boundaryConditions_(bcs)
+ReferencePropertyData::ReferencePropertyData() :
+    speciesName_("na")
 {
 }
 
-BoundaryCondition::~BoundaryCondition() {
+ReferencePropertyData::~ReferencePropertyData() {
 }
 

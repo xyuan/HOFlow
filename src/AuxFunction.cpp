@@ -4,8 +4,10 @@
 /*------------------------------------------------------------------------*/
 #include "AuxFunction.h"
 
-AuxFunction::AuxFunction() {
-}
+AuxFunction::AuxFunction(const unsigned beginPos, const unsigned endPos) :
+    beginPos_(beginPos),
+    endPos_(endPos)
+{}
 
 AuxFunction::~AuxFunction() {
 }

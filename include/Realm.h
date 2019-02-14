@@ -7,10 +7,25 @@
 
 #include <stk_util/util/ParameterList.hpp>
 #include <yaml-cpp/yaml.h>
+#include <Enums.h>
+#include <FieldTypeDef.h>
+#include <EquationSystems.h>
+#include <BoundaryConditions.h>
+#include <InitialConditions.h>
+#include <MaterialProperties.h>
+#include <string>
+#include <vector>
+#include <map>
 
 class Realms;
+class YAML::Node;
 class stk::mesh::Part;
 class stk::io::StkMeshIoBroker;
+class EquationSystem;
+class Algorithm;
+class AuxFunctionAlgorithm;
+class PropertyEvaluator;
+
 
 //! Stores information and methods for a specific computational domain
 class Realm {
@@ -78,7 +93,9 @@ public:
     
     std::string physics_part_name(std::string) const;
     std::vector<std::string> physics_part_names(std::vector<std::string>) const;
+    std::map<PropertyIdentifier, ScalarFieldType *> propertyMap_;
     std::vector<Algorithm *> initCondAlg_;
+    std::vector<Algorithm *> propertyAlg_;
 };
 
 #endif /* REALM_H */

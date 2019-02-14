@@ -3,6 +3,8 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "InitialConditions.h"
+#include <InitialCondition.h>
+#include <vector>
 
 InitialConditions::InitialConditions(Realm & realm) :
     realm_(realm)
@@ -14,8 +16,8 @@ InitialConditions::~InitialConditions() {
     }
 }
 
-void InitialConditions::load(YAML::Node node) {
-    /*InitialCondition tmp_initial_condition(*this);
+InitialConditions * InitialConditions::load(YAML::Node node) {
+    InitialCondition tmp_initial_condition(*this);
    
     if(node["initial_conditions"]) {
         const YAML::Node initial_conditions = node["initial_conditions"];
@@ -29,11 +31,7 @@ void InitialConditions::load(YAML::Node node) {
         throw std::runtime_error("parser error InitialConditions::load");
     }
 
-    return this;*/
-}
-
-size_t InitialConditions::size() {
-    return initialConditionVector_.size();
+    return this;
 }
 
 Realm *InitialConditions::parent() { 

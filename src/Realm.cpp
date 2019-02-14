@@ -3,7 +3,9 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "Realm.h"
+#include <Realms.h>
 #include <HOFlowEnv.h>
+#include <HOFlowParsing.h>
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 #include <vector>
@@ -14,11 +16,42 @@
 #include <InitialCondition.h>
 #include <MaterialProperties.h>
 #include <MaterialProperty.h>
+#include <MaterialPropertyData.h>
+#include <PropertyEvaluator.h>
+#include <ReferencePropertyData.h>
 #include <EquationSystems.h>
 #include <EquationSystem.h>
+#include <Algorithm.h>
+#include <AuxFunctionAlgorithm.h>
+#include <ConstantAuxFunction.h>
 
-// STK
+// stk_util
+#include <stk_util/parallel/Parallel.hpp>
+#include <stk_util/environment/WallTime.hpp>
+#include <stk_util/environment/perf_util.hpp>
+#include <stk_util/environment/FileUtils.hpp>
+
+// stk_mesh/base/fem
+#include <stk_mesh/base/BulkData.hpp>
+#include <stk_mesh/base/Field.hpp>
+#include <stk_mesh/base/FieldParallel.hpp>
+#include <stk_mesh/base/GetBuckets.hpp>
+#include <stk_mesh/base/GetEntities.hpp>
+#include <stk_mesh/base/CoordinateSystems.hpp>
+#include <stk_mesh/base/MetaData.hpp>
+#include <stk_mesh/base/Comm.hpp>
+#include <stk_mesh/base/CreateEdges.hpp>
+#include <stk_mesh/base/SkinBoundary.hpp>
+#include <stk_mesh/base/FieldBLAS.hpp>
+
+// stk_io
 #include <stk_io/StkMeshIoBroker.hpp>
+#include <stk_io/IossBridge.hpp>
+#include <stk_io/InputFile.hpp>
+#include <Ioss_SubSystem.h>
+
+// stk_util
+#include <stk_util/parallel/ParallelReduce.hpp>
 
 //! Constructor of a computational domain
 Realm::Realm(Realms & realms, const YAML::Node & node) :
@@ -215,16 +248,6 @@ void Realm::setup_initial_conditions() {
                     }
                 }
                 break;
-                case FUNCTION_UD:
-                {
-                    const UserFunctionInitialConditionData & fcnIC = *reinterpret_cast<const UserFunctionInitialConditionData *>(&initCond);
-                    equationSystems_.register_initial_condition_fcn(targetPart, fcnIC);
-                }
-                break;
-                case USER_SUB_UD:
-                    throw std::runtime_error("Realm::setup_initial_conditions: USER_SUB not supported: ");
-                case UserDataType_END:
-                    break;
                 default:
                     HOFlowEnv::self().hoflowOutputP0() << "Realm::setup_initial_conditions: unknown type: " << initCond.theIcType_ << std::endl;
                     throw std::runtime_error("Realm::setup_initial_conditions: unknown type:");
@@ -233,53 +256,62 @@ void Realm::setup_initial_conditions() {
     }
 }
 
+
 void Realm::setup_property() {
-    // loop over all target names
-    const std::vector<std::string> targetNames = get_physics_target_names();
+    // loop overall material property blocks
+    for ( size_t i = 0; i < materialProperties_.materialPropertyVector_.size(); ++i ) {
 
-    for (size_t itarget=0; itarget < targetNames.size(); ++itarget) {
-        // target need not be subsetted since nothing below will depend on topo
-        stk::mesh::Part *targetPart = metaData_->get_part(targetNames[itarget]);
+        MaterialProperty *matPropBlock = materialProperties_.materialPropertyVector_[i];
 
-        // loop over propertyMap
-        std::map<PropertyIdentifier, ScalarFieldType *>::iterator ii;
+        // loop over all target names
+        for (size_t itarget=0; itarget < matPropBlock->targetNames_.size(); ++itarget) {
 
-        for ( ii=propertyMap_.begin(); ii!=propertyMap_.end(); ++ii ) {
-            // extract property id and field pointer
-            PropertyIdentifier thePropId = (*ii).first;
-            ScalarFieldType *thePropField = (*ii).second;
+            // target need not be subsetted since nothing below will depend on topo
+            const std::string physicsPartName = physics_part_name(matPropBlock->targetNames_[itarget]);
+            stk::mesh::Part *targetPart = metaData_->get_part(physicsPartName);
 
-            // find the material property data object
-            MaterialPropertyData *matData = NULL;
-            std::map<PropertyIdentifier, MaterialPropertyData*>::iterator itf =
-                materialPropertys_.propertyDataMap_.find(thePropId);
-            if ( itf == materialPropertys_.propertyDataMap_.end() ) {
-                // will need to throw
-                HOFlowEnv::self().hoflowOutputP0() << "issue with property: " << PropertyIdentifierNames[thePropId] << std::endl;
-                throw std::runtime_error("Please add property specification ");
-            }
-            else {
-                matData = (*itf).second;
-            }
-            switch( matData->type_) {
-            case CONSTANT_MAT:
-            {
-                // set the default begin/end
-                int theBegin = 0;
-                int theEnd = 1;
+            // loop over propertyMap
+            std::map<PropertyIdentifier, ScalarFieldType *>::iterator ii;
+            for ( ii=propertyMap_.begin(); ii!=propertyMap_.end(); ++ii ) {
 
-                // create everything
-                std::vector<double> userConstData(1);
-                userConstData[0] = matData->constValue_;
-                ConstantAuxFunction *theAuxFunc = new ConstantAuxFunction(theBegin, theEnd, userConstData);
-                AuxFunctionAlgorithm *auxAlg = new AuxFunctionAlgorithm( *this, targetPart, thePropField, theAuxFunc, stk::topology::NODE_RANK);
-                propertyAlg_.push_back(auxAlg);
-            }
-            break;
-            case MaterialPropertyType_END:
-            break;
-            default:
-                throw std::runtime_error("Realm::setup_property: unknown type:");
+                // extract property id and field pointer
+                PropertyIdentifier thePropId = (*ii).first;
+                ScalarFieldType *thePropField = (*ii).second;
+
+                // find the material property data object
+                MaterialPropertyData *matData = NULL;
+                std::map<PropertyIdentifier, MaterialPropertyData*>::iterator itf = matPropBlock->propertyDataMap_.find(thePropId);
+                if ( itf == matPropBlock->propertyDataMap_.end() ) {
+                    // will need to throw
+                    HOFlowEnv::self().hoflowOutputP0() << "issue with property: " << PropertyIdentifierNames[thePropId] << std::endl;
+                    throw std::runtime_error("Please add property specification ");
+                }
+                else {
+                    matData = (*itf).second;
+                }
+
+                switch( matData->type_) {
+                case CONSTANT_MAT:
+                {
+                    // set the default begin/end
+                    int theBegin = 0;
+                    int theEnd = 1;
+
+                    // create everything
+                    std::vector<double> userConstData(1);
+                    userConstData[0] = matData->constValue_;
+                    ConstantAuxFunction *theAuxFunc = new ConstantAuxFunction(theBegin, theEnd, userConstData);
+                    AuxFunctionAlgorithm *auxAlg = new AuxFunctionAlgorithm( *this, targetPart, thePropField, theAuxFunc, stk::topology::NODE_RANK);
+                    propertyAlg_.push_back(auxAlg);         
+                }
+                break;
+                
+                case MaterialPropertyType_END:
+                break;
+
+                default:
+                    throw std::runtime_error("Realm::setup_property: unknown type:");
+                }
             }
         }
     }
@@ -316,7 +348,7 @@ void Realm::create_mesh() {
 }
 
 void Realm::create_output_mesh() {
-    // exodus output file creation
+    /*// exodus output file creation
     if (outputInfo_->hasOutputBlock_) {
         HOFlowEnv::self().hoflowOutputP0() << "Realm::create_output_mesh(): Begin" << std::endl;
 
@@ -380,11 +412,11 @@ void Realm::create_output_mesh() {
         outputInfo_->meshAdapted_ = false;
 
         HOFlowEnv::self().hoflowOutputP0() << "Realm::create_output_mesh() End" << std::endl;
-    }
+    }*/
 }
 
 void Realm::input_variables_from_mesh() {
-    // check whether to snap or interpolate data; all fields treated the same
+    /*// check whether to snap or interpolate data; all fields treated the same
     const stk::io::MeshField::TimeMatchOption fieldInterpOption = solutionOptions_->inputVariablesInterpolateInTime_
         ? stk::io::MeshField::LINEAR_INTERPOLATION
         : stk::io::MeshField::CLOSEST;
@@ -408,15 +440,15 @@ void Realm::input_variables_from_mesh() {
         else {
             ioBroker_->add_input_field(stk::io::MeshField(*theField, userName, fieldInterpOption));
         }
-    }
+    }*/
 }
 
 void Realm::augment_output_variable_list(const std::string fieldName) {
-    outputInfo_->outputFieldNameSet_.insert(fieldName);
+    //outputInfo_->outputFieldNameSet_.insert(fieldName);
 }
 
 void Realm::register_interior_algorithm(stk::mesh::Part *part) {
-    const AlgorithmType algType = INTERIOR;
+    /*const AlgorithmType algType = INTERIOR;
     std::map<AlgorithmType, Algorithm *>::iterator it = computeGeometryAlgDriver_->algMap_.find(algType);
     
     if ( it == computeGeometryAlgDriver_->algMap_.end() ) {
@@ -428,15 +460,11 @@ void Realm::register_interior_algorithm(stk::mesh::Part *part) {
     }
 
     // Track parts that are registered to interior algorithms
-    interiorPartVec_.push_back(part);
+    interiorPartVec_.push_back(part);*/
 }
 
 void Realm::register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo) {
-    //====================================================
-    // Register face (boundary condition) data
-    //====================================================
-
-    // push back the part for book keeping and, later, skin mesh
+    /*// push back the part for book keeping and, later, skin mesh
     bcPartVec_.push_back(part);
 
     const int nDim = metaData_->spatial_dimension();
@@ -459,17 +487,17 @@ void Realm::register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo
     }
     else {
         it->second->partVec_.push_back(part);
-    }
+    }*/
 }
 
 void Realm::provide_output() {
-    stk::diag::TimeBlock mesh_output_timeblock(Simulation::outputTimer());
+    /*stk::diag::TimeBlock mesh_output_timeblock(Simulation::outputTimer());
 
     if ( outputInfo_->hasOutputBlock_ ) {
         if (outputInfo_->outputFreq_ == 0) {
             return;
         }
-        const double start_time = NaluEnv::self().nalu_time();
+        const double start_time = HOFlowEnv::self().nalu_time();
 
         // process output via io
         const double currentTime = get_current_time();
@@ -482,15 +510,15 @@ void Realm::provide_output() {
             const double elapsedWallTime = stk::wall_time() - wallTimeStart_;
             // find the max over all core
             double g_elapsedWallTime = 0.0;
-            stk::all_reduce_max(NaluEnv::self().parallel_comm(), &elapsedWallTime, &g_elapsedWallTime, 1);
+            stk::all_reduce_max(HOFlowEnv::self().parallel_comm(), &elapsedWallTime, &g_elapsedWallTime, 1);
             // convert to hours
             g_elapsedWallTime /= 3600.0;
             // only force output the first time the timer is exceeded
             if ( g_elapsedWallTime > outputInfo_->userWallTimeResults_.second ) {
                 forcedOutput = true;
                 outputInfo_->userWallTimeResults_.first = false;
-                NaluEnv::self().naluOutputP0() << "Realm::provide_output()::Forced Result output will be processed at current time: " << currentTime << std::endl;
-                NaluEnv::self().naluOutputP0() <<  " Elapsed (max) WALL time: " << g_elapsedWallTime << " (hours)" << std::endl;
+                HOFlowEnv::self().hoflowOutputP0() << "Realm::provide_output()::Forced Result output will be processed at current time: " << currentTime << std::endl;
+                HOFlowEnv::self().hoflowOutputP0() <<  " Elapsed (max) WALL time: " << g_elapsedWallTime << " (hours)" << std::endl;
                 // provide timer information
                 dump_simulation_time();
             }
@@ -510,7 +538,7 @@ void Realm::provide_output() {
             }
             equationSystems_.provide_output();
         }
-    }
+    }*/
 }
 
 void Realm::set_global_id()
@@ -530,15 +558,15 @@ void Realm::set_global_id()
 }
 
 const std::vector<std::string> & Realm::get_physics_target_names() {
-    return materialPropertys_.targetNames_;
+    return materialProperties_.targetNames_;
 }
 
 void Realm::populate_boundary_data() {
-    // realm first
+    /*// realm first
     for ( size_t k = 0; k < bcDataAlg_.size(); ++k ) {
         bcDataAlg_[k]->execute();
     }
-    equationSystems_.populate_boundary_data();
+    equationSystems_.populate_boundary_data();*/
 }
 
 std::string Realm::physics_part_name(std::string name) const {
@@ -547,4 +575,24 @@ std::string Realm::physics_part_name(std::string name) const {
 
 std::vector<std::string> Realm::physics_part_names(std::vector<std::string> names) const {
     return names;
+}
+
+stk::mesh::BulkData & Realm::bulk_data()
+{
+    return *bulkData_;
+}
+
+const stk::mesh::BulkData & Realm::bulk_data() const
+{
+    return *bulkData_;
+}
+
+stk::mesh::MetaData & Realm::meta_data()
+{
+    return *metaData_;
+}
+
+const stk::mesh::MetaData & Realm::meta_data() const
+{
+    return *metaData_;
 }

@@ -18,6 +18,7 @@ public:
     MPI_Comm parallelCommunicator_;
     int pSize_;
     int pRank_;
+    int parallel_rank();
     std::ostream & hoflowOutputP0();
     std::ostream *hoflowLogStream_;
 };

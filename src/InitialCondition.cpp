@@ -3,9 +3,11 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "InitialCondition.h"
+#include <HOFlowEnv.h>
+#include <HOFlowParsing.h>
 
-InitialCondition::InitialCondition() {
-}
+//InitialCondition::InitialCondition() {
+//}
 
 InitialCondition::~InitialCondition() {
 }

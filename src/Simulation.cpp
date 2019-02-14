@@ -2,12 +2,13 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include <iostream>
-#include <yaml-cpp/yaml.h>
-
 #include <Simulation.h>
 #include <Realms.h>
 #include <LinearSolvers.h>
+#include <HOFlowEnv.h>
+#include <HOFlowParsing.h>
+#include <iostream>
+#include <yaml-cpp/yaml.h>
 
 //! Constructor
 Simulation::Simulation(const YAML::Node& root_node) :
@@ -39,5 +40,6 @@ void Simulation::initialize() {
 
 //! Run the simulation
 void Simulation::run() {
+    std::cout << "running sim" << std::endl;
     
 }
