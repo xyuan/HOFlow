@@ -6,8 +6,10 @@
 #include <HOFlowEnv.h>
 #include <HOFlowParsing.h>
 
-//InitialCondition::InitialCondition() {
-//}
+InitialCondition::InitialCondition(InitialConditions & ics) : 
+    initialConditions_(ics), 
+    theIcType_(UserDataType_END) 
+{}
 
 InitialCondition::~InitialCondition() {
 }
@@ -24,3 +26,10 @@ InitialCondition * InitialCondition::load(const YAML::Node & node) {
     return 0;
 }
 
+Simulation * InitialCondition::root() { 
+    return parent()->root(); 
+}
+
+InitialConditions * InitialCondition::parent() { 
+    return & initialConditions_; 
+}

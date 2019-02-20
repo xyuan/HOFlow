@@ -4,7 +4,10 @@
 /*------------------------------------------------------------------------*/
 #include "InitialConditions.h"
 #include <InitialCondition.h>
-#include <vector>
+#include <Realm.h>
+#include <HOFlowEnv.h>
+#include <HOFlowParsing.h>
+#include <yaml-cpp/yaml.h>
 
 InitialConditions::InitialConditions(Realm & realm) :
     realm_(realm)
@@ -23,7 +26,7 @@ InitialConditions * InitialConditions::load(YAML::Node node) {
         const YAML::Node initial_conditions = node["initial_conditions"];
         for ( size_t j_initial_condition = 0; j_initial_condition < initial_conditions.size(); ++j_initial_condition ) {
             const YAML::Node initial_condition_node = initial_conditions[j_initial_condition];
-            InitialCondition* ic = tmp_initial_condition.load(initial_condition_node);
+            InitialCondition * ic = tmp_initial_condition.load(initial_condition_node);
             initialConditionVector_.push_back(ic);
         }
     }
@@ -34,7 +37,10 @@ InitialConditions * InitialConditions::load(YAML::Node node) {
     return this;
 }
 
-Realm *InitialConditions::parent() { 
-    return &realm_; 
+Simulation * InitialConditions::root() { 
+    return parent()->root(); 
 }
 
+Realm * InitialConditions::parent() { 
+    return & realm_; 
+}

@@ -5,8 +5,9 @@
 #ifndef HOFLOWENV_H
 #define HOFLOWENV_H
 
-#include <iostream>
 #include <mpi.h>
+#include <fstream>
+#include <streambuf>
 
 //! Stores globally used stuff
 class HOFlowEnv {
@@ -20,7 +21,7 @@ public:
     int pRank_;
     int parallel_rank();
     std::ostream & hoflowOutputP0();
-    std::ostream *hoflowLogStream_;
+    std::ostream * hoflowLogStream_;
 };
 
 #endif /* HOFLOWENV_H */

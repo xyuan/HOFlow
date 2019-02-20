@@ -10,15 +10,17 @@
 #include <yaml-cpp/yaml.h>
 #include <Enums.h>
 
+class Simulation;
 class InitialConditions;
 class YAML::Node;
 
 //! Stores a initial condition specified in the input file
 class InitialCondition {
 public:
-    InitialCondition(InitialConditions & ics) : initialConditions_(ics), theIcType_(UserDataType_END) {}
+    InitialCondition(InitialConditions & ics);
     ~InitialCondition();
     InitialCondition * load(const YAML::Node & node);
+    Simulation * root();
     InitialConditions * parent();
     
     InitialConditions & initialConditions_;

@@ -10,6 +10,9 @@
 #include <iostream>
 #include <yaml-cpp/yaml.h>
 
+// Definition outstide of class because of debug_ being a static variable
+bool Simulation::debug_ = false;
+
 //! Constructor
 Simulation::Simulation(const YAML::Node& root_node) :
     m_root_node(root_node),
@@ -19,6 +22,8 @@ Simulation::Simulation(const YAML::Node& root_node) :
 
 //! Destructor
 Simulation::~Simulation() {
+    delete realms_;
+    delete linearSolvers_;
 }
 
 //! Loads the information necessary to do the simulation
@@ -29,7 +34,7 @@ void Simulation::load(const YAML::Node& node) {
     linearSolvers_->load(node);
 
     // create the realms
-    realms_ = new Realms();
+    realms_ = new Realms(*this);
     realms_->load(node);
 }
 
@@ -40,6 +45,21 @@ void Simulation::initialize() {
 
 //! Run the simulation
 void Simulation::run() {
-    std::cout << "running sim" << std::endl;
-    
+    std::cout << "running sim" << std::endl; 
+}
+
+Simulation * Simulation::root() {
+    return this; 
+}
+
+Simulation * Simulation::parent() {
+    return 0; 
+}
+
+bool Simulation::debug() {
+    return debug_;
+}
+
+bool Simulation::debug() const {
+    return debug_;
 }

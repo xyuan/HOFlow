@@ -3,8 +3,6 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "HOFlowParsingHelper.h"
-#include <yaml-cpp/yaml.h>
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -54,7 +52,7 @@ void HOFlowParsingHelper::emit(YAML::Emitter & emout, const YAML::Node & node) {
 }
 
 
-void HOFlowParsingHelper::emit(std::ostream& sout, const YAML::Node & node) {
+void HOFlowParsingHelper::emit(std::ostream & sout, const YAML::Node & node) {
     YAML::Emitter out;
     emit(out,node);
     sout << out.c_str() << std::endl;
@@ -67,6 +65,13 @@ std::string HOFlowParsingHelper::line_info(const YAML::Node & node) {
          << node.Mark().line << ", "
          << node.Mark().column << ")" ;
     //	 << "Unknown for now" ;
+    return sout.str();
+}
+
+std::string HOFlowParsingHelper::info(const YAML::Node & node) {
+    std::ostringstream sout;
+    sout << "Node at " << line_info(node) << " => \n" ;
+    emit(sout, node);
     return sout.str();
 }
 

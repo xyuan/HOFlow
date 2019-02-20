@@ -71,6 +71,7 @@ public:
     std::string name_;
     int maxIterations_;
     EquationSystemVector equationSystemVector_;
+    std::map<std::string, std::string> solverSpecMap_;
 };
 
 #endif /* EQUATIONSYSTEMS_H */

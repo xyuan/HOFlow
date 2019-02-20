@@ -17,6 +17,7 @@ public:
     /// uses Emitter to print node to stream
     static void emit(std::ostream & sout, const YAML::Node & node);
     static std::string line_info(const YAML::Node & node);
+    static std::string info(const YAML::Node & node);
 };
 
 #endif /* HOFLOWPARSINGHELPER_H */

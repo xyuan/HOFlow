@@ -1,4 +1,4 @@
-/*------------------------------------------------------------------------*/
+ /*------------------------------------------------------------------------*/
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
@@ -9,6 +9,7 @@
 #include <Realm.h>
 #include <string>
 
+class EquationSystems;
 struct stk::topology;
 class stk::mesh::FieldBase;
 class stk::mesh::Part;
@@ -34,6 +35,28 @@ public:
                                   const stk::topology & theTopo, 
                                   const WallBoundaryConditionData & wallBCData) 
     {}
+    
+    // base class with desired default no-op
+    virtual void register_nodal_fields(stk::mesh::Part * part) {}
+
+    virtual void register_edge_fields(stk::mesh::Part * part) {}
+
+    virtual void register_element_fields(stk::mesh::Part * part, const stk::topology & theTopo) {}
+    
+    virtual void register_wall_bc(stk::mesh::Part * part, const stk::topology & theTopo, const WallBoundaryConditionData & wallBCData) {}
+    
+    virtual void load(const YAML::Node & node);
+
+    Simulation * root();
+    EquationSystems * parent()
+    
+    EquationSystems & equationSystems_;
+    Realm & realm_;
+    std::string name_;
+    std::string userSuppliedName_;
+    const std::string eqnTypeName_;
+    int maxIterations_;
+    double convergenceTolerance_;
 };
 
 #endif /* EQUATIONSYSTEM_H */

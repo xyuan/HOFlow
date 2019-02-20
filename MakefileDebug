@@ -33,7 +33,7 @@ COPTIONS= -g
 CFLAGS =  -c  $(INCLUDES) $(COPTIONS) $(LIBS)
 CPPFLAGS =  -c  $(INCLUDES) $(CXXOPTIONS) $(LIBS)
 
-executableName=hoflow
+executableName=hoflow.exe
 
 RM=rm -fr
 Version=Opt

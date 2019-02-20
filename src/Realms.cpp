@@ -11,7 +11,10 @@
 #include <iostream>
 
 //! Constructor
-Realms::Realms() {
+Realms::Realms(Simulation & sim) :
+    simulation_(sim)
+{
+    // do nothing
 }
 
 //! Destructor
@@ -27,13 +30,13 @@ void Realms::load(const YAML::Node & node) {
             // check for multi_physics realm type...
             std::string realmType = "multi_physics";
             get_if_present(realm_node, "type", realmType, realmType);
-            Realm *realm = NULL;
+            Realm * realm = NULL;
             if ( realmType == "multi_physics" ) {
                 realm = new Realm(*this, realm_node);
-                std::cout << "new ralm type multi physics" << std::endl;
+                std::cout << "new realm type multi physics" << std::endl;
             } else {
                 //realm = new InputOutputRealm(*this, realm_node);
-                std::cout << "new ralm type not multi physics" << std::endl;
+                std::cout << "new realm type not multi physics" << std::endl;
             }
             realm->load(realm_node);
             realmVector_.push_back(realm);
@@ -48,5 +51,13 @@ void Realms::initialize() {
     for ( size_t irealm = 0; irealm < realmVector_.size(); ++irealm ) {
         realmVector_[irealm]->initialize();
     }
+}
+
+Simulation * Realms::root() { 
+    return parent()->root(); 
+}
+
+Simulation * Realms::parent() { 
+    return & simulation_; 
 }
 

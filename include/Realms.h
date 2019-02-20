@@ -9,20 +9,23 @@
 #include <Realm.h>
 #include <vector>
 
-typedef std::vector<Realm *> RealmVector;
 class Simulation;
+
+typedef std::vector<Realm *> RealmVector;
 
 //! Stores one or multiple Realms (objects of the class Realm)
 class Realms {
 public:
-    Realms();
+    Realms(Simulation & sim);
     ~Realms();
     void load(const YAML::Node & node);
     void initialize();
+    Simulation * root();
+    Simulation * parent();
     
-    size_t size() {return realmVector_.size();}
+    size_t size() { return realmVector_.size(); }
     
-    //Simulation & simulation_;
+    Simulation & simulation_;
     RealmVector realmVector_;
 };
 

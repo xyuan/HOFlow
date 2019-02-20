@@ -6,17 +6,53 @@
 #include <iterator>
 #include <string>
 #include <fstream>
+#include <iomanip>
+#include <stdexcept>
 #include <yaml-cpp/yaml.h>
 #include <boost/program_options.hpp>
+#include <mpi.h>
 
+// util
+#include <stk_util/environment/perf_util.hpp>
+#include <stk_util/parallel/ParallelReduce.hpp>
+
+#include <HOFlowParsing.h>
 #include <Simulation.h>
 #include <HOFlowEnv.h>
 
 namespace po = boost::program_options;
 
+static std::string human_bytes_double(double bytes) {
+    const double K = 1024;
+    const double M = K*1024;
+    const double G = M*1024;
+
+    std::ostringstream out;
+    if (bytes < K) {
+        out << bytes << " B";
+    } else if (bytes < M) {
+        bytes /= K;
+        out << bytes << " K";
+    } else if (bytes < G) {
+        bytes /= M;
+        out << bytes << " M";
+    } else {
+        bytes /= G;
+        out << bytes << " G";
+    }
+    
+    return out.str();
+}
+
 int main(int argc, char** argv) {
     const std::string VERSION = "0.0.1";
     std::string inputFileName;
+    
+    
+    // start up MPI
+    if ( MPI_SUCCESS != MPI_Init( &argc , &argv ) ) {
+        throw std::runtime_error("MPI_Init failed");
+    }
     
     // HOFlowEnv singleton
     HOFlowEnv & hoflowEnv = HOFlowEnv::self();
@@ -65,6 +101,7 @@ int main(int argc, char** argv) {
     
     // load the data specified in the input file
     std::cout << "load input file.." << std::endl;
+    sim.debug_ = debug;
     sim.load(doc);
     
     std::cout << "initialize classes.." << std::endl;

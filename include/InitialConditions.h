@@ -9,6 +9,7 @@
 #include <yaml-cpp/yaml.h>
 #include <Enums.h>
 
+class Simulation;
 class InitialCondition;
 class Realm;
 
@@ -29,6 +30,7 @@ public:
     
     Realm & realm_;
     InitialConditionVector initialConditionVector_;
+    Simulation * root();
     Realm * parent();
 };
 

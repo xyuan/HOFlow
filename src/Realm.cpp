@@ -68,7 +68,10 @@ Realm::Realm(Realms & realms, const YAML::Node & node) :
     initialConditions_(*this),
     materialProperties_(*this),
     equationSystems_(*this),
-    node_(node)
+    node_(node),
+    doPromotion_(false),
+    promotionOrder_(0u),
+    inputMeshIdx_(-1)
 {}
 
 //! Destructor of a computational domain
@@ -76,6 +79,22 @@ Realm::~Realm() {
     delete bulkData_;
     delete metaData_;
     delete ioBroker_;
+}
+
+Simulation * Realm::root() { 
+    return parent()->root(); 
+}
+
+Simulation * Realm::root() const { 
+    return parent()->root(); 
+}
+
+Realms * Realm::parent() { 
+    return & realms_; 
+}
+
+Realms * Realm::parent() const { 
+    return & realms_; 
 }
 
 //! Initializes the computational domain with in the input file specified values
@@ -128,12 +147,104 @@ void Realm::initialize() {
 //! Reads the mesh file name in the input file in order to read the mesh file.
 //! Reads all boundary and initial conditions as well as material properties.
 //! Reads all equation systems specified in the input file.
-void Realm::load(const YAML::Node& node) {
+void Realm::load(const YAML::Node & node) {
     name_ = node["name"].as<std::string>();
     inputDBName_ = node["mesh"].as<std::string>();
     get_if_present(node, "type", type_, type_);
     
+    // provide a high level banner
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "Realm Options Review: " << name_ << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "===========================" << std::endl;
+
+//    get_if_present(node, "estimate_memory_only", estimateMemoryOnly_, false);
+//    get_if_present(node, "available_memory_per_core_GB", availableMemoryPerCoreGB_, 0.0);
+//
+//    // exposed bc check
+//    get_if_present(node, "check_for_missing_bcs", checkForMissingBcs_, checkForMissingBcs_);
+//
+//    // check for bad Jacobians in the mesh
+//    get_if_present(node, "check_jacobians", checkJacobians_, checkJacobians_);
+//
+//    // entity count
+//    get_if_present(node, "provide_entity_count", provideEntityCount_, provideEntityCount_);
+
+    get_if_present(node, "polynomial_order", promotionOrder_, promotionOrder_);
+    if (promotionOrder_ >=1) {
+        doPromotion_ = true;
+
+        // with polynomial order set to 1, the HO method defaults down to the consistent mass matrix P1 discretization
+        // super-element/faces are activated despite being unnecessary
+        if (promotionOrder_ == 1) {
+            HOFlowEnv::self().hoflowOutputP0() << "Activating the consistent-mass matrix P1 discretization..." << std::endl;
+        }
+    }
+
+    // how often is the realm solved..
     get_if_present(node, "solve_frequency", solveFrequency_, solveFrequency_);
+
+//    // automatic decomposition
+//    get_if_present(node, "automatic_decomposition_type", autoDecompType_, autoDecompType_);
+//    if ( "None" != autoDecompType_ ) {
+//      HOFlowEnv::self().hoflowOutputP0() 
+//        <<"Warning: When using automatic_decomposition_type, one must have a serial file" << std::endl;
+//    }
+//
+//    // activate aura
+//    get_if_present(node, "activate_aura", activateAura_, activateAura_);
+//    if ( activateAura_ )
+//      HOFlowEnv::self().hoflowOutputP0() << "Nalu will activate aura ghosting" << std::endl;
+//    else
+//      HOFlowEnv::self().hoflowOutputP0() << "Nalu will deactivate aura ghosting" << std::endl;
+//
+//    // memory diagnostic
+//    get_if_present(node, "activate_memory_diagnostic", activateMemoryDiagnostic_, activateMemoryDiagnostic_);
+//    if ( activateMemoryDiagnostic_ )
+//      HOFlowEnv::self().hoflowOutputP0() << "Nalu will activate detailed memory pulse" << std::endl;
+//
+//    // allow for inconsistent restart (fields are missing)
+//    get_if_present(node, "support_inconsistent_multi_state_restart", supportInconsistentRestart_, supportInconsistentRestart_);
+//
+//    // time step control
+//    const bool dtOptional = true;
+//    const YAML::Node y_time_step = expect_map(node,"time_step_control", dtOptional);
+//    if ( y_time_step ) {
+//        get_if_present(y_time_step, "target_courant", targetCourant_, targetCourant_);
+//        get_if_present(y_time_step, "time_step_change_factor", timeStepChangeFactor_, timeStepChangeFactor_);
+//    }
+//
+//    get_if_present(node, "balance_nodes", doBalanceNodes_, doBalanceNodes_);
+//    get_if_present(node, "balance_nodes_iterations", balanceNodeOptions_.numIters, balanceNodeOptions_.numIters);
+//    get_if_present(node, "balance_nodes_target", balanceNodeOptions_.target, balanceNodeOptions_.target);
+//    if (node["balance_nodes_iterations"] || node["balance_nodes_target"] ) {
+//        doBalanceNodes_ = true;
+//    }
+
+
+    //======================================
+    // now other commands/actions
+    //======================================
+
+//    // load output first so we can check for serializing i/o
+//    outputInfo_->load(node);
+//    if (root()->serializedIOGroupSize_ == 0)
+//    {
+//      // only set from input file if command-line didn't set it
+//      root()->setSerializedIOGroupSize(outputInfo_->serializedIOGroupSize_);
+//    }
+//
+//    // Parse catalyst input file if requested
+//    if(!outputInfo_->catalystFileName_.empty())
+//    {
+//    int error = Iovs::DatabaseIO::parseCatalystFile(outputInfo_->catalystFileName_,
+//                                                    outputInfo_->catalystParseJson_);
+//    if(error)
+//      throw std::runtime_error("Catalyst file parse failed: " + outputInfo_->catalystFileName_);
+//    }
+
+    // solution options - loaded before create_mesh since we need to know if
+    // adaptivity is on to create the proper MetaData
+    solutionOptions_->load(node);
     
     create_mesh();
     spatialDimension_ = metaData_->spatial_dimension();
@@ -231,16 +342,16 @@ void Realm::setup_initial_conditions() {
                     
                     for (size_t ifield = 0; ifield < genIC.fieldNames_.size(); ++ifield) {
                         std::vector<double>  genSpec = genIC.data_[ifield];
-                        stk::mesh::FieldBase *field = stk::mesh::get_field_by_name(genIC.fieldNames_[ifield], *metaData_);
+                        stk::mesh::FieldBase * field = stk::mesh::get_field_by_name(genIC.fieldNames_[ifield], *metaData_);
                         ThrowAssert(field);
 
-                        stk::mesh::FieldBase *fieldWithState = ( field->number_of_states() > 1 )
+                        stk::mesh::FieldBase * fieldWithState = ( field->number_of_states() > 1 )
                           ? field->field_state(stk::mesh::StateNP1)
                           : field->field_state(stk::mesh::StateNone);
 
                         std::vector<double> userGen = genSpec;
-                        ConstantAuxFunction *theGenFunc = new ConstantAuxFunction(0, genSpec.size(), userGen);
-                        AuxFunctionAlgorithm *auxGen = new AuxFunctionAlgorithm(*this, targetPart,
+                        ConstantAuxFunction * theGenFunc = new ConstantAuxFunction(0, genSpec.size(), userGen);
+                        AuxFunctionAlgorithm * auxGen = new AuxFunctionAlgorithm(*this, targetPart,
                                                                                 fieldWithState, 
                                                                                 theGenFunc, 
                                                                                 stk::topology::NODE_RANK);
@@ -447,6 +558,11 @@ void Realm::augment_output_variable_list(const std::string fieldName) {
     //outputInfo_->outputFieldNameSet_.insert(fieldName);
 }
 
+void Realm::register_nodal_fields(stk::mesh::Part *part) {
+    // register high level common fields
+    const int nDim = metaData_->spatial_dimension();
+}
+
 void Realm::register_interior_algorithm(stk::mesh::Part *part) {
     /*const AlgorithmType algType = INTERIOR;
     std::map<AlgorithmType, Algorithm *>::iterator it = computeGeometryAlgDriver_->algMap_.find(algType);
@@ -567,6 +683,16 @@ void Realm::populate_boundary_data() {
         bcDataAlg_[k]->execute();
     }
     equationSystems_.populate_boundary_data();*/
+}
+
+void Realm::evaluate_properties() {
+//    double start_time = HOFlowEnv::self().nalu_time();
+//    for ( size_t k = 0; k < propertyAlg_.size(); ++k ) {
+//        propertyAlg_[k]->execute();
+//    }
+//    equationSystems_.evaluate_properties();
+//    double end_time = HOFlowEnv::self().nalu_time();
+//    timerPropertyEval_ += (end_time - start_time);
 }
 
 std::string Realm::physics_part_name(std::string name) const {

@@ -13,11 +13,13 @@
 #include <BoundaryConditions.h>
 #include <InitialConditions.h>
 #include <MaterialProperties.h>
+#include <SolutionOptions.h>
 #include <string>
 #include <vector>
 #include <map>
 
 class Realms;
+class Simulation;
 class YAML::Node;
 class stk::mesh::Part;
 class stk::io::StkMeshIoBroker;
@@ -34,6 +36,10 @@ public:
     virtual ~Realm();
     virtual void load(const YAML::Node & node);
     virtual void initialize();
+    Simulation * root() const;
+    Simulation * root();
+    Realms * parent() const;
+    Realms * parent();
     void create_mesh();
     void setup_nodal_fields();
     void setup_edge_fields();
@@ -48,6 +54,7 @@ public:
     void create_output_mesh();
     void input_variables_from_mesh();
     void augment_output_variable_list(const std::string fieldName);
+    void register_nodal_fields(stk::mesh::Part *part);
     void register_interior_algorithm(stk::mesh::Part *part);
     void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo);
     void provide_output();
@@ -88,6 +95,13 @@ public:
     MaterialProperties materialProperties_;
 
     EquationSystems equationSystems_;
+    
+    SolutionOptions *solutionOptions_;
+    
+    // element promotion options
+    bool doPromotion_; // conto
+    unsigned promotionOrder_;
+    
     size_t inputMeshIdx_;
     const YAML::Node & node_;
     
