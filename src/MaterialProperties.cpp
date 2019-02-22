@@ -5,6 +5,8 @@
 #include "MaterialProperties.h"
 #include <HOFlowParsing.h>
 #include <MaterialProperty.h>
+#include <Simulation.h>
+#include <Realm.h>
 
 MaterialProperties::MaterialProperties(Realm & realm) :
     realm_(realm)
@@ -57,4 +59,12 @@ void MaterialProperties::load(const YAML::Node & node) {
     else {
         throw std::runtime_error("Error: material_properties::load(): 'material_properties' line does not exist");
     }
+}
+
+Simulation * MaterialProperties::root() { 
+    return parent()->root(); 
+}
+
+Realm * MaterialProperties::parent() { 
+    return & realm_; 
 }

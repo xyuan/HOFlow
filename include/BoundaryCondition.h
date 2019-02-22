@@ -11,12 +11,15 @@
 
 class BoundaryConditions;
 class YAML::Node;
+class Simulation;
 
 class BoundaryCondition {
 public:
     BoundaryCondition(BoundaryConditions & bcs);
-    ~BoundaryCondition();
+    virtual ~BoundaryCondition();
     BoundaryCondition * load(const YAML::Node & node);
+    Simulation * root();
+    BoundaryConditions * parent();
     
     std::string bcName_;
     std::string targetName_;

@@ -60,12 +60,14 @@ public:
     void register_element_fields(const std::vector<std::string> targetNames);
     void register_interior_algorithm(const std::vector<std::string> targetNames);
     void register_wall_bc(const std::string targetName, const WallBoundaryConditionData & wallBCData);
+    Simulation * root();
+    Realm * parent();
     
     //! Ease of access function, an object of EquationSystems can treated like an array and its elements accessed
     size_t size() { return equationSystemVector_.size(); }
     
     //! Ease of access function, an object of EquationSystems can treated like an array and its elements accessed
-    EquationSystem *operator[](int i) { return equationSystemVector_[i];}
+    EquationSystem *operator[](int i) { return equationSystemVector_[i]; }
     
     Realm & realm_;
     std::string name_;

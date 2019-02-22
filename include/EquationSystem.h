@@ -1,4 +1,4 @@
- /*------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------*/
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
@@ -6,10 +6,12 @@
 #define EQUATIONSYSTEM_H
 
 #include <HOFlowParsing.h>
+#include <EquationSystems.h>
 #include <Realm.h>
 #include <string>
 
 class EquationSystems;
+class Simulation;
 struct stk::topology;
 class stk::mesh::FieldBase;
 class stk::mesh::Part;
@@ -29,26 +31,24 @@ public:
     EquationSystem(EquationSystems & eqSystems,
                    const std::string name = "no_name",
                    const std::string eqnTypeName = "no_eqn_type_name");
-    ~EquationSystem();
-    
-    virtual void register_wall_bc(stk::mesh::Part *part, 
-                                  const stk::topology & theTopo, 
-                                  const WallBoundaryConditionData & wallBCData) 
-    {}
+    virtual ~EquationSystem();
     
     // base class with desired default no-op
+    virtual void initialize() {}
     virtual void register_nodal_fields(stk::mesh::Part * part) {}
-
     virtual void register_edge_fields(stk::mesh::Part * part) {}
-
     virtual void register_element_fields(stk::mesh::Part * part, const stk::topology & theTopo) {}
-    
+    virtual void register_interior_algorithm(stk::mesh::Part * part) {}
     virtual void register_wall_bc(stk::mesh::Part * part, const stk::topology & theTopo, const WallBoundaryConditionData & wallBCData) {}
     
     virtual void load(const YAML::Node & node);
+    virtual bool system_is_converged();
+    virtual void assemble_and_solve(stk::mesh::FieldBase *deltaSolution);
+    virtual void solve_and_update() {}
 
     Simulation * root();
-    EquationSystems * parent()
+    EquationSystems * parent();
+//    LinearSystem * linsys_;
     
     EquationSystems & equationSystems_;
     Realm & realm_;
@@ -57,6 +57,12 @@ public:
     const std::string eqnTypeName_;
     int maxIterations_;
     double convergenceTolerance_;
+    
+    double avgLinearIterations_;
+    double maxLinearIterations_;
+    double minLinearIterations_;
+    int nonLinearIterationCount_;
+    bool reportLinearIterations_;
 };
 
 #endif /* EQUATIONSYSTEM_H */

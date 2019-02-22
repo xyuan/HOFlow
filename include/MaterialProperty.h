@@ -22,7 +22,8 @@ class MaterialProperty {
 public:
     MaterialProperty(MaterialProperties & materialProperties, const std::string materialBlockName);
     ~MaterialProperty();
-    void load(const YAML::Node & node);
+    void load(const YAML::Node & y_prop);
+    MaterialProperties * parent();
     
     MaterialProperties & materialProperties_;
     const std::string materialBlockName_;

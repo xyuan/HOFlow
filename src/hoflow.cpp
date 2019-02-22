@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
     HOFlowEnv & hoflowEnv = HOFlowEnv::self();
     
     // command line options.
-    bool debug = false;
+    bool debug = true;
     
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -100,14 +100,11 @@ int main(int argc, char** argv) {
     Simulation sim(doc);
     
     // load the data specified in the input file
-    std::cout << "load input file.." << std::endl;
     sim.debug_ = debug;
     sim.load(doc);
     
-    std::cout << "initialize classes.." << std::endl;
     sim.initialize();
     
-    std::cout << "run simulation.." << std::endl;
     sim.run();
  
     return 0;

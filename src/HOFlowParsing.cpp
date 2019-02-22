@@ -44,11 +44,11 @@ const YAML::Node expect_type(const YAML::Node & node, const std::string & key, Y
     }
 }
 
-const YAML::Node expect_null(const YAML::Node& node, const std::string& key, bool optional) {
+const YAML::Node expect_null(const YAML::Node & node, const std::string & key, bool optional) {
     return expect_type(node, key, YAML::NodeType::Null, optional);
 }
 
-const YAML::Node expect_scalar(const YAML::Node& node, const std::string& key, bool optional) {
+const YAML::Node expect_scalar(const YAML::Node & node, const std::string & key, bool optional) {
     return expect_type(node, key, YAML::NodeType::Scalar, optional);
 }
 
@@ -67,7 +67,7 @@ void operator >>(const YAML::Node & node, WallBoundaryConditionData & wallBC) {
         throw std::runtime_error("user_function_data is misplaced; it must be under wall_user_data");
  }
 
-const YAML::Node expect_map(const YAML::Node& node, const std::string& key, bool optional) {
+const YAML::Node expect_map(const YAML::Node & node, const std::string & key, bool optional) {
     return expect_type(node, key, YAML::NodeType::Map, optional);
 }
 

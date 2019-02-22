@@ -18,7 +18,7 @@ class YAML::Node;
 class InitialCondition {
 public:
     InitialCondition(InitialConditions & ics);
-    ~InitialCondition();
+    virtual ~InitialCondition();
     InitialCondition * load(const YAML::Node & node);
     Simulation * root();
     InitialConditions * parent();

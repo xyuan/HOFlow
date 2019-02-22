@@ -17,7 +17,7 @@ InitialCondition::~InitialCondition() {
 InitialCondition * InitialCondition::load(const YAML::Node & node) {
     if (node["constant"]) {
         HOFlowEnv::self().hoflowOutputP0() << "Initial Is Type constant " << std::endl;
-        ConstantInitialConditionData & constIC = *new ConstantInitialConditionData(*parent());
+        ConstantInitialConditionData & constIC = * new ConstantInitialConditionData(*parent());
         node >> constIC;
         return & constIC;
     } else {

@@ -10,6 +10,7 @@
 #include <yaml-cpp/yaml.h>
 
 class Realm;
+class Simulation;
 class BoundaryCondition;
 class YAML::Node;
 
@@ -19,7 +20,9 @@ class BoundaryConditions {
 public:
     BoundaryConditions(Realm & realm);
     ~BoundaryConditions();
-    void load(YAML::Node node);
+    BoundaryConditions * load(YAML::Node node);
+    Simulation * root();
+    Realm * parent();
     
     //! Ease of access function, an object of BoundaryConditions can treated like an array and its elements accessed
     size_t size() { return boundaryConditionVector_.size(); }

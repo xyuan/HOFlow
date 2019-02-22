@@ -8,6 +8,7 @@
 #include <HeatCondEquationSystem.h>
 #include <stk_mesh/base/BulkData.hpp>
 #include <stk_mesh/base/MetaData.hpp>
+#include <Simulation.h>
 
 EquationSystems::EquationSystems(Realm & realm) :
     realm_(realm)
@@ -122,7 +123,10 @@ void EquationSystems::register_interior_algorithm(const std::vector<std::string>
         }
     }
 }
+//! Creates objects for each equation system specified in the input file
 
+//! For each specified equation systeam a new object of a specialized class
+//! is created and the parameters of the equation system is written to the object. 
 void EquationSystems::load(const YAML::Node & y_node) {
     const YAML::Node y_equation_system = expect_map(y_node,"equation_systems");
     get_required(y_equation_system, "name", name_);
@@ -134,7 +138,7 @@ void EquationSystems::load(const YAML::Node & y_node) {
     const YAML::Node y_systems = expect_sequence(y_equation_system, "systems");
     for ( size_t isystem = 0; isystem < y_systems.size(); ++isystem ) {
         const YAML::Node y_system = y_systems[isystem] ;
-        EquationSystem *eqSys = 0;
+        EquationSystem * eqSys = 0;
         YAML::Node y_eqsys ;
         if( expect_map(y_system, "HeatConduction", true) ) {
             y_eqsys =  expect_map(y_system, "HeatConduction", true);
@@ -176,9 +180,17 @@ void EquationSystems::register_wall_bc(const std::string targetName, const WallB
                 realm_.register_wall_bc(part, the_topo);
                 EquationSystemVector::iterator ii;
                 for( ii = equationSystemVector_.begin(); ii != equationSystemVector_.end(); ++ii ) {
-//                      (*ii)->register_wall_bc(part, the_topo, wallBCData);
+                      (*ii)->register_wall_bc(part, the_topo, wallBCData);
                 }
             }
         }
     }
+}
+
+Simulation * EquationSystems::root() { 
+    return parent()->root(); 
+}
+
+Realm * EquationSystems::parent() { 
+    return & realm_; 
 }

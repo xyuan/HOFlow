@@ -10,6 +10,7 @@
 #include <yaml-cpp/yaml.h>
 
 class Realm;
+class Simulation;
 class MaterialProperty;
 class YAML::Node;
 
@@ -21,6 +22,8 @@ public:
     MaterialProperties(Realm & realm);
     ~MaterialProperties();
     void load(const YAML::Node & node);
+    Simulation * root();
+    Realm * parent();  
     
     //! Ease of access function, an object of MaterialProperties can treated like an array and its elements accessed
     size_t size() { return materialPropertyVector_.size(); }
