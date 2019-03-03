@@ -558,6 +558,10 @@ void Realm::augment_output_variable_list(const std::string fieldName) {
     //outputInfo_->outputFieldNameSet_.insert(fieldName);
 }
 
+void Realm::augment_restart_variable_list(std::string restartFieldName) {
+//    outputInfo_->restartFieldNameSet_.insert(restartFieldName);
+}
+
 void Realm::register_nodal_fields(stk::mesh::Part *part) {
     // register high level common fields
     const int nDim = metaData_->spatial_dimension();
@@ -695,6 +699,47 @@ void Realm::evaluate_properties() {
 //    timerPropertyEval_ += (end_time - start_time);
 }
 
+stk::mesh::BucketVector const& Realm::get_buckets( stk::mesh::EntityRank rank,
+                                                   const stk::mesh::Selector & selector ,
+                                                   bool get_all) const
+{
+    if (metaData_->spatial_dimension() == 3 && rank == stk::topology::EDGE_RANK)
+        return bulkData_->get_buckets(rank, selector);
+
+//    if (!get_all && solutionOptions_->useAdapter_ && solutionOptions_->maxRefinementLevel_ > 0) {
+//        stk::mesh::Selector new_selector = selector;
+//        if (rank != stk::topology::NODE_RANK) {
+//            // adapterSelector_ avoids parent elements
+//            new_selector = selector & adapterSelector_[rank];
+//        }
+//        return bulkData_->get_buckets(rank, new_selector);
+//    }
+//    else {
+        return bulkData_->get_buckets(rank, selector);
+//    }
+}
+
+bool Realm::get_consistent_mass_matrix_png(const std::string dofName ) {
+    bool cmmPng = solutionOptions_->consistentMMPngDefault_;
+    std::map<std::string, bool>::const_iterator iter = solutionOptions_->consistentMassMatrixPngMap_.find(dofName);
+    if (iter != solutionOptions_->consistentMassMatrixPngMap_.end()) {
+        cmmPng = (*iter).second;
+    }
+    
+    return cmmPng;
+}
+
+std::string Realm::name() {
+  return name_;
+}
+
+int Realm::number_of_states() {
+//  const int numStates = (timeIntegrator_->secondOrderTimeAccurate_) ? 3 : 2;
+    const int numStates = 2; //temp solution
+  return numStates;
+}
+
+
 std::string Realm::physics_part_name(std::string name) const {
     return name;
 }
@@ -721,4 +766,16 @@ stk::mesh::MetaData & Realm::meta_data()
 const stk::mesh::MetaData & Realm::meta_data() const
 {
     return *metaData_;
+}
+
+bool Realm::restarted_simulation()
+{
+//  return outputInfo_->activateRestart_ ;
+    return false; //temp soluition
+}
+
+bool Realm::support_inconsistent_restart()
+{
+//  return supportInconsistentRestart_ ;
+    return false; //temp solution
 }

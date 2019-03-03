@@ -4,9 +4,12 @@
 /*------------------------------------------------------------------------*/
 #include "LinearSolvers.h"
 #include <LinearSolver.h>
+#include <TpetraLinearSolver.h>
 #include <LinearSolverConfig.h>
 #include <TpetraLinearSolverConfig.h>
 #include <Simulation.h>
+#include <HOFlowEnv.h>
+#include <HOFlowParsing.h>
 
 #include <yaml-cpp/yaml.h>
 #include <iterator>
@@ -14,15 +17,16 @@
 LinearSolvers::LinearSolvers(Simulation & sim) :
     sim_(sim)
 {
+    // nothing to do
 }
 
 LinearSolvers::~LinearSolvers() {
-    /*for (SolverMap::const_iterator pos=solvers_.begin(); pos!=solvers_.end(); ++pos) {
+    for (SolverMap::const_iterator pos=solvers_.begin(); pos!=solvers_.end(); ++pos) {
         delete pos->second;
     }
     for (SolverTpetraConfigMap::const_iterator pos=solverTpetraConfig_.begin(); pos!=solverTpetraConfig_.end(); ++pos) {
         delete pos->second;
-    }*/
+    }
 }
 
 void LinearSolvers::load(const YAML::Node & node) {
@@ -47,8 +51,7 @@ void LinearSolvers::load(const YAML::Node & node) {
     }
 }
 
-LinearSolver *LinearSolvers::create_solver(std::string solverBlockName, EquationType theEQ) {
-    /* Deactivated because implementation is not finished
+LinearSolver * LinearSolvers::create_solver(std::string solverBlockName, EquationType theEQ) {
     // provide unique name
     std::string solverName = EquationTypeMap[theEQ] + "_Solver";
 
@@ -74,6 +77,12 @@ LinearSolver *LinearSolvers::create_solver(std::string solverBlockName, Equation
     // set it and return
     solvers_[theEQ] = theSolver;
     return theSolver;
-    */
-    return NULL;
+}
+
+Simulation *LinearSolvers::root() { 
+    return & sim_; 
+}
+
+Simulation *LinearSolvers::parent() { 
+    return root(); 
 }

@@ -3,22 +3,22 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "ProjectedNodalGradientEquationSystem.h"
-#include "AssemblePNGElemSolverAlgorithm.h"
-#include "AssemblePNGBoundarySolverAlgorithm.h"
-#include "AssemblePNGNonConformalSolverAlgorithm.h"
-#include "EquationSystem.h"
-#include "EquationSystems.h"
-#include "Enums.h"
-#include "FieldFunctions.h"
-#include "LinearSolvers.h"
-#include "LinearSolver.h"
-#include "LinearSystem.h"
-#include "NaluEnv.h"
-#include "Realm.h"
-#include "Realms.h"
-#include "Simulation.h"
-#include "SolutionOptions.h"
-#include "SolverAlgorithmDriver.h"
+#include <AssemblePNGBoundarySolverAlgorithm.h>
+#include <EquationSystem.h>
+#include <EquationSystems.h>
+#include <Enums.h>
+#include <FieldFunctions.h>
+#include <LinearSolvers.h>
+#include <LinearSolver.h>
+#include <TpetraLinearSolver.h>
+#include <LinearSystem.h>
+#include <TpetraLinearSystem.h>
+#include <HOFlowEnv.h>
+#include <Realm.h>
+#include <Realms.h>
+#include <Simulation.h>
+#include <SolutionOptions.h>
+#include <SolverAlgorithmDriver.h>
 
 // stk_util
 #include <stk_util/parallel/Parallel.hpp>
@@ -42,7 +42,9 @@
 // stk_util
 #include <stk_util/parallel/ParallelReduce.hpp>
 
-ProjectedNodalGradientEquationSystem::ProjectedNodalGradientEquationSystem(EquationSystems& eqSystems,
+#include <string>
+
+ProjectedNodalGradientEquationSystem::ProjectedNodalGradientEquationSystem(EquationSystems & eqSystems,
                                                                             const EquationType eqType,
                                                                             const std::string dofName, 
                                                                             const std::string deltaName, 
@@ -59,13 +61,13 @@ ProjectedNodalGradientEquationSystem::ProjectedNodalGradientEquationSystem(Equat
     dqdx_(NULL),
     qTmp_(NULL)
 {
-  // extract solver name and solver object
-  std::string solverName = realm_.equationSystems_.get_solver_block_name(dofName);
-  LinearSolver *solver = realm_.root()->linearSolvers_->create_solver(solverName, eqType_);
-  linsys_ = LinearSystem::create(realm_, realm_.spatialDimension_, this, solver);
+    // extract solver name and solver object
+    std::string solverName = realm_.equationSystems_.get_solver_block_name(dofName);
+    LinearSolver * solver = realm_.root()->linearSolvers_->create_solver(solverName, eqType_);
+    linsys_ = LinearSystem::create(realm_, realm_.spatialDimension_, this, solver);
 
-  // push back EQ to manager
-  realm_.push_equation_to_systems(this);
+    // push back EQ to manager
+    realm_.push_equation_to_systems(this);
 }
 
 ProjectedNodalGradientEquationSystem::~ProjectedNodalGradientEquationSystem() {
@@ -85,7 +87,7 @@ std::string ProjectedNodalGradientEquationSystem::get_name_given_bc(BoundaryCond
 }
 
 void ProjectedNodalGradientEquationSystem::register_nodal_fields(stk::mesh::Part *part) {
-    stk::mesh::MetaData &meta_data = realm_.meta_data();
+    stk::mesh::MetaData & meta_data = realm_.meta_data();
 
     const int nDim = meta_data.spatial_dimension();
 
@@ -108,8 +110,7 @@ void ProjectedNodalGradientEquationSystem::register_wall_bc(stk::mesh::Part *par
     std::map<AlgorithmType, SolverAlgorithm *>::iterator its =
       solverAlgDriver_->solverAlgMap_.find(algType);
     if ( its == solverAlgDriver_->solverAlgMap_.end() ) {
-        AssemblePNGBoundarySolverAlgorithm *theAlg
-          = new AssemblePNGBoundarySolverAlgorithm(realm_, part, this, fieldName);
+        AssemblePNGBoundarySolverAlgorithm * theAlg = new AssemblePNGBoundarySolverAlgorithm(realm_, part, this, fieldName);
         solverAlgDriver_->solverAlgMap_[algType] = theAlg;
     }
     else {

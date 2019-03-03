@@ -7,21 +7,26 @@
 
 #include <Enums.h>
 #include <yaml-cpp/yaml.h>
+#include <LinearSolver.h>
+#include <TpetraLinearSolver.h>
+#include <LinearSolverConfig.h>
+#include <TpetraLinearSolverConfig.h>
 
 #include <map>
 #include <string>
 
-class LinearSolver;
-class TpetraLinearSolverConfig;
 class Simulation;
+class LinearSolver;
 
 //! Stores one or multiple linear solvers (objects of the class LinearSolver)
 class LinearSolvers {
 public:
-    LinearSolvers(Simulation& sim);
+    LinearSolvers(Simulation & sim);
     ~LinearSolvers();
     void load(const YAML::Node & node);
     LinearSolver *create_solver(std::string solverBlockName, EquationType theEQ);
+    Simulation *root();
+    Simulation *parent();
     
     typedef std::map<EquationType, LinearSolver *> SolverMap;
     typedef std::map<std::string, TpetraLinearSolverConfig *> SolverTpetraConfigMap;

@@ -8,10 +8,18 @@
 #include <HOFlowParsing.h>
 #include <EquationSystems.h>
 #include <Realm.h>
+#include <vector>
 #include <string>
 
+class Algorithm;
+class AlgorithmDriver;
+class AuxFunctionAlgorithm;
+class SolverAlgorithmDriver;
+class InitialCondition;
 class EquationSystems;
-class Simulation;
+class LinearSystem;
+//class PostProcessingData;
+
 struct stk::topology;
 class stk::mesh::FieldBase;
 class stk::mesh::Part;
@@ -32,6 +40,7 @@ public:
                    const std::string name = "no_name",
                    const std::string eqnTypeName = "no_eqn_type_name");
     virtual ~EquationSystem();
+    void set_nodal_gradient(const std::string & dofName);
     
     // base class with desired default no-op
     virtual void initialize() {}
@@ -48,7 +57,9 @@ public:
 
     Simulation * root();
     EquationSystems * parent();
-//    LinearSystem * linsys_;
+    LinearSystem * linsys_;
+    
+    std::vector<Algorithm *> copyStateAlg_;
     
     EquationSystems & equationSystems_;
     Realm & realm_;
@@ -57,6 +68,10 @@ public:
     const std::string eqnTypeName_;
     int maxIterations_;
     double convergenceTolerance_;
+    
+    SolverAlgorithmDriver * solverAlgDriver_;
+    
+    bool edgeNodalGradient_;
     
     double avgLinearIterations_;
     double maxLinearIterations_;

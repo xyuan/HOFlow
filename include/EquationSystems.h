@@ -55,6 +55,7 @@ public:
     ~EquationSystems();
     void load(const YAML::Node & node);
     void initialize();
+    std::string get_solver_block_name(const std::string eqName);
     void register_nodal_fields(const std::vector<std::string> targetNames);
     void register_edge_fields(const std::vector<std::string> targetNames);
     void register_element_fields(const std::vector<std::string> targetNames);

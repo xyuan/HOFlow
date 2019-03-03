@@ -16,8 +16,8 @@ class LinearSolverConfig;
 class TpetraLinearSolverConfig : public LinearSolverConfig {
 public:
     TpetraLinearSolverConfig();
-    ~TpetraLinearSolverConfig();
-    virtual void load(const YAML::Node& node) final;
+    virtual ~TpetraLinearSolverConfig();
+    virtual void load(const YAML::Node & node) final;
 };
 
 #endif /* TPETRALINEARSOLVERCONFIG_H */

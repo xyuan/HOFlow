@@ -27,8 +27,8 @@ HOFlowEnv::~HOFlowEnv() {
 
 HOFlowEnv & HOFlowEnv::self()
 {
-  static HOFlowEnv s;
-  return s;
+    static HOFlowEnv s;
+    return s;
 }
 
 std::ostream & HOFlowEnv::hoflowOutputP0() {
@@ -36,9 +36,9 @@ std::ostream & HOFlowEnv::hoflowOutputP0() {
 }
 
 MPI_Comm HOFlowEnv::parallel_comm() {
-  return parallelCommunicator_;
+    return parallelCommunicator_;
 }
 
 int HOFlowEnv::parallel_rank() {
-  return pRank_;
+    return pRank_;
 }

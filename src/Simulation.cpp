@@ -27,7 +27,7 @@ Simulation::~Simulation() {
 }
 
 //! Loads the information necessary to do the simulation
-void Simulation::load(const YAML::Node& node) {
+void Simulation::load(const YAML::Node & node) {
     
     // load the linear solver configs
     linearSolvers_ = new LinearSolvers(*this);

@@ -46,6 +46,20 @@ void EquationSystems::initialize() {
     HOFlowEnv::self().hoflowOutputP0() << "EquationSystems::initialize(): End " << std::endl;
 }
 
+std::string EquationSystems::get_solver_block_name(const std::string eqName ) {
+    std::string solverName = "n_a";
+    std::map<std::string, std::string>::const_iterator iter
+      = solverSpecMap_.find(eqName);
+    if (iter != solverSpecMap_.end()) {
+        solverName = (*iter).second;
+    }
+    else {
+        HOFlowEnv::self().hoflowOutputP0() << "Missed equation solver block specification for " << eqName << std::endl;
+        throw std::runtime_error("issue with solver name mapping; none supplied");
+    }  
+    return solverName;
+}
+
 void EquationSystems::register_nodal_fields(const std::vector<std::string> targetNames) {
     stk::mesh::MetaData & meta_data = realm_.meta_data();
 

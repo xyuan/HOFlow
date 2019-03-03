@@ -3,6 +3,11 @@
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
 #include "EquationSystem.h"
+#include <LinearSystem.h>
+#include <TpetraLinearSystem.h>
+#include <Enums.h>
+#include <HOFlowEnv.h>
+#include <HOFlowParsing.h>
 
 EquationSystem::EquationSystem(EquationSystems & eqSystems, const std::string name, const std::string eqnTypeName) :
     equationSystems_(eqSystems),
@@ -16,8 +21,8 @@ EquationSystem::EquationSystem(EquationSystems & eqSystems, const std::string na
     maxLinearIterations_(0.0),
     minLinearIterations_(1.0e10),
     nonLinearIterationCount_(0),
-    reportLinearIterations_(false)
-//    linsys_(NULL)
+    reportLinearIterations_(false),
+    linsys_(NULL)
 {
     // nothing to do
 }
@@ -31,13 +36,26 @@ void EquationSystem::load(const YAML::Node & node) {
     get_required(node, "convergence_tolerance", convergenceTolerance_);
 }
 
+void EquationSystem::set_nodal_gradient(const std::string &dofName) {
+    // determine nodal gradient
+    std::map<std::string, std::string >::iterator ii = realm_.solutionOptions_->nodalGradMap_.find(dofName);
+    if ( ii != realm_.solutionOptions_->nodalGradMap_.end() ) {
+        if ( ii->second == "edge" ) 
+            edgeNodalGradient_ = true;
+        else if ( ii->second == "element" )
+            edgeNodalGradient_ = false;
+        else 
+            throw std::runtime_error("only edge or element nodal gradient supported");
+    }
+}
+
 bool EquationSystem::system_is_converged() {
-//    bool isConverged = true;
-//    if ( NULL != linsys_ ) {
-//      isConverged = (linsys_->scaledNonLinearResidual() <  convergenceTolerance_ );
-//    }
-//    
-//    return isConverged;
+    bool isConverged = true;
+    if ( NULL != linsys_ ) {
+        isConverged = (linsys_->scaledNonLinearResidual() <  convergenceTolerance_ );
+    }
+    
+    return isConverged;
 }
 
 void EquationSystem::assemble_and_solve(stk::mesh::FieldBase *deltaSolution) {

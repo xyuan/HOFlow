@@ -8,12 +8,16 @@
 #include <string>
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_RCP.hpp>
+#include <yaml-cpp/yaml.h>
+
+class YAML::Node;
 
 //! Configuration of a linear solver
 class LinearSolverConfig {
 public:
     LinearSolverConfig();
-    virtual ~LinearSolverConfig();
+    virtual ~LinearSolverConfig() = default;
+    virtual void load(const YAML::Node &) = 0;
     
     inline std::string name() const
     { return name_ ; }

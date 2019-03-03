@@ -8,16 +8,19 @@
 #include <Enums.h>
 #include <EquationSystem.h>
 #include <FieldTypeDef.h>
-#include <NaluParsing.h>
+#include <HOFlowParsing.h>
 
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/CoordinateSystems.hpp>
 
 struct stk::topology;
 class Realm;
+class AssembleNodalGradAlgorithmDriver;
+class AlgorithmDriver;
+class EquationSystems;
 class EquationSystem;
 
-class ProjectedNodalGradientEquationSystem {
+class ProjectedNodalGradientEquationSystem : public EquationSystem {
 public:
     ProjectedNodalGradientEquationSystem(EquationSystems & equationSystems,
                                         const EquationType eqType,
@@ -31,7 +34,7 @@ public:
     void set_data_map(BoundaryConditionType BC, std::string name);
     std::string get_name_given_bc(BoundaryConditionType BC);
     void register_nodal_fields(stk::mesh::Part *part);
-    void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo, const WallBoundaryConditionData &wallBCData);
+    void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo, const WallBoundaryConditionData & wallBCData);
     void initialize();
     
     // names that customize this PNG system

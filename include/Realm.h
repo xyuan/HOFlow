@@ -24,9 +24,12 @@ class YAML::Node;
 class stk::mesh::Part;
 class stk::io::StkMeshIoBroker;
 class EquationSystem;
+class EquationSystems;
 class Algorithm;
+class AlgorithmDriver;
 class AuxFunctionAlgorithm;
 class PropertyEvaluator;
+
 
 
 //! Stores information and methods for a specific computational domain
@@ -54,6 +57,7 @@ public:
     void create_output_mesh();
     void input_variables_from_mesh();
     void augment_output_variable_list(const std::string fieldName);
+    void augment_restart_variable_list(std::string restartFieldName);
     void register_nodal_fields(stk::mesh::Part *part);
     void register_interior_algorithm(stk::mesh::Part *part);
     void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo);
@@ -63,7 +67,13 @@ public:
     
     virtual void evaluate_properties();
     
+    // consistent mass matrix for projected nodal gradient
+    bool get_consistent_mass_matrix_png(const std::string dofname);
+    int number_of_states();
     std::string name();
+    stk::mesh::BucketVector const & get_buckets(stk::mesh::EntityRank rank,
+                                                const stk::mesh::Selector & selector ,
+                                                bool get_all = false) const;
     
     // get bulk and meta data
     stk::mesh::BulkData & bulk_data();
@@ -95,8 +105,10 @@ public:
     MaterialProperties materialProperties_;
 
     EquationSystems equationSystems_;
-    
     SolutionOptions *solutionOptions_;
+    
+    bool restarted_simulation();
+    bool support_inconsistent_restart();
     
     // element promotion options
     bool doPromotion_; // conto
