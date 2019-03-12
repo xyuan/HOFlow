@@ -40,5 +40,5 @@ $ hoflow_d.exe --input <input filename>
 Execute the following command to see all options
 
 ```
-$ hoflow --help
+$ hoflow_d.exe --help
 ```
