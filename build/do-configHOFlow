@@ -1,4 +1,3 @@
-hoflow_install_dir=/home/raphi/projects/HOFlow_cmake/build/debug
 trilinos_install_dir=/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/trilinos-master-gv7yileuqd73mchwmyiaqe2zmqqfvyx7
 yaml_install_dir=/home/raphi/spack/opt/spack/linux-ubuntu18.04-x86_64/gcc-7.3.0/yaml-cpp-0.6.2-cuarfgtpropry6cxz25nzh4fudyk2lja
 
