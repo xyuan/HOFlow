@@ -11,7 +11,7 @@
 #include <LinearSystem.h>
 #include <Realm.h>
 #include <SupplementalAlgorithm.h>
-#include <TimeIntegrator.h>
+//#include <TimeIntegrator.h>
 #include <master_element/MasterElement.h>
 
 // stk_mesh/base/fem
@@ -107,8 +107,8 @@ AssembleScalarElemDiffSolverAlgorithm::execute()
     const stk::mesh::Bucket::size_type length   = b.size();
 
     // extract master element
-    MasterElement *meSCS = sierra::nalu::MasterElementRepo::get_surface_master_element(b.topology());
-    MasterElement *meSCV = sierra::nalu::MasterElementRepo::get_volume_master_element(b.topology());
+    MasterElement *meSCS = MasterElementRepo::get_surface_master_element(b.topology());
+    MasterElement *meSCV = MasterElementRepo::get_volume_master_element(b.topology());
 
     // extract master element specifics
     const int nodesPerElement = meSCS->nodesPerElement_;

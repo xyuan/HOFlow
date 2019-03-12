@@ -7,7 +7,7 @@
 
 #include <FieldTypeDef.h>
 #include <Realm.h>
-#include <TimeIntegrator.h>
+//#include <TimeIntegrator.h>
 #include <master_element/MasterElement.h>
 
 // stk_mesh/base/fem
@@ -183,7 +183,7 @@ AssembleNodalGradElemAlgorithm::execute()
     const stk::mesh::Bucket::size_type length   = b.size();
 
     // extract master element
-    MasterElement *meSCS = sierra::nalu::MasterElementRepo::get_surface_master_element(b.topology());
+    MasterElement *meSCS = MasterElementRepo::get_surface_master_element(b.topology());
     const int nodesPerElement = meSCS->nodesPerElement_;
     const int numScsIp = meSCS->numIntPoints_;
     ws_shape_function.resize(numScsIp*nodesPerElement);

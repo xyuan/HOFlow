@@ -4,6 +4,8 @@
 /*------------------------------------------------------------------------*/
 #include "EquationSystems.h"
 #include <EquationSystem.h>
+#include <AlgorithmDriver.h>
+#include <AuxFunctionAlgorithm.h>
 #include <HOFlowEnv.h>
 #include <HeatCondEquationSystem.h>
 #include <stk_mesh/base/BulkData.hpp>
@@ -199,6 +201,12 @@ void EquationSystems::register_wall_bc(const std::string targetName, const WallB
             }
         }
     }
+}
+
+void EquationSystems::evaluate_properties() {
+    EquationSystemVector::iterator ii;
+    for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+        (*ii)->evaluate_properties();
 }
 
 Simulation * EquationSystems::root() { 

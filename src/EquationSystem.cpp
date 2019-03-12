@@ -5,9 +5,21 @@
 #include "EquationSystem.h"
 #include <LinearSystem.h>
 #include <TpetraLinearSystem.h>
+#include <Algorithm.h>
+#include <AuxFunctionAlgorithm.h>
+#include <SolverAlgorithmDriver.h>
 #include <Enums.h>
 #include <HOFlowEnv.h>
 #include <HOFlowParsing.h>
+#include <ConstantAuxFunction.h>
+#include <kernel/KernelBuilderLog.h>
+
+#include <stk_mesh/base/Field.hpp>
+
+// stk
+#include <stk_mesh/base/MetaData.hpp>
+
+#include <stk_util/parallel/ParallelReduce.hpp>
 
 EquationSystem::EquationSystem(EquationSystems & eqSystems, const std::string name, const std::string eqnTypeName) :
     equationSystems_(eqSystems),
@@ -17,11 +29,19 @@ EquationSystem::EquationSystem(EquationSystems & eqSystems, const std::string na
     eqnTypeName_(eqnTypeName),
     maxIterations_(1),
     convergenceTolerance_(1.0),
+    timerAssemble_(0.0),
+    timerLoadComplete_(0.0),
+    timerSolve_(0.0),
+    timerMisc_(0.0),
+    timerInit_(0.0),
+    timerPrecond_(0.0),
     avgLinearIterations_(0.0),
     maxLinearIterations_(0.0),
     minLinearIterations_(1.0e10),
     nonLinearIterationCount_(0),
     reportLinearIterations_(false),
+    firstTimeStepSolve_(true),
+    edgeNodalGradient_(false),
     linsys_(NULL)
 {
     // nothing to do
@@ -40,12 +60,10 @@ void EquationSystem::set_nodal_gradient(const std::string &dofName) {
     // determine nodal gradient
     std::map<std::string, std::string >::iterator ii = realm_.solutionOptions_->nodalGradMap_.find(dofName);
     if ( ii != realm_.solutionOptions_->nodalGradMap_.end() ) {
-        if ( ii->second == "edge" ) 
-            edgeNodalGradient_ = true;
-        else if ( ii->second == "element" )
+        if ( ii->second == "element" )
             edgeNodalGradient_ = false;
         else 
-            throw std::runtime_error("only edge or element nodal gradient supported");
+            throw std::runtime_error("only element nodal gradient supported");
     }
 }
 
@@ -100,3 +118,52 @@ void EquationSystem::assemble_and_solve(stk::mesh::FieldBase *deltaSolution) {
 //        HOFlowEnv::self().hoflowOutputP0() << "Error in " << userSuppliedName_ << "::solve_and_update()  " << std::endl;
 }
 
+bool EquationSystem::supp_alg_is_requested(std::string suppAlgName) {
+    const auto& nameMap = realm_.solutionOptions_->elemSrcTermsMap_;
+    auto it = nameMap.find(eqnTypeName_);
+    if (it == nameMap.end()) {
+        return false;
+    }
+    const std::vector<std::string>& nameVec = it->second;
+
+    if (std::find(nameVec.begin(), nameVec.end(), suppAlgName) == nameVec.end()) {
+        return false;
+    }
+    return true;
+}
+
+bool EquationSystem::supp_alg_is_requested(std::vector<std::string> names) {
+    const auto& nameMap = realm_.solutionOptions_->elemSrcTermsMap_;
+    auto it = nameMap.find(eqnTypeName_);
+
+    if (it == nameMap.end()) {
+        return false;
+    }
+
+    const std::vector<std::string>& nameVec = it->second;
+
+    bool found = false;
+    for(auto algName: names) {
+        if (std::find(nameVec.begin(), nameVec.end(), algName) != nameVec.end()) {
+            found = true;
+            break;
+        }
+    }
+    return found;
+}
+
+UserDataType EquationSystem::get_bc_data_type(const UserData &userData, std::string &name) {
+    UserDataType dataType = CONSTANT_UD;
+    std::map<std::string, UserDataType>::const_iterator iter
+        = userData.bcDataTypeMap_.find(name);
+    if ( iter != userData.bcDataTypeMap_.end() ) {
+        dataType = (*iter).second;
+    }
+    return dataType;
+}
+
+void EquationSystem::evaluate_properties() {
+    for ( size_t k = 0; k < propertyAlg_.size(); ++k ) {
+        propertyAlg_[k]->execute();
+    }
+}

@@ -25,6 +25,7 @@ public:
                          AuxFunction * auxFunction,
                          stk::mesh::EntityRank entityRank);
     virtual ~AuxFunctionAlgorithm();
+    virtual void execute();
 
 private:
     stk::mesh::FieldBase * field_;

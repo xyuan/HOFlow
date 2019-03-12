@@ -4,6 +4,7 @@
 /*------------------------------------------------------------------------*/
 #include "LinearSolver.h"
 #include <HOFlowEnv.h>
+#include <LinearSolvers.h>
 #include <LinearSolverTypes.h>
 
 #include <stk_util/util/ReportHandler.hpp>

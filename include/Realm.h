@@ -18,18 +18,23 @@
 #include <vector>
 #include <map>
 
-class Realms;
-class Simulation;
 class YAML::Node;
 class stk::mesh::Part;
 class stk::io::StkMeshIoBroker;
-class EquationSystem;
-class EquationSystems;
 class Algorithm;
 class AlgorithmDriver;
 class AuxFunctionAlgorithm;
+class EquationSystem;
+class EquationSystems;
+class TpetraLinearSystem;
+class Realms;
+class Simulation;
 class PropertyEvaluator;
-
+class SolutionOptions;
+class MasterElement;
+class TensorProductQuadratureRule;
+class LagrangeBasis;
+class ComputeGeometryAlgorithmDriver;
 
 
 //! Stores information and methods for a specific computational domain
@@ -64,8 +69,12 @@ public:
     void provide_output();
     void set_global_id();
     void populate_boundary_data();
+    const stk::mesh::PartVector & get_slave_part_vector();
     
     virtual void evaluate_properties();
+    std::string get_coordinates_name();
+    bool has_non_matching_boundary_face_alg() const;
+    bool get_shifted_grad_op(const std::string dofname);
     
     // consistent mass matrix for projected nodal gradient
     bool get_consistent_mass_matrix_png(const std::string dofname);
@@ -75,17 +84,27 @@ public:
                                                 const stk::mesh::Selector & selector ,
                                                 bool get_all = false) const;
     
-    // get bulk and meta data
+    // get aura, bulk and meta data
+    bool get_activate_aura();
     stk::mesh::BulkData & bulk_data();
     const stk::mesh::BulkData & bulk_data() const;
     stk::mesh::MetaData & meta_data();
     const stk::mesh::MetaData & meta_data() const;
-        
+    
+    // inactive part
+    stk::mesh::Selector get_inactive_selector();
+    
+    // mesh parts for all interior domains
+    stk::mesh::PartVector interiorPartVec_;
+    
     // push back equation to equation systems vector
     void push_equation_to_systems(EquationSystem *eqSystem);
     
     // provide all of the physics target names
     const std::vector<std::string> & get_physics_target_names();
+    
+    stk::mesh::PartVector emptyPartVector_;
+    stk::mesh::PartVector bcPartVec_;
     
     Realms & realms_;
     std::string name_;
@@ -96,9 +115,13 @@ public:
     stk::mesh::MetaData *metaData_;
     stk::mesh::BulkData *bulkData_;
     stk::io::StkMeshIoBroker *ioBroker_;
+    double l2Scaling_;
     
     // hoflow field data
     GlobalIdFieldType *hoflowGlobalId_;
+    
+    // algorithm drivers managed by region
+    ComputeGeometryAlgorithmDriver *computeGeometryAlgDriver_;
     
     BoundaryConditions boundaryConditions_;
     InitialConditions initialConditions_;
@@ -114,8 +137,13 @@ public:
     bool doPromotion_; // conto
     unsigned promotionOrder_;
     
+    // allow aura to be optional
+    bool activateAura_;
+    
     size_t inputMeshIdx_;
     const YAML::Node & node_;
+    
+    bool isFinalOuterIter_{false};
     
     std::string physics_part_name(std::string) const;
     std::vector<std::string> physics_part_names(std::vector<std::string>) const;

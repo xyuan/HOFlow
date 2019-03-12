@@ -6,9 +6,7 @@
 #define LINEARSOLVER_H
 
 #include <LinearSolverTypes.h>
-//#include <LinearSolverConfig.h>
 #include <LocalGraphArrays.h>
-//#include <LinearSolvers.h>
 #include <Enums.h>
 
 #include <Kokkos_DefaultNode.hpp>

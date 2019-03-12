@@ -9,8 +9,9 @@
 
 #include <FieldTypeDef.h>
 #include <LinearSystem.h>
+#include <TpetraLinearSystem.h>
 #include <Realm.h>
-#include <TimeIntegrator.h>
+//#include <TimeIntegrator.h>
 
 #include <kernel/Kernel.h>
 
@@ -72,7 +73,7 @@ AssembleElemSolverAlgorithm::execute()
   // set any data
   const size_t activeKernelsSize = activeKernels_.size();
   for ( size_t i = 0; i < activeKernelsSize; ++i )
-    activeKernels_[i]->setup(*realm_.timeIntegrator_);
+    activeKernels_[i]->setup();
 
   run_algorithm(bulk_data, [&](SharedMemData& smdata)
   {

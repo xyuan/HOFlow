@@ -14,9 +14,6 @@
 #include <utility>
 #include <memory>
 
-class MeshMotionInfo;
-struct FixPressureAtNodeInfo;
-
 enum ErrorIndicatorType {
   EIT_NONE                = 0,
   EIT_PSTAB               = 1 << 1,
@@ -66,7 +63,7 @@ public:
 
     std::vector<double> get_gravity_vector(const unsigned nDim) const;
 
-    double get_turb_model_constant(TurbulenceModelConstant turbModelEnum) const;
+//    double get_turb_model_constant(TurbulenceModelConstant turbModelEnum) const;
 
     bool get_noc_usage(const std::string &dofName) const;
 
@@ -99,7 +96,7 @@ public:
     bool uniformRefineSaveAfter_;
     std::vector<int> refineAt_;
     bool activateAdaptivity_;
-    ErrorIndicatorType errorIndicatorType_;
+//    ErrorIndicatorType errorIndicatorType_;
     int adaptivityFrequency_;
     bool useMarker_;
     double refineFraction_;
@@ -178,7 +175,7 @@ public:
     std::map<std::string, std::string> inputVarFromFileMap_;
 
     // mesh motion
-    std::map<std::string, MeshMotionInfo *> meshMotionInfoMap_;
+//    std::map<std::string, MeshMotionInfo *> meshMotionInfoMap_;
 
     std::vector<double> gravity_;
 
@@ -189,14 +186,14 @@ public:
     //! Flag indicating whether the user has requested pressure referencing
     bool needPressureReference_{false};
 
-    std::unique_ptr<FixPressureAtNodeInfo> fixPressureInfo_;
+//    std::unique_ptr<FixPressureAtNodeInfo> fixPressureInfo_;
 
     std::string name_;
 
     std::string quadType_;
 
     // allow for rho = f(P)
-    bool accousticallyCompressible_;
+    //bool accousticallyCompressible_;
 };
 
 #endif /* SOLUTIONOPTIONS_H */

@@ -37,6 +37,12 @@ public:
     void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo, const WallBoundaryConditionData & wallBCData);
     void initialize();
     
+    // internal solve and update from EquationSystems
+    void solve_and_update();
+
+    // external intended to be called by another EqSystem (used when someone manages PNGEqs)
+    void solve_and_update_external();
+    
     // names that customize this PNG system
     EquationType eqType_;
     std::string dofName_;

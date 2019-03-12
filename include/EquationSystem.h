@@ -54,12 +54,19 @@ public:
     virtual bool system_is_converged();
     virtual void assemble_and_solve(stk::mesh::FieldBase *deltaSolution);
     virtual void solve_and_update() {}
-
+    UserDataType get_bc_data_type(const UserData &, std::string & name);
+    virtual void evaluate_properties();
+    
     Simulation * root();
     EquationSystems * parent();
+    
+    std::vector<AuxFunctionAlgorithm *> bcDataAlg_;
+    std::vector<Algorithm *> bcDataMapAlg_;
+    std::vector<Algorithm *> copyStateAlg_;
     LinearSystem * linsys_;
     
-    std::vector<Algorithm *> copyStateAlg_;
+    bool supp_alg_is_requested(std::string name);
+    bool supp_alg_is_requested(std::vector<std::string>);
     
     EquationSystems & equationSystems_;
     Realm & realm_;
@@ -70,14 +77,23 @@ public:
     double convergenceTolerance_;
     
     SolverAlgorithmDriver * solverAlgDriver_;
-    
-    bool edgeNodalGradient_;
-    
+   
+    double timerAssemble_;
+    double timerLoadComplete_;
+    double timerSolve_;
+    double timerMisc_;
+    double timerInit_;
+    double timerPrecond_;
     double avgLinearIterations_;
     double maxLinearIterations_;
     double minLinearIterations_;
     int nonLinearIterationCount_;
     bool reportLinearIterations_;
+    bool firstTimeStepSolve_;
+    bool edgeNodalGradient_;
+    
+    // vector of property algorithms
+    std::vector<Algorithm *> propertyAlg_;
 };
 
 #endif /* EQUATIONSYSTEM_H */

@@ -9,7 +9,7 @@
 #include <Simulation.h>
 #include <LinearSolver.h>
 #include <TpetraLinearSolver.h>
-//#include <master_element/MasterElement.h>
+#include <master_element/MasterElement.h>
 
 #include <stk_util/parallel/Parallel.hpp>
 

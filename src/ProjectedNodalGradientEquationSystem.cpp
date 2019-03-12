@@ -123,3 +123,36 @@ void ProjectedNodalGradientEquationSystem::initialize() {
     linsys_->finalizeLinearSystem();
 }
 
+//--------------------------------------------------------------------------
+//-------- solve_and_update ------------------------------------------------
+//--------------------------------------------------------------------------
+void
+ProjectedNodalGradientEquationSystem::solve_and_update()
+{
+  if ( managesSolve_ )
+    solve_and_update_external();
+}
+
+//--------------------------------------------------------------------------
+//-------- solve_and_update_external ---------------------------------------
+//--------------------------------------------------------------------------
+void
+ProjectedNodalGradientEquationSystem::solve_and_update_external()
+{
+  for ( int k = 0; k < maxIterations_; ++k ) {
+
+    // projected nodal gradient, load_complete and solve
+    assemble_and_solve(qTmp_);
+    
+    // update
+//    double timeA = HOFlowEnv::self().hoflow_time();
+    field_axpby(
+      realm_.meta_data(),
+      realm_.bulk_data(),
+      1.0, *qTmp_,
+      1.0, *dqdx_, 
+      realm_.get_activate_aura());
+//    double timeB = NaluEnv::self().nalu_time();
+//    timerAssemble_ += (timeB-timeA);   
+  }
+}

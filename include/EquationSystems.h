@@ -61,6 +61,7 @@ public:
     void register_element_fields(const std::vector<std::string> targetNames);
     void register_interior_algorithm(const std::vector<std::string> targetNames);
     void register_wall_bc(const std::string targetName, const WallBoundaryConditionData & wallBCData);
+    void evaluate_properties();
     Simulation * root();
     Realm * parent();
     

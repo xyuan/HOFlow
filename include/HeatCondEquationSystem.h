@@ -17,6 +17,7 @@ class Realm;
 class AssembleNodalGradAlgorithmDriver;
 class AlgorithmDriver;
 class EquationSystems;
+class TpetraLinearSystem;
 class ProjectedNodalGradientEquationSystem;
 
 class HeatCondEquationSystem : public EquationSystem {
@@ -35,9 +36,6 @@ public:
     void initialize();
     void reinitialize_linear_system();
     void predict_state();
-    virtual void load(const YAML::Node & node);
-    
-    ProjectedNodalGradientEquationSystem * projectedNodalGradEqs_;
     
     // allow equation system to manage a projected nodal gradient
     const bool managePNG_;

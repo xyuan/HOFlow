@@ -9,6 +9,8 @@
 #include <Realm.h>
 
 class Realm;
+class MasterElement;
+class Kernel;
 class SupplementalAlgorithm;
 class stk::mesh::Part;
 
@@ -20,13 +22,13 @@ public:
     Algorithm(Realm & realm, stk::mesh::Part * part);
     Algorithm(Realm & realm, stk::mesh::PartVector & partVec);
     virtual ~Algorithm();
-//    virtual void execute() = 0;
-//    virtual void pre_work() {}
+    virtual void execute() = 0;
+    virtual void pre_work() {}
     
     Realm & realm_;
     PartVector partVec_;
     std::vector<SupplementalAlgorithm *> supplementalAlg_;
-    //std::vector<Kernel *> activeKernels_;
+    std::vector<Kernel *> activeKernels_;
 };
 
 #endif /* ALGORITHM_H */

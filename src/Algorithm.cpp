@@ -4,6 +4,7 @@
 /*------------------------------------------------------------------------*/
 #include "Algorithm.h"
 #include <SupplementalAlgorithm.h>
+#include <kernel/Kernel.h>
 
 //! Constructor if part is provided
 Algorithm::Algorithm(Realm & realm, stk::mesh::Part * part) :
@@ -27,7 +28,7 @@ Algorithm::~Algorithm()
     for( ii=supplementalAlg_.begin(); ii!=supplementalAlg_.end(); ++ii )
         delete *ii;
 
-//    std::vector<Kernel*>::iterator ij;
-//    for (ij = activeKernels_.begin(); ij != activeKernels_.end(); ++ij)
-//        delete *ij;
+    std::vector<Kernel*>::iterator ij;
+    for (ij = activeKernels_.begin(); ij != activeKernels_.end(); ++ij)
+        delete *ij;
 }

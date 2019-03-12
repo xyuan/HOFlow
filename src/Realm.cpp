@@ -24,6 +24,13 @@
 #include <Algorithm.h>
 #include <AuxFunctionAlgorithm.h>
 #include <ConstantAuxFunction.h>
+#include "SolutionOptions.h"
+#include "ComputeGeometryAlgorithmDriver.h"
+#include "ComputeGeometryInteriorAlgorithm.h"
+#include "ComputeGeometryBoundaryAlgorithm.h"
+#include "master_element/MasterElement.h"
+
+#include "hoflow_make_unique.h"
 
 // stk_util
 #include <stk_util/parallel/Parallel.hpp>
@@ -53,6 +60,12 @@
 // stk_util
 #include <stk_util/parallel/ParallelReduce.hpp>
 
+// basic c++
+#include <map>
+#include <cmath>
+#include <utility>
+#include <stdint.h>
+
 //! Constructor of a computational domain
 Realm::Realm(Realms & realms, const YAML::Node & node) :
     realms_(realms),
@@ -61,6 +74,8 @@ Realm::Realm(Realms & realms, const YAML::Node & node) :
     inputDBName_("input_unknown"),
     spatialDimension_(3u),  // for convenience; can always get it from meta data
     solveFrequency_(1),
+    computeGeometryAlgDriver_(0),
+    l2Scaling_(1.0),
     metaData_(NULL),
     bulkData_(NULL),
     ioBroker_(NULL),
@@ -69,6 +84,7 @@ Realm::Realm(Realms & realms, const YAML::Node & node) :
     materialProperties_(*this),
     equationSystems_(*this),
     node_(node),
+    activateAura_(false),
     doPromotion_(false),
     promotionOrder_(0u),
     inputMeshIdx_(-1)
@@ -411,8 +427,8 @@ void Realm::setup_property() {
                     // create everything
                     std::vector<double> userConstData(1);
                     userConstData[0] = matData->constValue_;
-                    ConstantAuxFunction *theAuxFunc = new ConstantAuxFunction(theBegin, theEnd, userConstData);
-                    AuxFunctionAlgorithm *auxAlg = new AuxFunctionAlgorithm( *this, targetPart, thePropField, theAuxFunc, stk::topology::NODE_RANK);
+                    ConstantAuxFunction * theAuxFunc = new ConstantAuxFunction(theBegin, theEnd, userConstData);
+                    AuxFunctionAlgorithm * auxAlg = new AuxFunctionAlgorithm(*this, targetPart, thePropField, theAuxFunc, stk::topology::NODE_RANK);
                     propertyAlg_.push_back(auxAlg);         
                 }
                 break;
@@ -568,11 +584,11 @@ void Realm::register_nodal_fields(stk::mesh::Part *part) {
 }
 
 void Realm::register_interior_algorithm(stk::mesh::Part *part) {
-    /*const AlgorithmType algType = INTERIOR;
+    const AlgorithmType algType = INTERIOR;
     std::map<AlgorithmType, Algorithm *>::iterator it = computeGeometryAlgDriver_->algMap_.find(algType);
     
     if ( it == computeGeometryAlgDriver_->algMap_.end() ) {
-        ComputeGeometryInteriorAlgorithm *theAlg = new ComputeGeometryInteriorAlgorithm(*this, part);
+        ComputeGeometryInteriorAlgorithm * theAlg = new ComputeGeometryInteriorAlgorithm(*this, part);
         computeGeometryAlgDriver_->algMap_[algType] = theAlg;
     }
     else {
@@ -580,11 +596,11 @@ void Realm::register_interior_algorithm(stk::mesh::Part *part) {
     }
 
     // Track parts that are registered to interior algorithms
-    interiorPartVec_.push_back(part);*/
+    interiorPartVec_.push_back(part);
 }
 
 void Realm::register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo) {
-    /*// push back the part for book keeping and, later, skin mesh
+    // push back the part for book keeping and, later, skin mesh
     bcPartVec_.push_back(part);
 
     const int nDim = metaData_->spatial_dimension();
@@ -607,7 +623,7 @@ void Realm::register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo
     }
     else {
         it->second->partVec_.push_back(part);
-    }*/
+    }
 }
 
 void Realm::provide_output() {
@@ -691,10 +707,10 @@ void Realm::populate_boundary_data() {
 
 void Realm::evaluate_properties() {
 //    double start_time = HOFlowEnv::self().nalu_time();
-//    for ( size_t k = 0; k < propertyAlg_.size(); ++k ) {
-//        propertyAlg_[k]->execute();
-//    }
-//    equationSystems_.evaluate_properties();
+    for ( size_t k = 0; k < propertyAlg_.size(); ++k ) {
+        propertyAlg_[k]->execute();
+    }
+    equationSystems_.evaluate_properties();
 //    double end_time = HOFlowEnv::self().nalu_time();
 //    timerPropertyEval_ += (end_time - start_time);
 }
@@ -729,6 +745,24 @@ bool Realm::get_consistent_mass_matrix_png(const std::string dofName ) {
     return cmmPng;
 }
 
+bool Realm::has_non_matching_boundary_face_alg() const {
+    return false; // hasNonConformal_ | hasOverset_; 
+}
+
+bool Realm::get_shifted_grad_op(const std::string dofName ) {
+    bool factor = solutionOptions_->shiftedGradOpDefault_;
+    std::map<std::string, bool>::const_iterator iter = solutionOptions_->shiftedGradOpMap_.find(dofName);
+    if (iter != solutionOptions_->shiftedGradOpMap_.end()) {
+        factor = (*iter).second;
+    }
+    return factor;
+}
+
+std::string Realm::get_coordinates_name() {
+    return ( (solutionOptions_->meshMotion_ | solutionOptions_->meshDeformation_ | solutionOptions_->externalMeshDeformation_) 
+           ? "current_coordinates" : "coordinates");
+}
+
 std::string Realm::name() {
   return name_;
 }
@@ -746,6 +780,11 @@ std::string Realm::physics_part_name(std::string name) const {
 
 std::vector<std::string> Realm::physics_part_names(std::vector<std::string> names) const {
     return names;
+}
+
+bool Realm::get_activate_aura()
+{
+    return activateAura_;
 }
 
 stk::mesh::BulkData & Realm::bulk_data()
@@ -778,4 +817,39 @@ bool Realm::support_inconsistent_restart()
 {
 //  return supportInconsistentRestart_ ;
     return false; //temp solution
+}
+
+const stk::mesh::PartVector & Realm::get_slave_part_vector() {
+//    if ( hasPeriodic_)
+//        return periodicManager_->get_slave_part_vector();
+//    else
+        return emptyPartVector_;
+}
+
+stk::mesh::Selector Realm::get_inactive_selector() {
+    // accumulate inactive parts relative to the universal part
+
+    // provide inactive Overset part that excludes background surface
+    //
+    // Treat this selector differently because certain entities from interior
+    // blocks could have been inactivated by the overset algorithm. 
+    stk::mesh::Selector nothing;
+//    stk::mesh::Selector inactiveOverSetSelector = (hasOverset_) ?
+//        oversetManager_->get_inactive_selector() : nothing;
+    stk::mesh::Selector inactiveOverSetSelector = nothing;
+
+    stk::mesh::Selector otherInactiveSelector = (
+        metaData_->universal_part()
+        & !(stk::mesh::selectUnion(interiorPartVec_))
+        & !(stk::mesh::selectUnion(bcPartVec_)));
+
+    if (interiorPartVec_.empty() && bcPartVec_.empty()) {
+        otherInactiveSelector = nothing;
+    }
+
+    return inactiveOverSetSelector | otherInactiveSelector;
+}
+
+void Realm::push_equation_to_systems(EquationSystem * eqSystem){
+    equationSystems_.equationSystemVector_.push_back(eqSystem);
 }

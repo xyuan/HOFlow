@@ -60,8 +60,8 @@ public:
    stk::mesh::BucketVector const& elem_buckets =
            realm_.get_buckets(entityRank_, elemSelector );
  
-   auto team_exec = sierra::nalu::get_team_policy(elem_buckets.size(), bytes_per_team, bytes_per_thread);
-   Kokkos::parallel_for(team_exec, [&](const sierra::nalu::TeamHandleType& team)
+   auto team_exec = get_team_policy(elem_buckets.size(), bytes_per_team, bytes_per_thread);
+   Kokkos::parallel_for(team_exec, [&](const TeamHandleType& team)
    {
      stk::mesh::Bucket & b = *elem_buckets[team.league_rank()];
  

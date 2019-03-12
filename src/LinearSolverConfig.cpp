@@ -13,7 +13,3 @@ LinearSolverConfig::LinearSolverConfig() :
 {
     // nothing to do
 }
-
-LinearSolverConfig::~LinearSolverConfig() {
-}
-
