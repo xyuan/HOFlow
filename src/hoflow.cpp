@@ -102,9 +102,8 @@ int main(int argc, char** argv) {
     // load the data specified in the input file
     sim.debug_ = debug;
     sim.load(doc);
-    
+    sim.breadboard();
     sim.initialize();
-    
     sim.run();
  
     return 0;

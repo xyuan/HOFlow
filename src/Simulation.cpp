@@ -26,6 +26,10 @@ Simulation::~Simulation() {
     delete linearSolvers_;
 }
 
+void Simulation::breadboard() {
+    realms_->breadboard();
+}
+
 //! Loads the information necessary to do the simulation
 void Simulation::load(const YAML::Node & node) {
     

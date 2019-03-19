@@ -18,6 +18,7 @@ class Simulation {
 public:
     Simulation(const YAML::Node & root_node);
     ~Simulation();
+    void breadboard();
     void load(const YAML::Node & node);
     void initialize();
     void run();

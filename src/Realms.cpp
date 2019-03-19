@@ -21,6 +21,12 @@ Realms::Realms(Simulation & sim) :
 Realms::~Realms() {
 }
 
+void Realms::breadboard(){
+    for ( size_t irealm = 0; irealm < realmVector_.size(); ++irealm ) {
+        realmVector_[irealm]->breadboard();
+    }
+}
+
 //! Loops through all Realms defined in the input file create a object from class Realm for each
 void Realms::load(const YAML::Node & node) {
     const YAML::Node realms = node["realms"];

@@ -83,6 +83,7 @@ Realm::Realm(Realms & realms, const YAML::Node & node) :
     initialConditions_(*this),
     materialProperties_(*this),
     equationSystems_(*this),
+    solutionOptions_(new SolutionOptions()),
     node_(node),
     activateAura_(false),
     doPromotion_(false),
@@ -95,6 +96,10 @@ Realm::~Realm() {
     delete bulkData_;
     delete metaData_;
     delete ioBroker_;
+}
+
+void Realm::breadboard() {
+    computeGeometryAlgDriver_ = new ComputeGeometryAlgorithmDriver(*this);
 }
 
 Simulation * Realm::root() { 

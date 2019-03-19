@@ -29,6 +29,7 @@ EquationSystem::EquationSystem(EquationSystems & eqSystems, const std::string na
     eqnTypeName_(eqnTypeName),
     maxIterations_(1),
     convergenceTolerance_(1.0),
+    solverAlgDriver_(new SolverAlgorithmDriver(realm_)),
     timerAssemble_(0.0),
     timerLoadComplete_(0.0),
     timerSolve_(0.0),

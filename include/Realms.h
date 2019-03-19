@@ -18,6 +18,7 @@ class Realms {
 public:
     Realms(Simulation & sim);
     ~Realms();
+    void breadboard();
     void load(const YAML::Node & node);
     void initialize();
     Simulation * root();

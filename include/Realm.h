@@ -42,6 +42,7 @@ class Realm {
 public:
     Realm(Realms & realms, const YAML::Node & node);
     virtual ~Realm();
+    virtual void breadboard();
     virtual void load(const YAML::Node & node);
     virtual void initialize();
     Simulation * root() const;
