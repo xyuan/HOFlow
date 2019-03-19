@@ -18,7 +18,7 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: periodic3d.g
+    mesh: myCube.exo
 
     equation_systems:
       name: theEqSys
@@ -36,12 +36,12 @@ realms:
     initial_conditions:
 
       - constant: ic_1
-        target_name: block_1
+        target_name: block_1-TETRA
         value:
          temperature: 10.0
 
     material_properties:
-      target_name: block_1
+      target_name: block_1-TETRA
       specifications:
         - name: thermal_conductivity
           type: constant
