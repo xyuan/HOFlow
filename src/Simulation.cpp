@@ -49,7 +49,10 @@ void Simulation::initialize() {
 
 //! Run the simulation
 void Simulation::run() {
-    std::cout << "running sim" << std::endl; 
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "*******************************************************" << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "Simulation Shall Commence: number of processors = " << HOFlowEnv::self().parallel_size() << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "*******************************************************" << std::endl;
 }
 
 Simulation * Simulation::root() {

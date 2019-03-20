@@ -480,71 +480,71 @@ void Realm::create_mesh() {
 }
 
 void Realm::create_output_mesh() {
-    /*// exodus output file creation
-    if (outputInfo_->hasOutputBlock_) {
-        HOFlowEnv::self().hoflowOutputP0() << "Realm::create_output_mesh(): Begin" << std::endl;
-
-        if (outputInfo_->outputFreq_ == 0)
-            return;
-
-        // if we are adapting, skip when no I/O happens before first adapt step
-        if (solutionOptions_->useAdapter_ && outputInfo_->meshAdapted_ == false &&
-            solutionOptions_->adaptivityFrequency_ <= outputInfo_->outputFreq_) {
-            return;
-        }
-
-        std::string oname =  outputInfo_->outputDBName_;
-        if (solutionOptions_->useAdapter_ && solutionOptions_->maxRefinementLevel_) {
-            static int fileid = 0;
-            std::ostringstream fileid_ss;
-            fileid_ss << std::setfill('0') << std::setw(4) << (fileid+1);
-            if (fileid++ > 0) oname += "-s" + fileid_ss.str();
-        }
-
-        if (!outputInfo_->catalystFileName_.empty()||!outputInfo_->paraviewScriptName_.empty()) {
-            outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_BLOCK_PARSE_JSON_STRING",
-                                                     outputInfo_->catalystParseJson_));
-            std::string input_deck_name = "%B";
-            stk::util::filename_substitution(input_deck_name);
-            outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_BLOCK_PARSE_INPUT_DECK_NAME", input_deck_name));
-
-            if(!outputInfo_->paraviewScriptName_.empty())
-              outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_SCRIPT", outputInfo_->paraviewScriptName_.c_str()));
-
-            outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_CREATE_SIDE_SETS", 1));
-
-            resultsFileIndex_ = ioBroker_->create_output_mesh( oname, stk::io::WRITE_RESULTS, *outputInfo_->outputPropertyManager_, "catalyst" );
-        }
-        else {
-            resultsFileIndex_ = ioBroker_->create_output_mesh( oname, stk::io::WRITE_RESULTS, *outputInfo_->outputPropertyManager_);
-        }
-
-        // Tell stk_io how to output element block nodal fields:
-        // if 'true' passed to function, then output them as nodeset fields;
-        // if 'false', then output as nodal fields (on all nodes of the mesh, zero-filled)
-        // The option is provided since some post-processing/visualization codes do not
-        // correctly handle nodeset fields.
-        ioBroker_->use_nodeset_for_part_nodes_fields(resultsFileIndex_, outputInfo_->outputNodeSet_);
-
-        // FIXME: add_field can take user-defined output name, not just varName
-        for ( std::set<std::string>::iterator itorSet = outputInfo_->outputFieldNameSet_.begin();
-            itorSet != outputInfo_->outputFieldNameSet_.end(); ++itorSet ) {
-            std::string varName = *itorSet;
-            stk::mesh::FieldBase *theField = stk::mesh::get_field_by_name(varName, *metaData_);
-            if ( NULL == theField ) {
-                HOFlowEnv::self().hoflowOutputP0() << " Sorry, no field by the name " << varName << std::endl;
-            }
-            else {
-                // 'varName' is the name that will be written to the database
-                // For now, just using the name of the stk field
-                ioBroker_->add_field(resultsFileIndex_, *theField, varName);
-            }
-        }
-        // reset this flag
-        outputInfo_->meshAdapted_ = false;
-
-        HOFlowEnv::self().hoflowOutputP0() << "Realm::create_output_mesh() End" << std::endl;
-    }*/
+//    // exodus output file creation
+//    if (outputInfo_->hasOutputBlock_) {
+//        HOFlowEnv::self().hoflowOutputP0() << "Realm::create_output_mesh(): Begin" << std::endl;
+//
+//        if (outputInfo_->outputFreq_ == 0)
+//            return;
+//
+//        // if we are adapting, skip when no I/O happens before first adapt step
+//        if (solutionOptions_->useAdapter_ && outputInfo_->meshAdapted_ == false &&
+//            solutionOptions_->adaptivityFrequency_ <= outputInfo_->outputFreq_) {
+//            return;
+//        }
+//
+//        std::string oname =  outputInfo_->outputDBName_;
+//        if (solutionOptions_->useAdapter_ && solutionOptions_->maxRefinementLevel_) {
+//            static int fileid = 0;
+//            std::ostringstream fileid_ss;
+//            fileid_ss << std::setfill('0') << std::setw(4) << (fileid+1);
+//            if (fileid++ > 0) oname += "-s" + fileid_ss.str();
+//        }
+//
+//        if (!outputInfo_->catalystFileName_.empty()||!outputInfo_->paraviewScriptName_.empty()) {
+//            outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_BLOCK_PARSE_JSON_STRING",
+//                                                     outputInfo_->catalystParseJson_));
+//            std::string input_deck_name = "%B";
+//            stk::util::filename_substitution(input_deck_name);
+//            outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_BLOCK_PARSE_INPUT_DECK_NAME", input_deck_name));
+//
+//            if(!outputInfo_->paraviewScriptName_.empty())
+//              outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_SCRIPT", outputInfo_->paraviewScriptName_.c_str()));
+//
+//            outputInfo_->outputPropertyManager_->add(Ioss::Property("CATALYST_CREATE_SIDE_SETS", 1));
+//
+//            resultsFileIndex_ = ioBroker_->create_output_mesh( oname, stk::io::WRITE_RESULTS, *outputInfo_->outputPropertyManager_, "catalyst" );
+//        }
+//        else {
+//            resultsFileIndex_ = ioBroker_->create_output_mesh( oname, stk::io::WRITE_RESULTS, *outputInfo_->outputPropertyManager_);
+//        }
+//
+//        // Tell stk_io how to output element block nodal fields:
+//        // if 'true' passed to function, then output them as nodeset fields;
+//        // if 'false', then output as nodal fields (on all nodes of the mesh, zero-filled)
+//        // The option is provided since some post-processing/visualization codes do not
+//        // correctly handle nodeset fields.
+//        ioBroker_->use_nodeset_for_part_nodes_fields(resultsFileIndex_, outputInfo_->outputNodeSet_);
+//
+//        // FIXME: add_field can take user-defined output name, not just varName
+//        for ( std::set<std::string>::iterator itorSet = outputInfo_->outputFieldNameSet_.begin();
+//            itorSet != outputInfo_->outputFieldNameSet_.end(); ++itorSet ) {
+//            std::string varName = *itorSet;
+//            stk::mesh::FieldBase *theField = stk::mesh::get_field_by_name(varName, *metaData_);
+//            if ( NULL == theField ) {
+//                HOFlowEnv::self().hoflowOutputP0() << " Sorry, no field by the name " << varName << std::endl;
+//            }
+//            else {
+//                // 'varName' is the name that will be written to the database
+//                // For now, just using the name of the stk field
+//                ioBroker_->add_field(resultsFileIndex_, *theField, varName);
+//            }
+//        }
+//        // reset this flag
+//        outputInfo_->meshAdapted_ = false;
+//
+//        HOFlowEnv::self().hoflowOutputP0() << "Realm::create_output_mesh() End" << std::endl;
+//    }
 }
 
 void Realm::input_variables_from_mesh() {
