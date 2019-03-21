@@ -2,6 +2,9 @@
 cmake_minimum_required (VERSION 3.1)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+# Set HOFlow's compilers, CMAKE_FIND_LIBRARY_PREFIXES
+project(HOFlow CXX Fortran)
+
 ########################## OPTIONS #####################################
 #option(ENABLE_WARNINGS "Add -Wall to show compiler warnings" ON)
 
@@ -42,10 +45,6 @@ if(Trilinos_BUILD_SHARED_LIBS)
 else(Trilinos_BUILD_SHARED_LIBS)
   set(HOFlow_LIBRARY_TYPE STATIC)
 endif(Trilinos_BUILD_SHARED_LIBS)
-
-# Set HOFlow's compilers, CMAKE_FIND_LIBRARY_PREFIXES
-# and CMAKE_FIND_LIBRARY_SUFFIXES, etc, after inheriting settings from Trilinos
-project(HOFlow CXX Fortran)
 
 ############################ YAML ######################################
 set(CMAKE_PREFIX_PATH ${YAML_DIR} ${CMAKE_PREFIX_PATH})
