@@ -9,9 +9,12 @@
 InitialCondition::InitialCondition(InitialConditions & ics) : 
     initialConditions_(ics), 
     theIcType_(UserDataType_END) 
-{}
+{
+    // nothing to do
+}
 
 InitialCondition::~InitialCondition() {
+    // nothing to do
 }
 
 InitialCondition * InitialCondition::load(const YAML::Node & node) {

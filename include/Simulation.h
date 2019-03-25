@@ -10,8 +10,9 @@
 #include <stk_util/diag/Timer.hpp>
 
 class YAML::Node;
-class Realms;
 class LinearSolvers;
+class TimeIntegrator;
+class Realms;
 
 //! Container that holds all data regearding the simulation and specifies the sequence of execution of the different methods
 class Simulation {
@@ -22,12 +23,17 @@ public:
     void load(const YAML::Node & node);
     void initialize();
     void run();
+    void high_level_banner();
     Simulation * root();
     Simulation * parent();
     bool debug();
     bool debug() const;
+    static stk::diag::TimerSet &rootTimerSet();
+    static stk::diag::Timer &rootTimer();
+    static stk::diag::Timer &outputTimer();
   
     const YAML::Node & m_root_node;
+    TimeIntegrator *timeIntegrator_;
     Realms * realms_;
     LinearSolvers * linearSolvers_;
     static bool debug_;

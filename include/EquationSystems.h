@@ -54,13 +54,33 @@ public:
     EquationSystems(Realm & realm);
     ~EquationSystems();
     void load(const YAML::Node & node);
-    void initialize();
     std::string get_solver_block_name(const std::string eqName);
     void register_nodal_fields(const std::vector<std::string> targetNames);
     void register_edge_fields(const std::vector<std::string> targetNames);
     void register_element_fields(const std::vector<std::string> targetNames);
     void register_interior_algorithm(const std::vector<std::string> targetNames);
     void register_wall_bc(const std::string targetName, const WallBoundaryConditionData & wallBCData);
+    
+    void initialize();
+    void reinitialize_linear_system();
+    void populate_derived_quantities();
+    void initial_work();
+    
+    bool solve_and_update();
+    double provide_system_norm();
+    double provide_mean_system_norm();
+
+    void predict_state();
+    void populate_boundary_data();
+    void boundary_data_to_state_data();
+    void provide_output();
+    void dump_eq_time();
+    void pre_timestep_work();
+    void post_converged_work();
+    void evaluate_properties();
+    void pre_iter_work();
+    void post_iter_work();
+  
     void evaluate_properties();
     Simulation * root();
     Realm * parent();
@@ -76,6 +96,12 @@ public:
     int maxIterations_;
     EquationSystemVector equationSystemVector_;
     std::map<std::string, std::string> solverSpecMap_;
+    
+    /// A list of tasks to be performed before all EquationSystem::solve_and_update
+    std::vector<AlgorithmDriver*> preIterAlgDriver_;
+
+    /// A list of tasks to be performed after all EquationSystem::solve_and_update
+    std::vector<AlgorithmDriver*> postIterAlgDriver_;
 };
 
 #endif /* EQUATIONSYSTEMS_H */

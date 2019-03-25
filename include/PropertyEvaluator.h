@@ -11,7 +11,7 @@ public:
     PropertyEvaluator();
     ~PropertyEvaluator();
     
-//    virtual double execute(double *indVarList, stk::mesh::Entity node = stk::mesh::Entity()) = 0;
+    virtual double execute(double *indVarList, stk::mesh::Entity node = stk::mesh::Entity()) = 0;
 };
 
 #endif /* PROPERTYEVALUATOR_H */

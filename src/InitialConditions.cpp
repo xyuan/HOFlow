@@ -11,7 +11,9 @@
 
 InitialConditions::InitialConditions(Realm & realm) :
     realm_(realm)
-{}
+{
+    // nothing to do
+}
 
 InitialConditions::~InitialConditions() {
     for ( size_t j_initial_condition = 0; j_initial_condition < initialConditionVector_.size(); ++j_initial_condition ) {

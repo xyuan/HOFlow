@@ -5,8 +5,10 @@
 #include "PropertyEvaluator.h"
 
 PropertyEvaluator::PropertyEvaluator() {
+    // nothing to do
 }
 
 PropertyEvaluator::~PropertyEvaluator() {
+    // nothing to do
 }
 

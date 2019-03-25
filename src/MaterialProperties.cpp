@@ -11,6 +11,7 @@
 MaterialProperties::MaterialProperties(Realm & realm) :
     realm_(realm)
 {
+    // nothing to do
 }
 
 MaterialProperties::~MaterialProperties() {

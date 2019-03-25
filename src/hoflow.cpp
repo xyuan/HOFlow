@@ -46,7 +46,7 @@ static std::string human_bytes_double(double bytes) {
 
 int main(int argc, char** argv) {
     const std::string VERSION = "0.0.1";
-    std::string inputFileName;
+    std::string inputFileName, logFileName;
     
     
     // start up MPI
@@ -56,6 +56,12 @@ int main(int argc, char** argv) {
     
     // HOFlowEnv singleton
     HOFlowEnv & hoflowEnv = HOFlowEnv::self();
+      
+    stk::diag::setEnabledTimerMetricsMask(stk::diag::METRICS_CPU_TIME | stk::diag::METRICS_WALL_TIME);
+    Simulation::rootTimer().start();
+
+    // start initial time
+    double start_time = hoflowEnv.hoflow_time();
     
     // command line options.
     bool debug = true;
@@ -66,6 +72,7 @@ int main(int argc, char** argv) {
         ("version,v", "shows HOFlow version")
         ("debug,D", "turn on debug mode")
         ("input,i", po::value<std::string>(&inputFileName)->default_value("input.i"))
+        ("log-file,o", po::value<std::string>(&logFileName), "Analysis log file")
     ;
 
     po::variables_map vm;        
@@ -93,8 +100,28 @@ int main(int argc, char** argv) {
         return 0;
     }
     
-    // reading input file
-    YAML::Node doc = YAML::LoadFile(inputFileName);
+    // deal with logfile name; if none supplied, go with inputFileName.log
+    if (!vm.count("log-file")) {
+        int dotPos = inputFileName.rfind(".");
+        if ( -1 == dotPos ) {  
+            // lacking extension
+            logFileName = inputFileName + ".log";
+        } 
+        else {  
+            // with extension; swap with .log
+            logFileName = inputFileName.substr(0, dotPos) + ".log";
+        }
+    }
+    
+    // deal with log file stream
+//    hoflowEnv.set_log_file_stream(logFileName, pprint); // disabled to force output to console
+
+    // proceed with reading input file "document" from YAML
+    YAML::Node doc = YAML::LoadFile(inputFileName.c_str());
+    if (debug) {
+        if (!hoflowEnv.parallel_rank())
+            HOFlowParsingHelper::emit(std::cout, doc);
+    }
     
     // create an Simulation object and give the input file as an argument
     Simulation sim(doc);
@@ -105,6 +132,71 @@ int main(int argc, char** argv) {
     sim.breadboard();
     sim.initialize();
     sim.run();
+    
+    // stop timer
+    const double stop_time = hoflowEnv.hoflow_time();
+    const double total_time = stop_time - start_time;
+
+    // parallel reduce overall times
+    double g_sum, g_min, g_max;
+    stk::all_reduce_min(hoflowEnv.parallel_comm(), &total_time, &g_min, 1);
+    stk::all_reduce_max(hoflowEnv.parallel_comm(), &total_time, &g_max, 1);
+    stk::all_reduce_sum(hoflowEnv.parallel_comm(), &total_time, &g_sum, 1);
+    const int nprocs = hoflowEnv.parallel_size();
+
+    // output total time
+    hoflowEnv.hoflowOutputP0() << "Timing for Simulation: nprocs= " << nprocs << std::endl;
+    hoflowEnv.hoflowOutputP0() << "           main() --  " << " \tavg: " << g_sum/double(nprocs)
+                           << " \tmin: " << g_min << " \tmax: " << g_max << std::endl;
+
+    // output memory usage
+    size_t now, hwm;
+    stk::get_memory_usage(now, hwm);
+    // min, max, sum
+    size_t global_now[3] = {now,now,now};
+    size_t global_hwm[3] = {hwm,hwm,hwm};
+
+    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceSum<1>( &global_now[2] ) );
+    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMin<1>( &global_now[0] ) );
+    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMax<1>( &global_now[1] ) );
+
+    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceSum<1>( &global_hwm[2] ) );
+    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMin<1>( &global_hwm[0] ) );
+    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMax<1>( &global_hwm[1] ) );
+
+    hoflowEnv.hoflowOutputP0() << "Memory Overview: " << std::endl;
+
+    hoflowEnv.hoflowOutputP0() << "nalu memory: total (over all cores) current/high-water mark= "
+                            << std::setw(15) << human_bytes_double(global_now[2])
+                            << std::setw(15) << human_bytes_double(global_hwm[2])
+                            << std::endl;
+
+    hoflowEnv.hoflowOutputP0() << "nalu memory:   min (over all cores) current/high-water mark= "
+                            << std::setw(15) << human_bytes_double(global_now[0])
+                            << std::setw(15) << human_bytes_double(global_hwm[0])
+                            << std::endl;
+
+    hoflowEnv.hoflowOutputP0() << "nalu memory:   max (over all cores) current/high-water mark= "
+                            << std::setw(15) << human_bytes_double(global_now[1])
+                            << std::setw(15) << human_bytes_double(global_hwm[1])
+                            << std::endl;
+
+    Simulation::rootTimer().stop();
+
+    //output timings consistent w/ rest of Sierra
+    stk::diag::Timer & sierra_timer = Simulation::rootTimer();
+    const double elapsed_time = sierra_timer.getMetric<stk::diag::WallTime>().getAccumulatedLap(false);
+    stk::diag::Timer & mesh_output_timer = Simulation::outputTimer();
+    double mesh_output_time = mesh_output_timer.getMetric<stk::diag::WallTime>().getAccumulatedLap(false);
+    double time_without_output = elapsed_time-mesh_output_time;
+
+    stk::parallel_print_time_without_output_and_hwm(hoflowEnv.parallel_comm(), time_without_output, hoflowEnv.hoflowOutputP0());
+
+    stk::diag::printTimersTable(hoflowEnv.hoflowOutputP0(), Simulation::rootTimer(),
+                                stk::diag::METRICS_CPU_TIME | stk::diag::METRICS_WALL_TIME,
+                                false, hoflowEnv.parallel_comm());
+
+    stk::diag::deleteRootTimer(Simulation::rootTimer());
  
     return 0;
 }

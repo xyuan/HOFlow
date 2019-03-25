@@ -15,36 +15,37 @@
 EquationSystems::EquationSystems(Realm & realm) :
     realm_(realm)
 {
+    // nothing to do
 }
 
 EquationSystems::~EquationSystems() {
     for (size_t ie = 0; ie < equationSystemVector_.size(); ++ie)
         delete equationSystemVector_[ie];
 
-//    for (auto it = preIterAlgDriver_.begin(); it != preIterAlgDriver_.end(); ++it) {
-//        delete (*it);
-//    }
-//
-//    for (auto it = postIterAlgDriver_.begin(); it != postIterAlgDriver_.end(); ++it) {
-//        delete (*it);
-//    }
+    for (auto it = preIterAlgDriver_.begin(); it != preIterAlgDriver_.end(); ++it) {
+        delete (*it);
+    }
+
+    for (auto it = postIterAlgDriver_.begin(); it != postIterAlgDriver_.end(); ++it) {
+        delete (*it);
+    }
 }
 
 void EquationSystems::initialize() {
     HOFlowEnv::self().hoflowOutputP0() << "EquationSystems::initialize(): Begin " << std::endl;
-//    double start_time = HOFlowEnv::self().nalu_time();
+    double start_time = HOFlowEnv::self().hoflow_time();
     for( EquationSystem* eqSys : equationSystemVector_ ) {
 //        if ( realm_.get_activate_memory_diagnostic() ) {
-//            HOFlowEnv::self().hoflowOutputP0() << "NaluMemory::EquationSystems::initialize(): " << eqSys->name_ << std::endl;
+//            HOFlowEnv::self().hoflowOutputP0() << "HOFlowMemory::EquationSystems::initialize(): " << eqSys->name_ << std::endl;
 //            realm_.provide_memory_summary();
 //        }
-//        double start_time_eq = HOFlowEnv::self().nalu_time();
+        double start_time_eq = HOFlowEnv::self().hoflow_time();
         eqSys->initialize();
-//        double end_time_eq = HOFlowEnv::self().nalu_time();
-//        eqSys->timerInit_ += (end_time_eq - start_time_eq);
+        double end_time_eq = HOFlowEnv::self().hoflow_time();
+        eqSys->timerInit_ += (end_time_eq - start_time_eq);
     }
-//    double end_time = HOFlowEnv::self().nalu_time();
-//    realm_.timerInitializeEqs_ += (end_time-start_time);
+    double end_time = HOFlowEnv::self().hoflow_time();
+    realm_.timerInitializeEqs_ += (end_time-start_time);
     HOFlowEnv::self().hoflowOutputP0() << "EquationSystems::initialize(): End " << std::endl;
 }
 
@@ -215,4 +216,226 @@ Simulation * EquationSystems::root() {
 
 Realm * EquationSystems::parent() { 
     return & realm_; 
+}
+
+//--------------------------------------------------------------------------
+//-------- reinitialize_linear_system() ----------------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::reinitialize_linear_system()
+{
+  double start_time = HOFlowEnv::self().hoflow_time();
+  for( EquationSystem* eqSys : equationSystemVector_ ) {
+    double start_time_eq = HOFlowEnv::self().hoflow_time();
+    eqSys->reinitialize_linear_system();
+    double end_time_eq = HOFlowEnv::self().hoflow_time();
+    eqSys->timerInit_ += (end_time_eq - start_time_eq);
+  }
+  double end_time = HOFlowEnv::self().hoflow_time();
+  realm_.timerInitializeEqs_ += (end_time-start_time);
+}
+
+//--------------------------------------------------------------------------
+//-------- populate_derived_qauntities() -----------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::populate_derived_quantities()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->populate_derived_quantities();
+}
+
+//--------------------------------------------------------------------------
+//-------- initial_work() --------------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::initial_work()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->initial_work();
+}
+
+//--------------------------------------------------------------------------
+//-------- solve_and_update ------------------------------------------------
+//--------------------------------------------------------------------------
+bool
+EquationSystems::solve_and_update()
+{
+  EquationSystemVector::iterator ii;
+  // Perform necessary setup tasks before iterations
+  pre_iter_work();
+
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+  {
+    (*ii)->pre_iter_work();
+    (*ii)->solve_and_update();
+    (*ii)->post_iter_work();
+  }
+
+  // memory diagnostic
+  if ( realm_.get_activate_memory_diagnostic() ) {
+    HOFlowEnv::self().hoflowOutputP0() << "HOFlowMemory::EquationSystem::solve_and_update()" << std::endl;
+    realm_.provide_memory_summary();
+  }
+
+  // TODO: Refactor code to adhere to pre and post iter_work design
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->post_iter_work_dep();
+
+  // Perform tasks after all EQS have been solved
+  post_iter_work();
+
+  // check equations for convergence
+  bool overallConvergence = true;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii ) {
+    const bool systemConverged = (*ii)->system_is_converged();
+    if ( !systemConverged )
+      overallConvergence = false;
+  }
+  
+  return overallConvergence;
+}
+
+
+//--------------------------------------------------------------------------
+//-------- provide_system_norm ---------------------------------------------
+//--------------------------------------------------------------------------
+double
+EquationSystems::provide_system_norm()
+{
+  double maxNorm = -1.0e16;
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    maxNorm = std::max(maxNorm, (*ii)->provide_scaled_norm());
+  return maxNorm;
+}
+
+//--------------------------------------------------------------------------
+//-------- provide_mean_system_norm ----------------------------------------
+//--------------------------------------------------------------------------
+double
+EquationSystems::provide_mean_system_norm()
+{
+  double meanNorm = 0.0;
+  double normIncrement = 0.0;
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii ) {
+    meanNorm += (*ii)->provide_norm();
+    normIncrement += (*ii)->provide_norm_increment();
+  }
+  return meanNorm/normIncrement;
+}
+
+//--------------------------------------------------------------------------
+//-------- dump_eq_time ----------------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::dump_eq_time()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii ) {
+    (*ii)->dump_eq_time();
+  }
+}
+
+//--------------------------------------------------------------------------
+//-------- predict_state ---------------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::predict_state()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->predict_state();
+}
+
+//--------------------------------------------------------------------------
+//-------- populate_boundary_data ------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::populate_boundary_data()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii ) {
+    for ( size_t k = 0; k < (*ii)->bcDataAlg_.size(); ++k ) {
+      (*ii)->bcDataAlg_[k]->execute();
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+//-------- boundary_data_to_state_data -------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::boundary_data_to_state_data()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii ) {
+    for ( size_t k = 0; k < (*ii)->bcDataMapAlg_.size(); ++k ) {
+      (*ii)->bcDataMapAlg_[k]->execute();
+    }
+  }
+}
+
+//--------------------------------------------------------------------------
+//-------- provide_output --------------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::provide_output()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->provide_output();
+}
+
+//--------------------------------------------------------------------------
+//-------- pre_timestep_work -----------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::pre_timestep_work()
+{
+  // do the work
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->pre_timestep_work();
+}
+
+//--------------------------------------------------------------------------
+//-------- post_converged_work----------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::post_converged_work()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->post_converged_work();
+}
+
+//--------------------------------------------------------------------------
+//-------- evaluate_properties----------------------------------------------
+//--------------------------------------------------------------------------
+void
+EquationSystems::evaluate_properties()
+{
+  EquationSystemVector::iterator ii;
+  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
+    (*ii)->evaluate_properties();
+}
+
+void
+EquationSystems::pre_iter_work()
+{
+  for (auto alg: preIterAlgDriver_) {
+    alg->execute();
+  }
+}
+
+void
+EquationSystems::post_iter_work()
+{
+  for (auto alg: postIterAlgDriver_) {
+    alg->execute();
+  }
 }

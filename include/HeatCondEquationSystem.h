@@ -49,6 +49,8 @@ public:
     VectorFieldType *exact_dtdx_;
     VectorFieldType *exact_laplacian_;
 
+    ScalarFieldType *density_;
+    ScalarFieldType *specHeat_;
     ScalarFieldType *thermalCond_;
     
     VectorFieldType *edgeAreaVec_;

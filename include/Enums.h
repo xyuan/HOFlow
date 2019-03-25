@@ -7,6 +7,11 @@
 
 #include <string>
 
+enum HOFlowState {
+  HOFLOW_STATE_N = 0,
+  HOFLOW_STATE_NM1 = 1
+};
+
 enum AlgorithmType{
     INTERIOR  = 0,
     INFLOW    = 1,

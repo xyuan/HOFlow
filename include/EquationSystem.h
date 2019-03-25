@@ -18,7 +18,6 @@ class SolverAlgorithmDriver;
 class InitialCondition;
 class EquationSystems;
 class LinearSystem;
-//class PostProcessingData;
 
 struct stk::topology;
 class stk::mesh::FieldBase;
@@ -41,6 +40,8 @@ public:
                    const std::string eqnTypeName = "no_eqn_type_name");
     virtual ~EquationSystem();
     void set_nodal_gradient(const std::string & dofName);
+    virtual void initial_work();
+    virtual void populate_derived_quantities() {}
     
     // base class with desired default no-op
     virtual void initialize() {}
@@ -56,9 +57,38 @@ public:
     virtual void solve_and_update() {}
     UserDataType get_bc_data_type(const UserData &, std::string & name);
     virtual void evaluate_properties();
+    virtual void solve_and_update() {}
+    virtual void pre_iter_work();
+    virtual void post_iter_work();
+    virtual void post_iter_work_dep() {}
+    
+    virtual void assemble_and_solve(stk::mesh::FieldBase *deltaSolution);
+    virtual void predict_state() {}
+    virtual void register_interior_algorithm(stk::mesh::Part *part) {}
+    virtual void provide_output() {}
+    virtual void pre_timestep_work();
+    virtual void reinitialize_linear_system() {}
+    virtual void dump_eq_time();
+    virtual double provide_scaled_norm();
+    virtual double provide_norm();
+    virtual double provide_norm_increment();
+    virtual bool system_is_converged();
     
     Simulation * root();
     EquationSystems * parent();
+
+    void report_invalid_supp_alg_names();
+    void report_built_supp_alg_names();
+    bool supp_alg_is_requested(std::string name);
+    bool supp_alg_is_requested(std::vector<std::string>);
+
+    bool nodal_src_is_requested();
+    
+    void update_iteration_statistics(const int & iters);
+
+    bool bc_data_specified(const UserData&, std::string &name);
+    
+    virtual void post_converged_work() {}
     
     std::vector<AuxFunctionAlgorithm *> bcDataAlg_;
     std::vector<Algorithm *> bcDataMapAlg_;
@@ -92,8 +122,16 @@ public:
     bool firstTimeStepSolve_;
     bool edgeNodalGradient_;
     
+    size_t num_graph_entries_;
+
     // vector of property algorithms
     std::vector<Algorithm *> propertyAlg_;
+
+    /// List of tasks to be performed before each EquationSystem::solve_and_update
+    std::vector<AlgorithmDriver *> preIterAlgDriver_;
+
+    /// List of tasks to be performed after each EquationSystem::solve_and_update
+    std::vector<AlgorithmDriver*> postIterAlgDriver_;
 };
 
 #endif /* EQUATIONSYSTEM_H */

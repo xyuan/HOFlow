@@ -14,11 +14,14 @@
 Realms::Realms(Simulation & sim) :
     simulation_(sim)
 {
-    // do nothing
+    // nothing to do
 }
 
 //! Destructor
 Realms::~Realms() {
+    for (size_t ir = 0; ir < realmVector_.size(); ++ir) {
+        delete realmVector_[ir];
+    }
 }
 
 void Realms::breadboard(){
@@ -67,3 +70,10 @@ Simulation * Realms::parent() {
     return & simulation_; 
 }
 
+Realm * Realms::find_realm(std::string realm_name) {
+    RealmVector::iterator realm_iter  = std::find_if(realmVector_.begin(), realmVector_.end(), IsString(realm_name));
+    if (realm_iter != realmVector_.end())
+        return *realm_iter;
+    else
+        return 0;
+}

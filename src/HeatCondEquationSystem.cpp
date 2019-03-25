@@ -16,7 +16,7 @@
 #include "AssembleNodalGradElemAlgorithm.h"
 #include "AssembleNodalGradBoundaryAlgorithm.h"
 //#include "AssembleNodalGradNonConformalAlgorithm.h"
-//#include "AssembleNodeSolverAlgorithm.h"
+#include "AssembleNodeSolverAlgorithm.h"
 #include "AuxFunctionAlgorithm.h"
 #include "ConstantAuxFunction.h"
 #include "CopyFieldAlgorithm.h"
@@ -33,15 +33,15 @@
 #include "HOFlowEnv.h"
 #include "Realm.h"
 #include "Realms.h"
-//#include "HeatCondMassBackwardEulerNodeSuppAlg.h"
-//#include "HeatCondMassBDF2NodeSuppAlg.h"
+#include "HeatCondMassBackwardEulerNodeSuppAlg.h"
+#include "HeatCondMassBDF2NodeSuppAlg.h"
 #include "ProjectedNodalGradientEquationSystem.h"
 //#include "PstabErrorIndicatorEdgeAlgorithm.h"
 //#include "PstabErrorIndicatorElemAlgorithm.h"
 //#include "SimpleErrorIndicatorScalarElemAlgorithm.h"
 #include "Simulation.h"
 #include "SolutionOptions.h"
-//#include "TimeIntegrator.h"
+#include "TimeIntegrator.h"
 #include "SolverAlgorithmDriver.h"
 
 // template for kernels
@@ -103,6 +103,8 @@ HeatCondEquationSystem::HeatCondEquationSystem(EquationSystems & eqSystems) :
     exact_temperature_(NULL),
     exact_dtdx_(NULL),
     exact_laplacian_(NULL),
+    density_(NULL),
+    specHeat_(NULL),
     thermalCond_(NULL),
     edgeAreaVec_(NULL),
     assembleNodalGradAlgDriver_(new AssembleNodalGradAlgorithmDriver(realm_, "temperature", "dtdx")),
@@ -169,10 +171,18 @@ void HeatCondEquationSystem::register_nodal_fields(stk::mesh::Part *part) {
     stk::mesh::put_field_on_mesh(*coordinates_, *part, nDim, nullptr);
 
     // props
+    density_ = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "density"));
+    stk::mesh::put_field_on_mesh(*density_, *part, nullptr);
+
+    specHeat_ = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "specific_heat"));
+    stk::mesh::put_field_on_mesh(*specHeat_, *part, nullptr);
+
     thermalCond_ = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "thermal_conductivity"));
     stk::mesh::put_field_on_mesh(*thermalCond_, *part, nullptr);
 
     // push to property list
+    realm_.augment_property_map(DENSITY_ID, density_);
+    realm_.augment_property_map(SPEC_HEAT_ID, specHeat_);
     realm_.augment_property_map(THERMAL_COND_ID, thermalCond_);
 
     // make sure all states are properly populated (restart can handle this)
@@ -189,7 +199,7 @@ void HeatCondEquationSystem::register_nodal_fields(stk::mesh::Part *part) {
 //-------- register_edge_fields -------------------------------------------
 //--------------------------------------------------------------------------
 void HeatCondEquationSystem::register_edge_fields(stk::mesh::Part *part) {
-    stk::mesh::MetaData &meta_data = realm_.meta_data();
+    // can be deleted but safely
 }
 
 //--------------------------------------------------------------------------
@@ -274,6 +284,93 @@ HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) {
             itsi->second->partVec_.push_back(part);
         } 
     }
+    else {
+        //========================================================================================
+        // WIP... supplemental algs plug into one homogeneous kernel, AssembleElemSolverAlgorithm
+        // currently valid for P=1 3D hex tet pyr wedge and P=2 3D hex
+        //========================================================================================
+
+        // extract topo from part
+        stk::topology partTopo = part->topology();
+        HOFlowEnv::self().hoflowOutputP0() << "The name of this part is " << partTopo.name() << std::endl;
+
+        auto& solverAlgMap = solverAlgDriver_->solverAlgorithmMap_;
+
+        AssembleElemSolverAlgorithm* solverAlg =  nullptr;
+        bool solverAlgWasBuilt =  false;
+        std::tie(solverAlg, solverAlgWasBuilt) = build_or_add_part_to_solver_alg(*this, *part, solverAlgMap);
+
+        ElemDataRequests& dataPreReqs = solverAlg->dataNeededByKernels_;
+        auto& activeKernels = solverAlg->activeKernels_;
+
+        if (solverAlgWasBuilt) {
+//          build_topo_kernel_if_requested<SteadyThermal3dContactSrcElemKernel>(
+//            partTopo, *this, activeKernels, "steady_3d_thermal",
+//            realm_.bulk_data(), *realm_.solutionOptions_, dataPreReqs
+//          );
+//
+//          build_topo_kernel_if_requested<ScalarDiffElemKernel>(
+//            partTopo, *this, activeKernels, "CVFEM_DIFF",
+//            realm_.bulk_data(), *realm_.solutionOptions_,
+//            temperature_, thermalCond_, dataPreReqs
+//          );
+//
+//          build_fem_kernel_if_requested<ScalarDiffFemKernel>(
+//            partTopo, *this, activeKernels, "FEM_DIFF",
+//            realm_.bulk_data(), *realm_.solutionOptions_, temperature_, thermalCond_, dataPreReqs
+//          );
+//
+//          report_invalid_supp_alg_names();
+//          report_built_supp_alg_names();
+        }
+    }
+
+    // time term; nodally lumped
+    const AlgorithmType algMass = MASS;
+    std::map<AlgorithmType, SolverAlgorithm *>::iterator itsm
+      = solverAlgDriver_->solverAlgMap_.find(algMass);
+    if ( itsm == solverAlgDriver_->solverAlgMap_.end() ) {
+        // create the solver alg
+        AssembleNodeSolverAlgorithm *theAlg = new AssembleNodeSolverAlgorithm(realm_, part, this);
+        solverAlgDriver_->solverAlgMap_[algMass] = theAlg;
+
+        // now create the supplemental alg for mass term
+        if ( realm_.number_of_states() == 2 ) {
+          HeatCondMassBackwardEulerNodeSuppAlg *theMass = new HeatCondMassBackwardEulerNodeSuppAlg(realm_);
+          theAlg->supplementalAlg_.push_back(theMass);
+        }
+        else {
+          HeatCondMassBDF2NodeSuppAlg *theMass = new HeatCondMassBDF2NodeSuppAlg(realm_);
+          theAlg->supplementalAlg_.push_back(theMass);
+        }
+
+//        // Add src term supp alg...; limited number supported
+//        std::map<std::string, std::vector<std::string> >::iterator isrc = realm_.solutionOptions_->srcTermsMap_.find("temperature");
+//        if ( isrc != realm_.solutionOptions_->srcTermsMap_.end() ) {
+//            std::vector<std::string> mapNameVec = isrc->second;
+//            for (size_t k = 0; k < mapNameVec.size(); ++k ) {
+//                std::string sourceName = mapNameVec[k];
+//                if (sourceName == "steady_2d_thermal" ) {
+//                    SteadyThermalContactSrcNodeSuppAlg *theSrc
+//                      = new SteadyThermalContactSrcNodeSuppAlg(realm_);
+//                    HOFlowEnv::self().hoflowOutputP0() << "HeatCondNodalSrcTerms::added() " << sourceName << std::endl;
+//
+//                    theAlg->supplementalAlg_.push_back(theSrc);
+//                }
+//                else if (sourceName == "steady_3d_thermal" ) {
+//                    SteadyThermalContact3DSrcNodeSuppAlg *theSrc
+//                    = new SteadyThermalContact3DSrcNodeSuppAlg(realm_);
+//                    theAlg->supplementalAlg_.push_back(theSrc);
+//                }
+//                else {
+//                    throw std::runtime_error("HeatCondNodalSrcTerms::Error Source term is not supported: " + sourceName);
+//                }
+//            }
+//        }
+  }
+  else {
+    itsm->second->partVec_.push_back(part);
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -698,21 +795,21 @@ HeatCondEquationSystem::solve_and_update()
     assemble_and_solve(tTmp_);
 
     // update
-//    double timeA = NaluEnv::self().nalu_time();
+    double timeA = HOFlowEnv::self().hoflow_time();
     field_axpby(
       realm_.meta_data(),
       realm_.bulk_data(),
       1.0, *tTmp_,
       1.0, *temperature_, 
       realm_.get_activate_aura());
-//    double timeB = NaluEnv::self().nalu_time();
-//    timerAssemble_ += (timeB-timeA);
+    double timeB = HOFlowEnv::self().hoflow_time();
+    timerAssemble_ += (timeB-timeA);
    
     // projected nodal gradient
-//    timeA = NaluEnv::self().nalu_time();
+    timeA = HOFlowEnv::self().hoflow_time();
     compute_projected_nodal_gradient();
-//    timeB = NaluEnv::self().nalu_time();
-//    timerMisc_ += (timeB-timeA);
+    timeB = HOFlowEnv::self().hoflow_time();
+    timerMisc_ += (timeB-timeA);
   }  
 }
 
