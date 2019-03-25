@@ -90,14 +90,9 @@ ComputeGeometryAlgorithmDriver::post_work()
 
   stk::mesh::parallel_sum(bulk_data, {dualNodalVolume});
 
-//  if ( realm_.hasPeriodic_) {
-//    const unsigned fieldSize = 1;
-//    realm_.periodic_field_update(dualNodalVolume, fieldSize);
-//  }
-
-//  if ( realm_.checkJacobians_ ) {
-//    check_jacobians();
-//  }
+  if ( realm_.checkJacobians_ ) {
+    check_jacobians();
+  }
 }
 
 //--------------------------------------------------------------------------

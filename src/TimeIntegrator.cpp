@@ -161,34 +161,34 @@ TimeIntegrator::integrate_realm()
     (*ii)->boundary_data_to_state_data();
   }
 
-  // read any fields from input file; restoration time returned
-  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-    currentTime_ = (*ii)->populate_variables_from_input(currentTime_);
-  }
+//  // read any fields from input file; restoration time returned
+//  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//    currentTime_ = (*ii)->populate_variables_from_input(currentTime_);
+//  }
 
-  // possible restart; need to extract current time (max wins)
-  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-    currentTime_ = std::max(currentTime_, (*ii)->populate_restart(timeStepNm1_, timeStepCount_));
-  }
+//  // possible restart; need to extract current time (max wins)
+//  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//    currentTime_ = std::max(currentTime_, (*ii)->populate_restart(timeStepNm1_, timeStepCount_));
+//  }
 
-  // populate data from transfer; init, io and external
-  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-    (*ii)->process_initialization_transfer();
-    // FIXME: might erase the initialization Realm since it has performed its duty (requires shared pointers)
-  }
+//  // populate data from transfer; init, io and external
+//  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//    (*ii)->process_initialization_transfer();
+//    // FIXME: might erase the initialization Realm since it has performed its duty (requires shared pointers)
+//  }
 
-  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-    (*ii)->process_io_transfer();
-  }
+//  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//    (*ii)->process_io_transfer();
+//  }
 
-  // read any fields from input file that will serve at external fields
-  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-    (*ii)->populate_external_variables_from_input(currentTime_);
-  }
-  // process transfer
-  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-    (*ii)->process_external_data_transfer();
-  }
+//  // read any fields from input file that will serve at external fields
+//  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//    (*ii)->populate_external_variables_from_input(currentTime_);
+//  }
+//  // process transfer
+//  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//    (*ii)->process_external_data_transfer();
+//  }
   
   // nm1 dt from possible restart always prevails; input file overrides for fixed time stepping
   if ( adaptiveTimeStep_ ) {
@@ -213,12 +213,12 @@ TimeIntegrator::integrate_realm()
     (*ii)->initial_work();
   }
 
-  // provide for initial multi-physics transfer if restart
-  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-    if ( (*ii)->restarted_simulation() ) {
-      (*ii)->process_multi_physics_transfer(true);
-    }
-  }
+//  // provide for initial multi-physics transfer if restart
+//  for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//    if ( (*ii)->restarted_simulation() ) {
+//      (*ii)->process_multi_physics_transfer(true);
+//    }
+//  }
 
   // provide output/restart for initial condition
   for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
@@ -231,14 +231,14 @@ TimeIntegrator::integrate_realm()
   
   while ( simulation_proceeds() ) {
 
-    // negotiate time step
-    if ( adaptiveTimeStep_ ) {
-      double theStep = 1.0e8;
-      for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-        theStep = std::min(theStep, (*ii)->compute_adaptive_time_step());
-      }
-      timeStepN_ = theStep;
-    }
+//    // negotiate time step
+//    if ( adaptiveTimeStep_ ) {
+//      double theStep = 1.0e8;
+//      for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//        theStep = std::min(theStep, (*ii)->compute_adaptive_time_step());
+//      }
+//      timeStepN_ = theStep;
+//    }
 
     currentTime_ += timeStepN_;
     timeStepCount_ += 1;
@@ -247,11 +247,12 @@ TimeIntegrator::integrate_realm()
     if ( secondOrderTimeAccurate_ )
       compute_gamma();
     
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
     HOFlowEnv::self().hoflowOutputP0()
       << "*******************************************************" << std::endl
       << "Time Step Count: " << timeStepCount_
       << " Current Time: " << currentTime_ << std::endl
-      << " dtN: " << timeStepN_     
+      << " dtN: " << timeStepN_  
       << " dtNm1: " << timeStepNm1_
       << " gammas: " << gamma1_ << " " << gamma2_ << " " << gamma3_ << std::endl;
     
@@ -281,10 +282,10 @@ TimeIntegrator::integrate_realm()
       (*ii)->output_banner();
     }
 
-    // for this time, extract all of the proper data
-    for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-      (*ii)->process_external_data_transfer();
-    }
+//    // for this time, extract all of the proper data
+//    for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//      (*ii)->process_external_data_transfer();
+//    }
 
     // nonlinear iteration loop; Picard-style
     for ( int k = 0; k < nonlinearIterations_; ++k ) {
@@ -293,7 +294,7 @@ TimeIntegrator::integrate_realm()
         << std::endl;
       for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
         (*ii)->advance_time_step();
-        (*ii)->process_multi_physics_transfer();
+//        (*ii)->process_multi_physics_transfer();
       }
     }
 
@@ -302,10 +303,10 @@ TimeIntegrator::integrate_realm()
       (*ii)->post_converged_work();
     }
     
-    // populate data from io transfer
-    for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
-      (*ii)->process_io_transfer();
-    }
+//    // populate data from io transfer
+//    for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {
+//      (*ii)->process_io_transfer();
+//    }
 
     // provide output/restart after nonlinear iteration
     for ( ii = realmVec_.begin(); ii!=realmVec_.end(); ++ii) {

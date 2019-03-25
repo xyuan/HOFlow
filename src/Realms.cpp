@@ -42,10 +42,9 @@ void Realms::load(const YAML::Node & node) {
             Realm * realm = NULL;
             if ( realmType == "multi_physics" ) {
                 realm = new Realm(*this, realm_node);
-                std::cout << "new realm type multi physics" << std::endl;
             } else {
                 //realm = new InputOutputRealm(*this, realm_node);
-                std::cout << "new realm type not multi physics" << std::endl;
+                throw std::runtime_error("parser error Realms::load");
             }
             realm->load(realm_node);
             realmVector_.push_back(realm);

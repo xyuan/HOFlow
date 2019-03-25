@@ -43,6 +43,7 @@
 class EquationSystem;
 class YAML::Node;
 class Simulation;
+class AlgorithmDriver;
 class stk::mesh::Part;
 class Realm;
 
@@ -81,7 +82,6 @@ public:
     void pre_iter_work();
     void post_iter_work();
   
-    void evaluate_properties();
     Simulation * root();
     Realm * parent();
     

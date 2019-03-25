@@ -57,14 +57,11 @@ public:
     virtual void solve_and_update() {}
     UserDataType get_bc_data_type(const UserData &, std::string & name);
     virtual void evaluate_properties();
-    virtual void solve_and_update() {}
     virtual void pre_iter_work();
     virtual void post_iter_work();
     virtual void post_iter_work_dep() {}
     
-    virtual void assemble_and_solve(stk::mesh::FieldBase *deltaSolution);
     virtual void predict_state() {}
-    virtual void register_interior_algorithm(stk::mesh::Part *part) {}
     virtual void provide_output() {}
     virtual void pre_timestep_work();
     virtual void reinitialize_linear_system() {}
@@ -72,7 +69,6 @@ public:
     virtual double provide_scaled_norm();
     virtual double provide_norm();
     virtual double provide_norm_increment();
-    virtual bool system_is_converged();
     
     Simulation * root();
     EquationSystems * parent();
@@ -94,9 +90,6 @@ public:
     std::vector<Algorithm *> bcDataMapAlg_;
     std::vector<Algorithm *> copyStateAlg_;
     LinearSystem * linsys_;
-    
-    bool supp_alg_is_requested(std::string name);
-    bool supp_alg_is_requested(std::vector<std::string>);
     
     EquationSystems & equationSystems_;
     Realm & realm_;

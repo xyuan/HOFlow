@@ -30,7 +30,6 @@ public:
     ~SolutionOptions();
 
     void load(const YAML::Node & node);
-    void initialize_turbulence_constants();
 
     inline bool has_mesh_motion() const { return meshMotion_; }
 

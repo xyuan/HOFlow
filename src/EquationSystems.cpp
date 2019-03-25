@@ -413,17 +413,6 @@ EquationSystems::post_converged_work()
     (*ii)->post_converged_work();
 }
 
-//--------------------------------------------------------------------------
-//-------- evaluate_properties----------------------------------------------
-//--------------------------------------------------------------------------
-void
-EquationSystems::evaluate_properties()
-{
-  EquationSystemVector::iterator ii;
-  for( ii=equationSystemVector_.begin(); ii!=equationSystemVector_.end(); ++ii )
-    (*ii)->evaluate_properties();
-}
-
 void
 EquationSystems::pre_iter_work()
 {

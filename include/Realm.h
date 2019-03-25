@@ -26,11 +26,13 @@ class AlgorithmDriver;
 class AuxFunctionAlgorithm;
 class EquationSystem;
 class EquationSystems;
+class OutputInfo;
 class TpetraLinearSystem;
 class Realms;
 class Simulation;
 class PropertyEvaluator;
 class SolutionOptions;
+class TimeIntegrator;
 class MasterElement;
 class TensorProductQuadratureRule;
 class LagrangeBasis;
@@ -40,6 +42,7 @@ class ComputeGeometryAlgorithmDriver;
 //! Stores information and methods for a specific computational domain
 class Realm {
 public:
+    typedef size_t SizeType;
     Realm(Realms & realms, const YAML::Node & node);
     virtual ~Realm();
     virtual void breadboard();
@@ -69,13 +72,35 @@ public:
     void register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo);
     void provide_output();
     void set_global_id();
-    void populate_boundary_data();
+    void check_job(bool get_node_count);
+    void dump_simulation_time();
+    double provide_mean_norm();
+    void provide_entity_count();
+    void compute_geometry();
     const stk::mesh::PartVector & get_slave_part_vector();
     
+    virtual void populate_initial_condition();
+    virtual void populate_boundary_data();
+    virtual void boundary_data_to_state_data();
+    virtual double populate_variables_from_input(const double currentTime);
+    virtual void populate_external_variables_from_input(const double currentTime) {}
+    virtual void populate_derived_quantities();
     virtual void evaluate_properties();
+    virtual double compute_adaptive_time_step();
+    virtual void swap_states();
+    virtual void predict_state();
+    virtual void pre_timestep_work();
+    virtual void output_banner();
+    virtual void advance_time_step();
+    virtual bool active_time_step();
+    virtual void initial_work();
+  
     std::string get_coordinates_name();
     bool has_non_matching_boundary_face_alg() const;
     bool get_shifted_grad_op(const std::string dofname);
+    
+    bool get_activate_memory_diagnostic();
+    void provide_memory_summary();
     
     // consistent mass matrix for projected nodal gradient
     bool get_consistent_mass_matrix_png(const std::string dofname);
@@ -84,6 +109,23 @@ public:
     stk::mesh::BucketVector const & get_buckets(stk::mesh::EntityRank rank,
                                                 const stk::mesh::Selector & selector ,
                                                 bool get_all = false) const;
+    
+    void post_converged_work();
+    
+    // time information; calls through timeIntegrator
+    double get_current_time();
+    double get_time_step();
+    double get_gamma1();
+    double get_gamma2();
+    double get_gamma3();
+    int get_time_step_count() const;
+    double get_time_step_from_file();
+    bool get_is_fixed_time_step();
+    bool get_is_terminate_based_on_time();
+    double get_total_sim_time();
+    int get_max_time_step_count();
+    
+    std::string convert_bytes(double bytes);
     
     // get aura, bulk and meta data
     bool get_activate_aura();
@@ -104,6 +146,30 @@ public:
     // provide all of the physics target names
     const std::vector<std::string> & get_physics_target_names();
     
+    TimeIntegrator * timeIntegrator_;
+    double wallTimeStart_;
+    
+    SizeType nodeCount_;
+    bool estimateMemoryOnly_;
+    double availableMemoryPerCoreGB_;
+    double timerCreateMesh_;
+    double timerPopulateMesh_;
+    double timerPopulateFieldData_;
+    double timerOutputFields_;
+    double timerCreateEdges_;
+    double timerNonconformal_;
+    double timerInitializeEqs_;
+    double timerPropertyEval_;
+    double timerAdapt_;
+    double timerTransferSearch_;
+    double timerTransferExecute_;
+    double timerSkinMesh_;
+    double timerPromoteMesh_;
+    double timerSortExposedFace_;
+    
+    int currentNonlinearIteration_;
+    OutputInfo * outputInfo_;
+    
     stk::mesh::PartVector emptyPartVector_;
     stk::mesh::PartVector bcPartVec_;
     
@@ -117,6 +183,11 @@ public:
     stk::mesh::BulkData *bulkData_;
     stk::io::StkMeshIoBroker *ioBroker_;
     double l2Scaling_;
+    
+    size_t resultsFileIndex_;
+    
+    // part for all exposed surfaces in the mesh
+    stk::mesh::Part *exposedBoundaryPart_;
     
     // hoflow field data
     GlobalIdFieldType *hoflowGlobalId_;
@@ -138,6 +209,9 @@ public:
     bool doPromotion_; // conto
     unsigned promotionOrder_;
     
+    // allow detailed output (memory) to be provided
+    bool activateMemoryDiagnostic_;
+    
     // allow aura to be optional
     bool activateAura_;
     
@@ -145,6 +219,15 @@ public:
     const YAML::Node & node_;
     
     bool isFinalOuterIter_{false};
+    
+    // cheack that all exposed surfaces have a bc applied
+    bool checkForMissingBcs_;
+
+    // check if there are negative Jacobians
+    bool checkJacobians_;
+
+    // some post processing of entity counts
+    bool provideEntityCount_;
     
     std::string physics_part_name(std::string) const;
     std::vector<std::string> physics_part_names(std::vector<std::string>) const;

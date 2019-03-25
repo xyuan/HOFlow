@@ -43,7 +43,13 @@ realms:
     material_properties:
       target_name: block_1-TETRA
       specifications:
+        - name: density
+          type: constant
+          value: 1.0
         - name: thermal_conductivity
+          type: constant
+          value: 1.0
+        - name: specific_heat
           type: constant
           value: 1.0
 

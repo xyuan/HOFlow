@@ -143,40 +143,6 @@ void EquationSystem::assemble_and_solve(stk::mesh::FieldBase *deltaSolution) {
         HOFlowEnv::self().hoflowOutputP0() << "Error in " << userSuppliedName_ << "::solve_and_update()  " << std::endl;
 }
 
-bool EquationSystem::supp_alg_is_requested(std::string suppAlgName) {
-    const auto& nameMap = realm_.solutionOptions_->elemSrcTermsMap_;
-    auto it = nameMap.find(eqnTypeName_);
-    if (it == nameMap.end()) {
-        return false;
-    }
-    const std::vector<std::string>& nameVec = it->second;
-
-    if (std::find(nameVec.begin(), nameVec.end(), suppAlgName) == nameVec.end()) {
-        return false;
-    }
-    return true;
-}
-
-bool EquationSystem::supp_alg_is_requested(std::vector<std::string> names) {
-    const auto& nameMap = realm_.solutionOptions_->elemSrcTermsMap_;
-    auto it = nameMap.find(eqnTypeName_);
-
-    if (it == nameMap.end()) {
-        return false;
-    }
-
-    const std::vector<std::string>& nameVec = it->second;
-
-    bool found = false;
-    for(auto algName: names) {
-        if (std::find(nameVec.begin(), nameVec.end(), algName) != nameVec.end()) {
-            found = true;
-            break;
-        }
-    }
-    return found;
-}
-
 UserDataType EquationSystem::get_bc_data_type(const UserData &userData, std::string &name) {
     UserDataType dataType = CONSTANT_UD;
     std::map<std::string, UserDataType>::const_iterator iter

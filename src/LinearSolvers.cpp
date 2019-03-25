@@ -33,10 +33,8 @@ void LinearSolvers::load(const YAML::Node & node) {
     const YAML::Node nodes = node["linear_solvers"]; // extract the part about linear solver from the input file
     if (nodes) {
         for ( size_t inode = 0; inode <  nodes.size(); ++inode ) { // loop through multiple defined linear solvers
-            std::cout << "linear solver " << inode << std::endl;
             const YAML::Node linear_solver_node = nodes[inode]; // get the linear solver declared in the input file
             std::string solver_type = linear_solver_node["type"].as<std::string>(); // get the solver type specified in the input file
-            std::cout << "solver type " << solver_type << std::endl;
 
             if (solver_type == "tpetra") {
                 TpetraLinearSolverConfig * linearSolverConfig = new TpetraLinearSolverConfig();

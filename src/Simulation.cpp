@@ -117,7 +117,6 @@ void Simulation::high_level_banner() {
     HOFlowEnv::self().hoflowOutputP0() << "        Now with heat equation, powered by Joseph Fourier        " << std::endl;
     HOFlowEnv::self().hoflowOutputP0() << "=================================================================" << std::endl;
     HOFlowEnv::self().hoflowOutputP0() << std::endl;
-    HOFlowEnv::self().hoflowOutputP0()
     HOFlowEnv::self().hoflowOutputP0() << "   TPLs: Boost, HDF5, netCDF, STK, Trilinos, YAML_cpp and zlib   " << std::endl;
 
     HOFlowEnv::self().hoflowOutputP0() << std::endl;
