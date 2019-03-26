@@ -11,7 +11,7 @@
 #include <LinearSystem.h>
 #include <Realm.h>
 #include <SupplementalAlgorithm.h>
-//#include <TimeIntegrator.h>
+#include <TimeIntegrator.h>
 #include <master_element/MasterElement.h>
 
 // stk_mesh/base/fem

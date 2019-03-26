@@ -166,17 +166,17 @@ int main(int argc, char** argv) {
 
     hoflowEnv.hoflowOutputP0() << "Memory Overview: " << std::endl;
 
-    hoflowEnv.hoflowOutputP0() << "nalu memory: total (over all cores) current/high-water mark= "
+    hoflowEnv.hoflowOutputP0() << "HOFlow memory: total (over all cores) current/high-water mark= "
                             << std::setw(15) << human_bytes_double(global_now[2])
                             << std::setw(15) << human_bytes_double(global_hwm[2])
                             << std::endl;
 
-    hoflowEnv.hoflowOutputP0() << "nalu memory:   min (over all cores) current/high-water mark= "
+    hoflowEnv.hoflowOutputP0() << "HOFlow memory:   min (over all cores) current/high-water mark= "
                             << std::setw(15) << human_bytes_double(global_now[0])
                             << std::setw(15) << human_bytes_double(global_hwm[0])
                             << std::endl;
 
-    hoflowEnv.hoflowOutputP0() << "nalu memory:   max (over all cores) current/high-water mark= "
+    hoflowEnv.hoflowOutputP0() << "HOFlow memory:   max (over all cores) current/high-water mark= "
                             << std::setw(15) << human_bytes_double(global_now[1])
                             << std::setw(15) << human_bytes_double(global_hwm[1])
                             << std::endl;

@@ -1,16 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   SolverAlgorithmDriver.h
- * Author: raphi
- *
- * Created on March 3, 2019, 10:17 AM
- */
-
+/*------------------------------------------------------------------------*/
+/*  HOFlow - Higher Order Flow                                            */
+/*  CFD Solver based ond CVFEM                                            */
+/*------------------------------------------------------------------------*/
 #ifndef SOLVERALGORITHMDRIVER_H
 #define SOLVERALGORITHMDRIVER_H
 

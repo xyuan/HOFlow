@@ -287,7 +287,7 @@ void Realm::load(const YAML::Node & node) {
     // memory diagnostic
     get_if_present(node, "activate_memory_diagnostic", activateMemoryDiagnostic_, activateMemoryDiagnostic_);
     if ( activateMemoryDiagnostic_ )
-      HOFlowEnv::self().hoflowOutputP0() << "Nalu will activate detailed memory pulse" << std::endl;
+      HOFlowEnv::self().hoflowOutputP0() << "HOFlow will activate detailed memory pulse" << std::endl;
 //
 //    // allow for inconsistent restart (fields are missing)
 //    get_if_present(node, "support_inconsistent_multi_state_restart", supportInconsistentRestart_, supportInconsistentRestart_);
@@ -314,23 +314,6 @@ void Realm::load(const YAML::Node & node) {
 
     // load output first so we can check for serializing i/o
     outputInfo_->load(node);
-//    if (root()->serializedIOGroupSize_ == 0)
-//    {
-//      // only set from input file if command-line didn't set it
-//      root()->setSerializedIOGroupSize(outputInfo_->serializedIOGroupSize_);
-//    }
-
-//    // Parse catalyst input file if requested
-//    if(!outputInfo_->catalystFileName_.empty())
-//    {
-//    int error = Iovs::DatabaseIO::parseCatalystFile(outputInfo_->catalystFileName_,
-//                                                    outputInfo_->catalystParseJson_);
-//    if(error)
-//      throw std::runtime_error("Catalyst file parse failed: " + outputInfo_->catalystFileName_);
-//    }
-
-    // solution options - loaded before create_mesh since we need to know if
-    // adaptivity is on to create the proper MetaData
     solutionOptions_->load(node);
     
     create_mesh();

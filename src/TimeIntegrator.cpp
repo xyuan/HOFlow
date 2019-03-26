@@ -249,7 +249,9 @@ TimeIntegrator::integrate_realm()
     
     HOFlowEnv::self().hoflowOutputP0() << std::endl;
     HOFlowEnv::self().hoflowOutputP0()
-      << "*******************************************************" << std::endl
+      << "*******************************************************" << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+    HOFlowEnv::self().hoflowOutputP0()
       << "Time Step Count: " << timeStepCount_
       << " Current Time: " << currentTime_ << std::endl
       << " dtN: " << timeStepN_  

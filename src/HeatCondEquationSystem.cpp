@@ -67,7 +67,7 @@
 //
 //#include "overset/UpdateOversetFringeAlgorithmDriver.h"
 
-// Nalu utils
+// HOFlow utils
 #include "utils/StkHelpers.h"
 
 // stk_util
@@ -294,9 +294,9 @@ HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) {
         stk::topology partTopo = part->topology();
         HOFlowEnv::self().hoflowOutputP0() << "The name of this part is " << partTopo.name() << std::endl;
 
-        auto& solverAlgMap = solverAlgDriver_->solverAlgorithmMap_;
+        auto & solverAlgMap = solverAlgDriver_->solverAlgorithmMap_;
 
-        AssembleElemSolverAlgorithm* solverAlg =  nullptr;
+        AssembleElemSolverAlgorithm * solverAlg =  nullptr;
         bool solverAlgWasBuilt =  false;
         std::tie(solverAlg, solverAlgWasBuilt) = build_or_add_part_to_solver_alg(*this, *part, solverAlgMap);
 

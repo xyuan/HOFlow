@@ -97,7 +97,7 @@ Simulation::rootTimerSet()
 //static
 stk::diag::Timer& Simulation::rootTimer()
 {
-  static stk::diag::Timer s_timer = stk::diag::createRootTimer("Nalu", rootTimerSet());
+  static stk::diag::Timer s_timer = stk::diag::createRootTimer("HOFlow", rootTimerSet());
 
   return s_timer;
 }

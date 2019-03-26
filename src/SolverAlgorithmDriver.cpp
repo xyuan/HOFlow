@@ -1,16 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   SolverAlgorithmDriver.cpp
- * Author: raphi
- * 
- * Created on March 3, 2019, 10:17 AM
- */
-
+/*------------------------------------------------------------------------*/
+/*  HOFlow - Higher Order Flow                                            */
+/*  CFD Solver based ond CVFEM                                            */
+/*------------------------------------------------------------------------*/
 #include "SolverAlgorithmDriver.h"
 
 #include <AlgorithmDriver.h>
@@ -19,23 +10,12 @@
 
 class Realm;
 
-//==========================================================================
-// Class Definition
-//==========================================================================
-// SolverAlgorithmDriver - Drives algorithms
-//==========================================================================
-//--------------------------------------------------------------------------
-//-------- constructor -----------------------------------------------------
-//--------------------------------------------------------------------------
 SolverAlgorithmDriver::SolverAlgorithmDriver(Realm & realm) : 
     AlgorithmDriver(realm)
 {
-  // does nothing
+  // nothing to do
 }
 
-//--------------------------------------------------------------------------
-//-------- destructor ------------------------------------------------------
-//--------------------------------------------------------------------------
 SolverAlgorithmDriver::~SolverAlgorithmDriver()
 {
   std::map<std::string, SolverAlgorithm *>::iterator is;

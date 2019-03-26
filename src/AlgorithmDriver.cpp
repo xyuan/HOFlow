@@ -1,16 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   AlgorithmDriver.cpp
- * Author: raphi
- * 
- * Created on March 3, 2019, 10:19 AM
- */
-
+/*------------------------------------------------------------------------*/
+/*  HOFlow - Higher Order Flow                                            */
+/*  CFD Solver based ond CVFEM                                            */
+/*------------------------------------------------------------------------*/
 #include "AlgorithmDriver.h"
 
 #include <Algorithm.h>
@@ -30,7 +21,7 @@ AlgorithmDriver::AlgorithmDriver(
   Realm &realm)
   : realm_(realm)
 {
-  // does nothing
+  // nothing to do
 }
 
 //--------------------------------------------------------------------------

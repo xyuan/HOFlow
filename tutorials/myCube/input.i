@@ -5,6 +5,8 @@
 
 Simulations:
   - name: sim1
+    time_integrator: ti_1
+    optimizer: opt1
 
 linear_solvers:
   - name: solve_scalar
@@ -84,15 +86,6 @@ realms:
       target_name: surface_6
       wall_user_data:
         temperature: 50.0
-
-    solution_options:
-      name: myOptions
-
-      use_consolidated_solver_algorithm: yes
-
-      options:
-      - element_source_terms:
-          temperature: FEM_DIFF
 
     output:
       output_data_base_name: femHC.e

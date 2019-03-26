@@ -31,7 +31,7 @@ SolverAlgorithm::SolverAlgorithm(
   : Algorithm(realm, part),
     eqSystem_(eqSystem)
 {
-  // does nothing
+  // nothing to do
 }
 
 //--------------------------------------------------------------------------
