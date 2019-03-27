@@ -150,36 +150,38 @@ int main(int argc, char** argv) {
                            << " \tmin: " << g_min << " \tmax: " << g_max << std::endl;
 
     // output memory usage
-    size_t now, hwm;
-    stk::get_memory_usage(now, hwm);
-    // min, max, sum
-    size_t global_now[3] = {now,now,now};
-    size_t global_hwm[3] = {hwm,hwm,hwm};
+    {
+        size_t now, hwm;
+        stk::get_memory_usage(now, hwm);
+        // min, max, sum
+        size_t global_now[3] = {now,now,now};
+        size_t global_hwm[3] = {hwm,hwm,hwm};
 
-    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceSum<1>( &global_now[2] ) );
-    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMin<1>( &global_now[0] ) );
-    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMax<1>( &global_now[1] ) );
+        stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceSum<1>( &global_now[2] ) );
+        stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMin<1>( &global_now[0] ) );
+        stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMax<1>( &global_now[1] ) );
 
-    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceSum<1>( &global_hwm[2] ) );
-    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMin<1>( &global_hwm[0] ) );
-    stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMax<1>( &global_hwm[1] ) );
+        stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceSum<1>( &global_hwm[2] ) );
+        stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMin<1>( &global_hwm[0] ) );
+        stk::all_reduce(hoflowEnv.parallel_comm(), stk::ReduceMax<1>( &global_hwm[1] ) );
 
-    hoflowEnv.hoflowOutputP0() << "Memory Overview: " << std::endl;
+        hoflowEnv.hoflowOutputP0() << "Memory Overview: " << std::endl;
 
-    hoflowEnv.hoflowOutputP0() << "HOFlow memory: total (over all cores) current/high-water mark= "
-                            << std::setw(15) << human_bytes_double(global_now[2])
-                            << std::setw(15) << human_bytes_double(global_hwm[2])
-                            << std::endl;
+        hoflowEnv.hoflowOutputP0() << "HOFlow memory: total (over all cores) current/high-water mark= "
+                                << std::setw(15) << human_bytes_double(global_now[2])
+                                << std::setw(15) << human_bytes_double(global_hwm[2])
+                                << std::endl;
 
-    hoflowEnv.hoflowOutputP0() << "HOFlow memory:   min (over all cores) current/high-water mark= "
-                            << std::setw(15) << human_bytes_double(global_now[0])
-                            << std::setw(15) << human_bytes_double(global_hwm[0])
-                            << std::endl;
+        hoflowEnv.hoflowOutputP0() << "HOFlow memory:   min (over all cores) current/high-water mark= "
+                                << std::setw(15) << human_bytes_double(global_now[0])
+                                << std::setw(15) << human_bytes_double(global_hwm[0])
+                                << std::endl;
 
-    hoflowEnv.hoflowOutputP0() << "HOFlow memory:   max (over all cores) current/high-water mark= "
-                            << std::setw(15) << human_bytes_double(global_now[1])
-                            << std::setw(15) << human_bytes_double(global_hwm[1])
-                            << std::endl;
+        hoflowEnv.hoflowOutputP0() << "HOFlow memory:   max (over all cores) current/high-water mark= "
+                                << std::setw(15) << human_bytes_double(global_now[1])
+                                << std::setw(15) << human_bytes_double(global_hwm[1])
+                                << std::endl;
+    }
 
     Simulation::rootTimer().stop();
 
