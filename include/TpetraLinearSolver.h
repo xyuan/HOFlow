@@ -6,14 +6,8 @@
 #define TPETRALINEARSOLVER_H
 
 #include <LinearSolver.h>
-//#include <LinearSolverConfig.h>
-//#include <TpetraLinearSolverConfig.h>
-//#include <LinearSolverTypes.h>
 #include <LocalGraphArrays.h>
 #include <Enums.h>
-
-//#include <LinearSolvers.h>
-
 
 #include <Kokkos_DefaultNode.hpp>
 #include <Tpetra_Vector.hpp>
@@ -25,17 +19,16 @@
 
 class TpetraLinearSolverConfig;
 
-// Header files defining default types for template parameters.
-// These headers must be included after other MueLu/Xpetra headers.
 typedef double Scalar;
 typedef long GlobalOrdinal;
 typedef int LocalOrdinal;
 typedef Tpetra::Map<LocalOrdinal, GlobalOrdinal>::node_type Node;
 typedef Teuchos::ScalarTraits<Scalar> STS;
 
-//! Specific type of linear solver
+/** A specialized class of LinearSolver for the TpetraLinearSolver*/
 class TpetraLinearSolver : public LinearSolver {
 public:
+    /** Initializes some variables*/
     TpetraLinearSolver(std::string solverName,
                         TpetraLinearSolverConfig * config,
                         const Teuchos::RCP<Teuchos::ParameterList> params,
@@ -43,8 +36,10 @@ public:
                         LinearSolvers * linearSolvers);
     virtual ~TpetraLinearSolver();
     
+    /** Sets the variables matrix_ and rhs_ which represents A and b*/
     void setSystemObjects(Teuchos::RCP<LinSys::Matrix> matrix, Teuchos::RCP<LinSys::Vector> rhs);
-
+    
+    /** Creates a linear system of equations*/
     void setupLinearSolver(Teuchos::RCP<LinSys::Vector> sln,
                             Teuchos::RCP<LinSys::Matrix> matrix,
                             Teuchos::RCP<LinSys::Vector> rhs,
@@ -62,6 +57,8 @@ public:
 
     /** Solve the linear system Ax = b
      *
+     *  This method is called once every non-linear iteration (outer iterations).
+     *  The inner iterations are happening within the solver in the TPL.
      *  @param[out] sln The solution vector
      *  @param[out] iterationCount The number of linear solver iterations to convergence
      *  @param[out] scaledResidual The final residual norm
@@ -72,11 +69,12 @@ public:
     virtual PetraType getType() override { return PT_TPETRA; }
 
 private:
-    //! The solver parameters
+    /** the solver parameters*/
     const Teuchos::RCP<Teuchos::ParameterList> params_;
 
-    //! The preconditioner parameters
+    /** The preconditioner parameters*/
     const Teuchos::RCP<Teuchos::ParameterList> paramsPrecond_;
+    
     Teuchos::RCP<LinSys::Matrix> matrix_;
     Teuchos::RCP<LinSys::Vector> rhs_;
     Teuchos::RCP<LinSys::LinearProblem> problem_;

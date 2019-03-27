@@ -69,13 +69,13 @@ void TpetraLinearSolver::setupLinearSolver(Teuchos::RCP<LinSys::Vector> sln,
     problem_ = Teuchos::RCP<LinSys::LinearProblem>(new LinSys::LinearProblem(matrix_, sln, rhs_) );
 
     Ifpack2::Factory factory;
-    preconditioner_ = factory.create (preconditionerType_, 
+    preconditioner_ = factory.create(preconditionerType_, 
                                       Teuchos::rcp_const_cast<const LinSys::Matrix>(matrix_), 0);
     preconditioner_->setParameters(*paramsPrecond_);
 
     // delay initialization for some preconditioners
     if ( "RILUK" != preconditionerType_ ) {
-      preconditioner_->initialize();
+        preconditioner_->initialize();
     }
     problem_->setRightPrec(preconditioner_);
 
@@ -125,16 +125,16 @@ int TpetraLinearSolver::solve(Teuchos::RCP<LinSys::Vector> sln, int & iters, dou
     int whichNorm = 2;
     finalResidNrm=0.0;
 
-//    double time = -HOFlowEnv::self().nalu_time();
+    double time = -HOFlowEnv::self().hoflow_time();
     if ( "RILUK" == preconditionerType_ ) {
       preconditioner_->initialize();
     }
     preconditioner_->compute();
-    //time += HOFlowEnv::self().nalu_time();
+    time += HOFlowEnv::self().hoflow_time();
 
     // Update preconditioner timer for this timestep; actual summing over
     // timesteps is handled in EquationSystem::assemble_and_solve
-//    timerPrecond_ = time;
+    timerPrecond_ = time;
 
     Teuchos::RCP<Teuchos::ParameterList> params(Teuchos::rcp(new Teuchos::ParameterList));
     if (isFinalOuterIter) {

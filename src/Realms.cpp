@@ -10,27 +10,18 @@
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 
-//! Constructor
 Realms::Realms(Simulation & sim) :
     simulation_(sim)
 {
     // nothing to do
 }
 
-//! Destructor
 Realms::~Realms() {
     for (size_t ir = 0; ir < realmVector_.size(); ++ir) {
         delete realmVector_[ir];
     }
 }
 
-void Realms::breadboard(){
-    for ( size_t irealm = 0; irealm < realmVector_.size(); ++irealm ) {
-        realmVector_[irealm]->breadboard();
-    }
-}
-
-//! Loops through all Realms defined in the input file create a object from class Realm for each
 void Realms::load(const YAML::Node & node) {
     const YAML::Node realms = node["realms"];
     if (realms) {
@@ -54,7 +45,12 @@ void Realms::load(const YAML::Node & node) {
     }
 }
 
-//! Loops through all Realms stored and initialize them
+void Realms::breadboard(){
+    for ( size_t irealm = 0; irealm < realmVector_.size(); ++irealm ) {
+        realmVector_[irealm]->breadboard();
+    }
+}
+
 void Realms::initialize() {
     for ( size_t irealm = 0; irealm < realmVector_.size(); ++irealm ) {
         realmVector_[irealm]->initialize();
@@ -72,7 +68,7 @@ Simulation * Realms::parent() {
 Realm * Realms::find_realm(std::string realm_name) {
     RealmVector::iterator realm_iter  = std::find_if(realmVector_.begin(), realmVector_.end(), IsString(realm_name));
     if (realm_iter != realmVector_.end())
-        return *realm_iter;
+        return * realm_iter;
     else
         return 0;
 }

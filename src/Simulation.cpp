@@ -15,27 +15,21 @@
 // Definition outstide of class because of debug_ being a static variable
 bool Simulation::debug_ = false;
 
-//! Constructor
 Simulation::Simulation(const YAML::Node& root_node) :
     m_root_node(root_node),
     timeIntegrator_(NULL),
     realms_(NULL),
     linearSolvers_(NULL)
-{}
+{
+    // nothing to do
+}
 
-//! Destructor
 Simulation::~Simulation() {
     delete realms_;
     delete timeIntegrator_;
     delete linearSolvers_;
 }
 
-void Simulation::breadboard() {
-    realms_->breadboard();
-    timeIntegrator_->breadboard();
-}
-
-//! Loads the information necessary to do the simulation
 void Simulation::load(const YAML::Node & node) {
     high_level_banner();
     
@@ -55,19 +49,39 @@ void Simulation::load(const YAML::Node & node) {
     timeIntegrator_->load(node);
 }
 
-//! Initializes all computational domains
+void Simulation::breadboard() {
+    realms_->breadboard();
+    timeIntegrator_->breadboard();
+}
+
 void Simulation::initialize() {
     realms_->initialize();
     timeIntegrator_->initialize();
 }
 
-//! Run the simulation
 void Simulation::run() {
     HOFlowEnv::self().hoflowOutputP0() << std::endl;
     HOFlowEnv::self().hoflowOutputP0() << "*******************************************************" << std::endl;
     HOFlowEnv::self().hoflowOutputP0() << "Simulation Shall Commence: number of processors = " << HOFlowEnv::self().parallel_size() << std::endl;
     HOFlowEnv::self().hoflowOutputP0() << "*******************************************************" << std::endl;
     timeIntegrator_->integrate_realm();
+}
+
+void Simulation::high_level_banner() {
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "=================================================================" << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "                  HOFlow - Higher Order Flow                     " << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "                   CFD solver based on CVFEM                     " << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "        Now with heat equation, powered by Joseph Fourier        " << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "=================================================================" << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "   TPLs: Boost, HDF5, netCDF, STK, Trilinos, YAML_cpp and zlib   " << std::endl;
+
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "      This project uses some suff from Sandia Corporation        " << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "                            Thx...                               " << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << "-----------------------------------------------------------------" << std::endl;
+    HOFlowEnv::self().hoflowOutputP0() << std::endl;
 }
 
 Simulation * Simulation::root() {
@@ -86,42 +100,20 @@ bool Simulation::debug() const {
     return debug_;
 }
 
-stk::diag::TimerSet &
-Simulation::rootTimerSet()
-{
-  static stk::diag::TimerSet s_timerSet(sierra::Diag::TIMER_ALL);
-
-  return s_timerSet;
+// static
+stk::diag::TimerSet & Simulation::rootTimerSet() {
+    static stk::diag::TimerSet s_timerSet(sierra::Diag::TIMER_ALL);
+    return s_timerSet;
 }
 
-//static
-stk::diag::Timer& Simulation::rootTimer()
-{
-  static stk::diag::Timer s_timer = stk::diag::createRootTimer("HOFlow", rootTimerSet());
-
-  return s_timer;
+// static
+stk::diag::Timer& Simulation::rootTimer() {
+    static stk::diag::Timer s_timer = stk::diag::createRootTimer("HOFlow", rootTimerSet());
+    return s_timer;
 }
 
-//static
-stk::diag::Timer& Simulation::outputTimer()
-{
-  static stk::diag::Timer s_timer("Output", rootTimer());
-  return s_timer;
-}
-
-void Simulation::high_level_banner() {
-    HOFlowEnv::self().hoflowOutputP0() << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "=================================================================" << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "                  HOFlow - Higher Order Flow                     " << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "                   CFD solver based on CVFEM                     " << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "        Now with heat equation, powered by Joseph Fourier        " << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "=================================================================" << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "   TPLs: Boost, HDF5, netCDF, STK, Trilinos, YAML_cpp and zlib   " << std::endl;
-
-    HOFlowEnv::self().hoflowOutputP0() << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "      This project uses some suff from Sandia Corporation        " << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "                            Thx...                               " << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << "-----------------------------------------------------------------" << std::endl;
-    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+// static
+stk::diag::Timer& Simulation::outputTimer() {
+    static stk::diag::Timer s_timer("Output", rootTimer());
+    return s_timer;
 }

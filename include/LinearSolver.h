@@ -31,12 +31,7 @@ class LinearSolvers;
 class LinearSolverConfig;
 class Simulation;
 
-/** An abstract representation of a linear solver in Nalu
- *
- *  Defines the basic API supported by the linear solvers for use within Nalu.
- *  See concrete implementations such as sierra::nalu::TpetraLinearSolver for
- *  more details.
- */
+/** An abstract class for a linear solver*/
 class LinearSolver {
 public:
     LinearSolver(std::string name, LinearSolvers * linearSolvers, LinearSolverConfig * config);

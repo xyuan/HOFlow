@@ -51,8 +51,7 @@ void EquationSystems::initialize() {
 
 std::string EquationSystems::get_solver_block_name(const std::string eqName ) {
     std::string solverName = "n_a";
-    std::map<std::string, std::string>::const_iterator iter
-      = solverSpecMap_.find(eqName);
+    std::map<std::string, std::string>::const_iterator iter = solverSpecMap_.find(eqName);
     if (iter != solverSpecMap_.end()) {
         solverName = (*iter).second;
     }

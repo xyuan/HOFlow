@@ -13,15 +13,14 @@
 #include <string>
 #include <iostream>
 
-//! Constructor
 TpetraLinearSolverConfig::TpetraLinearSolverConfig() {
+    // nothing to do
 }
 
-//! Destructor
 TpetraLinearSolverConfig::~TpetraLinearSolverConfig() {
+    // nothing to do
 }
 
-//! Loads all parameters for the linear solver from the input file
 void TpetraLinearSolverConfig::load(const YAML::Node& node) {
     name_ = node["name"].as<std::string>();
     method_ = node["method"].as<std::string>();

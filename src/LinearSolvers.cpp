@@ -53,7 +53,7 @@ LinearSolver * LinearSolvers::create_solver(std::string solverBlockName, Equatio
     // provide unique name
     std::string solverName = EquationTypeMap[theEQ] + "_Solver";
 
-    LinearSolver *theSolver = NULL;
+    LinearSolver * theSolver = NULL;
 
     // check in tpetra map...
     bool foundT = false;

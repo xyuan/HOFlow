@@ -18,20 +18,44 @@
 class Simulation;
 class LinearSolver;
 
-//! Stores one or multiple linear solvers (objects of the class LinearSolver)
+/** Container class to store one or multiple linear solvers
+ *
+ * The linear solvers stored are created based on the information
+ * specified in the input file
+ */
 class LinearSolvers {
 public:
+    /** Initializes some variables*/
     LinearSolvers(Simulation & sim);
+    
+    /** Deletes all solver configurations and solvers created*/
     ~LinearSolvers();
+    
+    /** Create objects based on the information in the input file
+     * 
+     * Parses the input file and creates an object for the solver
+     * configuration. A solver created later will use this configuration
+     */
     void load(const YAML::Node & node);
-    LinearSolver *create_solver(std::string solverBlockName, EquationType theEQ);
-    Simulation *root();
-    Simulation *parent();
+    
+    /** Creates a solver for the equation system
+     *
+     * The created solver are stored in the map solvers_ with the
+     * equation type and the coresponding solver.
+     * E.g. equation type = temperature, solver = TpetraLinearSoilver*/
+    LinearSolver * create_solver(std::string solverBlockName, EquationType theEQ);
+    
+    Simulation * root();
+    Simulation * parent();
     
     typedef std::map<EquationType, LinearSolver *> SolverMap;
     typedef std::map<std::string, TpetraLinearSolverConfig *> SolverTpetraConfigMap;
-    SolverMap solvers_; // mapping solvers to equation types
-    SolverTpetraConfigMap solverTpetraConfig_; // solver configurations of tpetra type solvers, acces with name from input file
+    
+    /** Stores one or multiple equation types with coresponding solvers*/
+    SolverMap solvers_;
+    
+    /** Stores one or multiple solver configurations that are created based on the information form the input file*/
+    SolverTpetraConfigMap solverTpetraConfig_;
     
     Simulation & sim_;
 };
