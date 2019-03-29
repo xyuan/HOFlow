@@ -34,11 +34,11 @@ EquationSystems::~EquationSystems() {
 void EquationSystems::initialize() {
     HOFlowEnv::self().hoflowOutputP0() << "EquationSystems::initialize(): Begin " << std::endl;
     double start_time = HOFlowEnv::self().hoflow_time();
-    for( EquationSystem* eqSys : equationSystemVector_ ) {
-//        if ( realm_.get_activate_memory_diagnostic() ) {
-//            HOFlowEnv::self().hoflowOutputP0() << "HOFlowMemory::EquationSystems::initialize(): " << eqSys->name_ << std::endl;
-//            realm_.provide_memory_summary();
-//        }
+    for( EquationSystem * eqSys : equationSystemVector_ ) {
+        if ( realm_.get_activate_memory_diagnostic() ) {
+            HOFlowEnv::self().hoflowOutputP0() << "HOFlowMemory::EquationSystems::initialize(): " << eqSys->name_ << std::endl;
+            realm_.provide_memory_summary();
+        }
         double start_time_eq = HOFlowEnv::self().hoflow_time();
         eqSys->initialize();
         double end_time_eq = HOFlowEnv::self().hoflow_time();
@@ -177,7 +177,7 @@ void EquationSystems::load(const YAML::Node & y_node) {
 void EquationSystems::register_wall_bc(const std::string targetName, const WallBoundaryConditionData & wallBCData) {
     stk::mesh::MetaData & meta_data = realm_.meta_data();
 
-    stk::mesh::Part *targetPart = meta_data.get_part(targetName);
+    stk::mesh::Part * targetPart = meta_data.get_part(targetName);
     if ( NULL == targetPart ) {
         HOFlowEnv::self().hoflowOutputP0() << "Sorry, no part name found by the name " << targetName << std::endl;
     }

@@ -9,12 +9,9 @@
 
 class Realm;
 
-class ComputeGeometryAlgorithmDriver : public AlgorithmDriver
-{
+class ComputeGeometryAlgorithmDriver : public AlgorithmDriver {
 public:
-
-  ComputeGeometryAlgorithmDriver(
-    Realm &realm);
+  ComputeGeometryAlgorithmDriver(Realm &realm);
   virtual ~ComputeGeometryAlgorithmDriver() {}
 
   void pre_work();

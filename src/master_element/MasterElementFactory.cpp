@@ -26,9 +26,7 @@
 #include <iostream>
 #include <memory>
 
-std::unique_ptr<MasterElement>
-create_surface_master_element(stk::topology topo)
-{
+std::unique_ptr<MasterElement> create_surface_master_element(stk::topology topo) {
   if (topo.is_super_topology()) {
     // super topologies uses different master element type
     return nullptr;
@@ -57,8 +55,8 @@ create_surface_master_element(stk::topology topo)
 //    case stk::topology::QUAD_9:
 //      return make_unique<Quad93DSCS>();
 //
-//    case stk::topology::TRI_3:
-//      return make_unique<Tri3DSCS>();
+    case stk::topology::TRI_3:
+      return make_unique<Tri3DSCS>();
 //
 //    case stk::topology::QUAD_4_2D:
 //      return make_unique<Quad42DSCS>();
@@ -88,7 +86,7 @@ create_surface_master_element(stk::topology topo)
 //      return make_unique<Edge2DSCS>();
 
     default:
-      HOFlowEnv::self().hoflowOutputP0() << "sorry, we only support tet4 surface elements" << std::endl;
+      HOFlowEnv::self().hoflowOutputP0() << "sorry, we only support TET_4 and TRI_3 surface elements" << std::endl;
       HOFlowEnv::self().hoflowOutputP0() << "your type is " << topo.value() << std::endl;
       break;
 
@@ -96,9 +94,7 @@ create_surface_master_element(stk::topology topo)
   return nullptr;
 }
 //--------------------------------------------------------------------------
-std::unique_ptr<MasterElement>
-create_volume_master_element(stk::topology topo)
-{
+std::unique_ptr<MasterElement> create_volume_master_element(stk::topology topo) {
   if (topo.is_super_topology()) {
     // super topologies uses different master element type
     return nullptr;
@@ -137,52 +133,45 @@ create_volume_master_element(stk::topology topo)
   }
   return nullptr;
 }
-//--------------------------------------------------------------------------
-std::unique_ptr<MasterElement>
-create_surface_master_element(stk::topology topo, int dimension, std::string quadType)
-{
-  if (!topo.is_super_topology()) {
-    // regular topologies uses different master element type
+
+std::unique_ptr<MasterElement> create_surface_master_element(stk::topology topo, int dimension, std::string quadType) {
+    if (!topo.is_super_topology()) {
+        // regular topologies uses different master element type
+        return nullptr;
+    }
+
+//    ThrowRequire(dimension > 0 && dimension < 4);
+//
+//    auto desc = ElementDescription::create(dimension, topo);
+//
+//    auto basis = (topo.is_superelement()) ?
+//        LagrangeBasis(desc->inverseNodeMap, desc->nodeLocs1D)
+//      : LagrangeBasis(desc->inverseNodeMapBC, desc->nodeLocs1D);
+//
+//    auto quad = TensorProductQuadratureRule(quadType, desc->polyOrder);
+//
+//    if (topo.is_superedge()) {
+//      ThrowRequire(desc->baseTopo == stk::topology::QUAD_4_2D);
+//      return make_unique<HigherOrderEdge2DSCS>(*desc, basis, quad);
+//    }
+//
+//    if (topo.is_superface()) {
+//      ThrowRequire(desc->baseTopo == stk::topology::HEX_8);
+//      return make_unique<HigherOrderQuad3DSCS>(*desc, basis, quad);
+//    }
+//
+//    if (topo.is_superelement() && desc->baseTopo == stk::topology::QUAD_4_2D) {
+//      return make_unique<HigherOrderQuad2DSCS>(*desc, basis, quad);
+//    }
+//
+//    if (topo.is_superelement() && desc->baseTopo == stk::topology::HEX_8) {
+//      return make_unique<HigherOrderHexSCS>(*desc, basis, quad);
+//    }
+
     return nullptr;
-  }
-
-  ThrowRequire(dimension > 0 && dimension < 4);
-//
-//  auto desc = ElementDescription::create(dimension, topo);
-//
-//  auto basis = (topo.is_superelement()) ?
-//      LagrangeBasis(desc->inverseNodeMap, desc->nodeLocs1D)
-//    : LagrangeBasis(desc->inverseNodeMapBC, desc->nodeLocs1D);
-
-//  auto quad = TensorProductQuadratureRule(quadType, desc->polyOrder);
-
-//  if (topo.is_superedge()) {
-//    ThrowRequire(desc->baseTopo == stk::topology::QUAD_4_2D);
-//    return make_unique<HigherOrderEdge2DSCS>(*desc, basis, quad);
-//  }
-//
-//  if (topo.is_superface()) {
-//    ThrowRequire(desc->baseTopo == stk::topology::HEX_8);
-//    return make_unique<HigherOrderQuad3DSCS>(*desc, basis, quad);
-//  }
-//
-//  if (topo.is_superelement() && desc->baseTopo == stk::topology::QUAD_4_2D) {
-//    return make_unique<HigherOrderQuad2DSCS>(*desc, basis, quad);
-//  }
-//
-//  if (topo.is_superelement() && desc->baseTopo == stk::topology::HEX_8) {
-//    return make_unique<HigherOrderHexSCS>(*desc, basis, quad);
-//  }
-
-  return nullptr;
 }
-//--------------------------------------------------------------------------
-std::unique_ptr<MasterElement>
-create_volume_master_element(
-  stk::topology topo,
-  int dimension,
-  std::string quadType)
-{
+
+std::unique_ptr<MasterElement> create_volume_master_element(stk::topology topo, int dimension, std::string quadType) {
   if (!topo.is_super_topology()) {
     // regular topologies uses different master element type
     return nullptr;
@@ -208,46 +197,38 @@ create_volume_master_element(
 
 std::map<stk::topology, std::unique_ptr<MasterElement>> MasterElementRepo::surfaceMeMap_;
 
-MasterElement* MasterElementRepo::get_surface_master_element(
-  const stk::topology& theTopo,
-  int dimension,
-  std::string quadType)
-{
-  auto it = surfaceMeMap_.find(theTopo);
-  if (it == surfaceMeMap_.end()) {
-    if (!theTopo.is_super_topology()) {
-      surfaceMeMap_[theTopo] = create_surface_master_element(theTopo);
-    } else {
-      surfaceMeMap_[theTopo] = create_surface_master_element(theTopo, dimension, quadType);
+MasterElement * MasterElementRepo::get_surface_master_element(const stk::topology & theTopo, int dimension, std::string quadType) {
+    auto it = surfaceMeMap_.find(theTopo);
+    if (it == surfaceMeMap_.end()) {
+        if (!theTopo.is_super_topology()) {
+            surfaceMeMap_[theTopo] = create_surface_master_element(theTopo);
+        } else {
+            surfaceMeMap_[theTopo] = create_surface_master_element(theTopo, dimension, quadType);
+        }
     }
-  }
-  MasterElement* theElem = surfaceMeMap_.at(theTopo).get();
-  ThrowRequire(theElem != nullptr);
-  return theElem;
+    MasterElement* theElem = surfaceMeMap_.at(theTopo).get();
+    ThrowRequire(theElem != nullptr);
+    
+    return theElem;
 }
 
 std::map<stk::topology, std::unique_ptr<MasterElement>> MasterElementRepo::volumeMeMap_;
 
-MasterElement* MasterElementRepo::get_volume_master_element(
-  const stk::topology& theTopo,
-  int dimension,
-  std::string quadType)
-{
-  auto it = volumeMeMap_.find(theTopo);
-  if (it == volumeMeMap_.end()) {
-    if (!theTopo.is_super_topology()) {
-      volumeMeMap_[theTopo] = create_volume_master_element(theTopo);
-    } else {
-      volumeMeMap_[theTopo] = create_volume_master_element(theTopo, dimension, quadType);
+MasterElement * MasterElementRepo::get_volume_master_element(const stk::topology& theTopo, int dimension, std::string quadType) {
+    auto it = volumeMeMap_.find(theTopo);
+    if (it == volumeMeMap_.end()) {
+        if (!theTopo.is_super_topology()) {
+            volumeMeMap_[theTopo] = create_volume_master_element(theTopo);
+        } else {
+            volumeMeMap_[theTopo] = create_volume_master_element(theTopo, dimension, quadType);
+        }
     }
-  }
-  MasterElement* theElem = volumeMeMap_.at(theTopo).get();
-  ThrowRequire(theElem != nullptr);
-  return theElem;
+    MasterElement * theElem = volumeMeMap_.at(theTopo).get();
+    ThrowRequire(theElem != nullptr);
+    return theElem;
 }
 
-void MasterElementRepo::clear()
-{
-  surfaceMeMap_.clear();
-  volumeMeMap_.clear();
+void MasterElementRepo::clear() {
+    surfaceMeMap_.clear();
+    volumeMeMap_.clear();
 }

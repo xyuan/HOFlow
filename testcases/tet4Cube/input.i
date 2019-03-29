@@ -20,7 +20,7 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: myCube.exo
+    mesh: myCube_side.exo
 
     equation_systems:
       name: theEqSys

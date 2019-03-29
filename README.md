@@ -9,11 +9,11 @@ The framework is heavily inspired by the [Nalu](https://github.com/NaluCFD/Nalu)
 - yaml-cpp
 - boost
 
-### Procedure
+### Build HOFlow
 1. Install Spack
 2. Install Trilinos with Spack
 3. Edit the paths to trilinos and yaml in build/do-configHOFlow, usually spack/opt/etc.
-4. Change directory to build
+4. Change to build/ directory
 4. Execute the following command to run cmake
 
 ```
@@ -25,6 +25,16 @@ $ ./do-configHOFlow
 ```
 $ make
 ```
+
+### Build Documentation
+1. Change to doc/ directory
+2. Execute the following command to run doxygen
+
+```
+$ doxygen
+```
+
+If the graphs (e.g. class hierarchy) are not properly displayed, install graphviz.
 
 ## Run
 1. Add the location of the executable to the PATH variable, usually build/hoflow_d.exe

@@ -50,23 +50,15 @@ OutputInfo::OutputInfo()
     outputPropertyManager_(new Ioss::PropertyManager()),
     restartPropertyManager_(new Ioss::PropertyManager())  
 {
-  // does nothing
+    // nothing to do
 }
 
-//--------------------------------------------------------------------------
-//-------- destructor ------------------------------------------------------
-//--------------------------------------------------------------------------
-OutputInfo::~OutputInfo()
-{
-  delete outputPropertyManager_;
-  delete restartPropertyManager_;
+OutputInfo::~OutputInfo() {
+    delete outputPropertyManager_;
+    delete restartPropertyManager_;
 }
 
-//--------------------------------------------------------------------------
-//-------- load ------------------------------------------------------------
-//--------------------------------------------------------------------------
-void
-OutputInfo::load(const YAML::Node & y_node) {
+void OutputInfo::load(const YAML::Node & y_node) {
     const YAML::Node y_output = y_node["output"];
     if (y_output) {
         // user desires output
@@ -197,21 +189,18 @@ OutputInfo::load(const YAML::Node & y_node) {
 }
 
 // compression options
-int
-OutputInfo::get_output_compression() {
-  return outputCompressionLevel_;
-}
-bool
-OutputInfo::get_output_shuffle() {
-  return outputCompressionShuffle_;
+int OutputInfo::get_output_compression() {
+    return outputCompressionLevel_;
 }
 
-int
-OutputInfo::get_restart_compression() {
-  return restartCompressionLevel_;
+bool OutputInfo::get_output_shuffle() {
+    return outputCompressionShuffle_;
 }
 
-bool
-OutputInfo::get_restart_shuffle() {
-  return restartCompressionShuffle_;
+int OutputInfo::get_restart_compression() {
+    return restartCompressionLevel_;
+}
+
+bool OutputInfo::get_restart_shuffle() {
+    return restartCompressionShuffle_;
 }

@@ -34,7 +34,6 @@ class PropertyEvaluator;
 class SolutionOptions;
 class TimeIntegrator;
 class MasterElement;
-class TensorProductQuadratureRule;
 class LagrangeBasis;
 class ComputeGeometryAlgorithmDriver;
 
@@ -43,11 +42,30 @@ class ComputeGeometryAlgorithmDriver;
 class Realm {
 public:
     typedef size_t SizeType;
+    /** Initializes some variables*/
     Realm(Realms & realms, const YAML::Node & node);
+    
+    /** Deletes mesh and some property data and algorithms*/
     virtual ~Realm();
+    
+    /** Creates object of ComputeGeometryAlgorithmDriver*/
     virtual void breadboard();
+    
+    /** Read information from the input file an creates the coresponding objects
+     * 
+     * Get information from the input file. If not specified, default values
+     * are use.
+     * E.g. Boundary and initial conditions objects are created
+     * and the meta data from the mesh file is initialized.
+     */
     virtual void load(const YAML::Node & node);
+    
+    /** Initializes the created objects and create fields
+     * 
+     * Populates bulk and field data of the mesh.
+     */
     virtual void initialize();
+    
     Simulation * root() const;
     Simulation * root();
     Realms * parent() const;
@@ -173,6 +191,8 @@ public:
     
     stk::mesh::PartVector emptyPartVector_;
     stk::mesh::PartVector bcPartVec_;
+    
+    std::vector<AuxFunctionAlgorithm *> bcDataAlg_;
     
     Realms & realms_;
     std::string name_;

@@ -140,10 +140,10 @@ Realm::~Realm() {
       delete *ii;
     }
 
-//    // any bc data
-//    std::vector<AuxFunctionAlgorithm *>::iterator iaux;
-//    for( iaux=bcDataAlg_.begin(); iaux!=bcDataAlg_.end(); ++iaux )
-//      delete *iaux;
+    // any bc data
+    std::vector<AuxFunctionAlgorithm *>::iterator iaux;
+    for( iaux=bcDataAlg_.begin(); iaux!=bcDataAlg_.end(); ++iaux )
+        delete *iaux;
 
     delete solutionOptions_;
     delete outputInfo_;
@@ -171,69 +171,6 @@ Realms * Realm::parent() const {
     return & realms_; 
 }
 
-//! Initializes the computational domain with in the input file specified values
-void Realm::initialize() {
-    HOFlowEnv::self().hoflowOutputP0() << "Realm::initialize() Begin " << std::endl;
-    
-    // field registration
-    setup_nodal_fields();
-    setup_edge_fields();
-    setup_element_fields();
-
-    // property maps and evaluation algorithms
-    setup_property();
-
-    // interior algorithm creation
-    setup_interior_algorithms();
-
-    // create boundary conditions
-    setup_bc();
-    
-    // create initial conditions
-    setup_initial_conditions();
-    
-    // Populate_mesh fills in the entities (nodes/elements/etc) and
-    // connectivities, but no field-data. Field-data is not allocated yet.
-    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_mesh() Begin" << std::endl;
-    double time = -HOFlowEnv::self().hoflow_time();
-    ioBroker_->populate_mesh();
-    time += HOFlowEnv::self().hoflow_time();
-    timerPopulateMesh_ += time;
-    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_mesh() End" << std::endl;
-
-    // output entity counts including max/min
-    if ( provideEntityCount_ ) {
-        provide_entity_count();
-    }
-    
-    // Now the mesh is fully populated, so we're ready to populate
-    // field-data including coordinates, and attributes and/or distribution factors
-    // if those exist on the input mesh file.
-    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_field_data() Begin" << std::endl;
-    time = -HOFlowEnv::self().hoflow_time();
-    ioBroker_->populate_field_data();
-    time += HOFlowEnv::self().hoflow_time();
-    timerPopulateFieldData_ += time;
-    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_field_data() End" << std::endl;
-    
-    // manage HOFlowGlobalId for linear system
-    set_global_id();
-    
-    // output and restart files
-    create_output_mesh();
-    
-    populate_boundary_data();
-    compute_geometry();
-    equationSystems_.initialize();
-    check_job(false);
-    HOFlowEnv::self().hoflowOutputP0() << "Realm::initialize() End " << std::endl;
-}
-
-//! Loads information regarding the computational domain from the input file (also mesh file)
-
-//! Reads the mesh file name in the input file in order to read the mesh file.
-//! Reads all boundary and initial conditions as well as material properties.
-//! Reads all equation systems specified in the input file.
 void Realm::load(const YAML::Node & node) {
     name_ = node["name"].as<std::string>();
     inputDBName_ = node["mesh"].as<std::string>();
@@ -338,6 +275,64 @@ void Realm::load(const YAML::Node & node) {
         equationSystems_.load(node);
     }
     check_job(true);
+}
+
+//! Initializes the computational domain with in the input file specified values
+void Realm::initialize() {
+    HOFlowEnv::self().hoflowOutputP0() << "Realm::initialize() Begin " << std::endl;
+    
+    // field registration
+    setup_nodal_fields();
+    setup_edge_fields();
+    setup_element_fields();
+
+    // property maps and evaluation algorithms
+    setup_property();
+
+    // interior algorithm creation
+    setup_interior_algorithms();
+
+    // create boundary conditions
+    setup_bc();
+    
+    // create initial conditions
+    setup_initial_conditions();
+    
+    // Populate_mesh fills in the entities (nodes/elements/etc) and
+    // connectivities, but no field-data. Field-data is not allocated yet.
+    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_mesh() Begin" << std::endl;
+    double time = -HOFlowEnv::self().hoflow_time();
+    ioBroker_->populate_mesh();
+    time += HOFlowEnv::self().hoflow_time();
+    timerPopulateMesh_ += time;
+    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_mesh() End" << std::endl;
+
+    // output entity counts including max/min
+    if ( provideEntityCount_ ) {
+        provide_entity_count();
+    }
+    
+    // Now the mesh is fully populated, so we're ready to populate
+    // field-data including coordinates, and attributes and/or distribution factors
+    // if those exist on the input mesh file.
+    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_field_data() Begin" << std::endl;
+    time = -HOFlowEnv::self().hoflow_time();
+    ioBroker_->populate_field_data();
+    time += HOFlowEnv::self().hoflow_time();
+    timerPopulateFieldData_ += time;
+    HOFlowEnv::self().hoflowOutputP0() << "Realm::ioBroker_->populate_field_data() End" << std::endl;
+    
+    // manage HOFlowGlobalId for linear system
+    set_global_id();
+    
+    // output and restart files
+    create_output_mesh();
+    
+    populate_boundary_data();
+    compute_geometry();
+    equationSystems_.initialize();
+    check_job(false);
+    HOFlowEnv::self().hoflowOutputP0() << "Realm::initialize() End " << std::endl;
 }
 
 //! Sets material properties to the nodal field
@@ -654,17 +649,17 @@ void Realm::register_interior_algorithm(stk::mesh::Part *part) {
     interiorPartVec_.push_back(part);
 }
 
-void Realm::register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo) {
+void Realm::register_wall_bc(stk::mesh::Part * part, const stk::topology & theTopo) {
     // push back the part for book keeping and, later, skin mesh
     bcPartVec_.push_back(part);
 
     const int nDim = metaData_->spatial_dimension();
 
     // register fields
-    MasterElement *meFC = MasterElementRepo::get_surface_master_element(theTopo);
+    MasterElement * meFC = MasterElementRepo::get_surface_master_element(theTopo);
     const int numScsIp = meFC->numIntPoints_;
 
-    GenericFieldType *exposedAreaVec_ = &(metaData_->declare_field<GenericFieldType>(static_cast<stk::topology::rank_t>(metaData_->side_rank()), "exposed_area_vector"));
+    GenericFieldType * exposedAreaVec_ = &(metaData_->declare_field<GenericFieldType>(static_cast<stk::topology::rank_t>(metaData_->side_rank()), "exposed_area_vector"));
     stk::mesh::put_field_on_mesh(*exposedAreaVec_, *part, nDim*numScsIp, nullptr);
 
     //====================================================
@@ -673,7 +668,7 @@ void Realm::register_wall_bc(stk::mesh::Part *part, const stk::topology &theTopo
     const AlgorithmType algType = WALL;
     std::map<AlgorithmType, Algorithm *>::iterator it = computeGeometryAlgDriver_->algMap_.find(algType);
     if ( it == computeGeometryAlgDriver_->algMap_.end() ) {
-        ComputeGeometryBoundaryAlgorithm *theAlg = new ComputeGeometryBoundaryAlgorithm(*this, part);
+        ComputeGeometryBoundaryAlgorithm * theAlg = new ComputeGeometryBoundaryAlgorithm(*this, part);
         computeGeometryAlgDriver_->algMap_[algType] = theAlg;
     }
     else {
@@ -749,11 +744,11 @@ const std::vector<std::string> & Realm::get_physics_target_names() {
 }
 
 void Realm::populate_boundary_data() {
-    /*// realm first
+    // realm first
     for ( size_t k = 0; k < bcDataAlg_.size(); ++k ) {
         bcDataAlg_[k]->execute();
     }
-    equationSystems_.populate_boundary_data();*/
+    equationSystems_.populate_boundary_data();
 }
 
 void Realm::evaluate_properties() {

@@ -25,7 +25,7 @@ AuxFunctionAlgorithm::AuxFunctionAlgorithm(Realm & realm,
     auxFunction_(auxFunction),
     entityRank_(entityRank)
 {
-    // does nothing
+    // nothing to do
 }
 
 AuxFunctionAlgorithm::~AuxFunctionAlgorithm() {
@@ -40,10 +40,9 @@ void AuxFunctionAlgorithm::execute() {
     stk::mesh::MetaData & meta_data = realm_.meta_data();
 
     const unsigned nDim = meta_data.spatial_dimension();
-//    const double time = realm_.get_current_time();
+    const double time = realm_.get_current_time();
     VectorFieldType *coordinates = meta_data.get_field<VectorFieldType>(stk::topology::NODE_RANK, realm_.get_coordinates_name());
     
-    double time = 0; // temp solution
     auxFunction_->setup(time);
 
     stk::mesh::Selector selector = stk::mesh::selectUnion(partVec_) &

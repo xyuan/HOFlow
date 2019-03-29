@@ -243,8 +243,8 @@ void HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) 
             itsi->second->partVec_.push_back(part);
         } 
     }
-    // Consolidated solver algorithm
     else {
+        // Consolidated solver algorithm
         //========================================================================================
         // WIP... supplemental algs plug into one homogeneous kernel, AssembleElemSolverAlgorithm
         // currently valid for P=1 3D hex tet pyr wedge and P=2 3D hex
@@ -287,21 +287,24 @@ void HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) 
 
     // time term; nodally lumped
     const AlgorithmType algMass = MASS;
-    std::map<AlgorithmType, SolverAlgorithm *>::iterator itsm
-      = solverAlgDriver_->solverAlgMap_.find(algMass);
+    std::map<AlgorithmType, SolverAlgorithm *>::iterator itsm = solverAlgDriver_->solverAlgMap_.find(algMass);
+    
+    // If algorithm is not present, create a new one
     if ( itsm == solverAlgDriver_->solverAlgMap_.end() ) {
         // create the solver alg
-        AssembleNodeSolverAlgorithm *theAlg = new AssembleNodeSolverAlgorithm(realm_, part, this);
+        AssembleNodeSolverAlgorithm * theAlg = new AssembleNodeSolverAlgorithm(realm_, part, this);
         solverAlgDriver_->solverAlgMap_[algMass] = theAlg;
 
         // now create the supplemental alg for mass term
         if ( realm_.number_of_states() == 2 ) {
-          HeatCondMassBackwardEulerNodeSuppAlg *theMass = new HeatCondMassBackwardEulerNodeSuppAlg(realm_);
-          theAlg->supplementalAlg_.push_back(theMass);
+            // 1st order time accuracy, bdf1 = backwards euler aka implicit euler
+            HeatCondMassBackwardEulerNodeSuppAlg * theMass = new HeatCondMassBackwardEulerNodeSuppAlg(realm_);
+            theAlg->supplementalAlg_.push_back(theMass);
         }
         else {
-          HeatCondMassBDF2NodeSuppAlg *theMass = new HeatCondMassBDF2NodeSuppAlg(realm_);
-          theAlg->supplementalAlg_.push_back(theMass);
+            // 2nd order time accuracy, backward differentiation formula bdf2
+            HeatCondMassBDF2NodeSuppAlg * theMass = new HeatCondMassBDF2NodeSuppAlg(realm_);
+            theAlg->supplementalAlg_.push_back(theMass);
         }
 
 //        // Add src term supp alg...; limited number supported
@@ -327,18 +330,17 @@ void HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) 
 //                }
 //            }
 //        }
-  }
-  else {
-    itsm->second->partVec_.push_back(part);
-  }
+    }
+    else {
+        itsm->second->partVec_.push_back(part);
+    }
 }
 
 void HeatCondEquationSystem::register_wall_bc(
-  stk::mesh::Part *part,
-  const stk::topology &partTopo,
-  const WallBoundaryConditionData &wallBCData)
+    stk::mesh::Part * part,
+    const stk::topology & partTopo,
+    const WallBoundaryConditionData & wallBCData)
 {
-
     const AlgorithmType algType = WALL;
 
     // np1
@@ -349,11 +351,11 @@ void HeatCondEquationSystem::register_wall_bc(
 
     // non-solver; dtdx; allow for element-based shifted; all bcs are of generic type "WALL"
     if ( !managePNG_ ) {
-        std::map<AlgorithmType, Algorithm *>::iterator it
-            = assembleNodalGradAlgDriver_->algMap_.find(algType);
+        std::map<AlgorithmType, Algorithm *>::iterator it = assembleNodalGradAlgDriver_->algMap_.find(algType);
+        
+        // If algorithm is not present, create a new one
         if ( it == assembleNodalGradAlgDriver_->algMap_.end() ) {
-            Algorithm *theAlg 
-              = new AssembleNodalGradBoundaryAlgorithm(realm_, part, &tempNp1, &dtdxNone, edgeNodalGradient_);
+            Algorithm * theAlg = new AssembleNodalGradBoundaryAlgorithm(realm_, part, & tempNp1, &dtdxNone, edgeNodalGradient_);
             assembleNodalGradAlgDriver_->algMap_[algType] = theAlg;
         }
         else {
@@ -372,7 +374,7 @@ void HeatCondEquationSystem::register_wall_bc(
         ScalarFieldType *theBcField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "temperature_bc"));
         stk::mesh::put_field_on_mesh(*theBcField, *part, nullptr);
 
-        AuxFunction *theAuxFunc = NULL;
+        AuxFunction * theAuxFunc = NULL;
         if ( CONSTANT_UD == theDataType ) {
             Temperature theTemp = userData.temperature_;
             std::vector<double> userSpec(1);
@@ -393,18 +395,16 @@ void HeatCondEquationSystem::register_wall_bc(
         }*/
 
         // bc data alg
-        AuxFunctionAlgorithm *auxAlg
-            = new AuxFunctionAlgorithm(realm_, part,
-                                     theBcField, theAuxFunc,
-                                     stk::topology::NODE_RANK);
+        AuxFunctionAlgorithm * auxAlg = new AuxFunctionAlgorithm(realm_, part,
+                                                                theBcField, theAuxFunc,
+                                                                stk::topology::NODE_RANK);
         bcDataAlg_.push_back(auxAlg);
 
         // copy temperature_bc to temperature np1...
-        CopyFieldAlgorithm *theCopyAlg
-            = new CopyFieldAlgorithm(realm_, part,
-                                    theBcField, &tempNp1,
-                                    0, 1,
-                                    stk::topology::NODE_RANK);
+        CopyFieldAlgorithm * theCopyAlg = new CopyFieldAlgorithm(realm_, part,
+                                                                theBcField, &tempNp1,
+                                                                0, 1,
+                                                                stk::topology::NODE_RANK);
         bcDataMapAlg_.push_back(theCopyAlg);
 
         // wall specified temperature solver algorithm
@@ -432,15 +432,15 @@ void HeatCondEquationSystem::register_wall_bc(
         }
         else {
             // Dirichlet bc
-            std::map<AlgorithmType, SolverAlgorithm *>::iterator itd =
-              solverAlgDriver_->solverDirichAlgMap_.find(algType);
+            std::map<AlgorithmType, SolverAlgorithm *>::iterator itd = solverAlgDriver_->solverDirichAlgMap_.find(algType);
+            
+            // If algorithm is not present, create a new one
             if ( itd == solverAlgDriver_->solverDirichAlgMap_.end() ) {
-              DirichletBC *theAlg
-                = new DirichletBC(realm_, this, part, &tempNp1, theBcField, 0, 1);
-              solverAlgDriver_->solverDirichAlgMap_[algType] = theAlg;
+                DirichletBC * theAlg = new DirichletBC(realm_, this, part, &tempNp1, theBcField, 0, 1);
+                solverAlgDriver_->solverDirichAlgMap_[algType] = theAlg;
             }
             else {
-              itd->second->partVec_.push_back(part);
+                itd->second->partVec_.push_back(part);
             }
         }
     }

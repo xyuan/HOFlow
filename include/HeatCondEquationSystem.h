@@ -60,8 +60,9 @@ public:
     
     /** Creates solver algorithms
      *
-     * Nodal gradient and solver algorithm. It differentiates between
-     * consolidated and not consolidated solver algorithm.
+     * Nodal gradient, solver algorithm and time term alg. 
+     * It differentiates between consolidated and not
+     * consolidated solver algorithm.
      * @note Not sure what a consolidated solver alogirthm is
      */
     void register_interior_algorithm(stk::mesh::Part *part);

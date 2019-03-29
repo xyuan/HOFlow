@@ -21,7 +21,9 @@ DirichletBC::DirichletBC(
     bcValues_(bcValues),
     beginPos_(beginPos),
     endPos_(endPos)
-{}
+{
+    // nothing to do
+}
 
 void
 DirichletBC::initialize_connectivity()
