@@ -10,7 +10,9 @@
 #include <string>
 #include <set>
 
-Ioss::PropertyManager;
+namespace Ioss{
+  class PropertyManager;
+}
 
 /** Container class for the information about simulation output
  * in the input file.
