@@ -99,6 +99,7 @@ public:
     bool has_non_matching_boundary_face_alg() const;
     bool get_shifted_grad_op(const std::string dofname);
     
+    bool debug() const;
     bool get_activate_memory_diagnostic();
     void provide_memory_summary();
     

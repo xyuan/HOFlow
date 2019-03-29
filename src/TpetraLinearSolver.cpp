@@ -66,11 +66,10 @@ void TpetraLinearSolver::setupLinearSolver(Teuchos::RCP<LinSys::Vector> sln,
                                             Teuchos::RCP<LinSys::Vector> rhs,
                                             Teuchos::RCP<LinSys::MultiVector> coords) {
     setSystemObjects(matrix,rhs);
-    problem_ = Teuchos::RCP<LinSys::LinearProblem>(new LinSys::LinearProblem(matrix_, sln, rhs_) );
+    problem_ = Teuchos::RCP<LinSys::LinearProblem>(new LinSys::LinearProblem(matrix_, sln, rhs_)); // Create a new Belos problem
 
     Ifpack2::Factory factory;
-    preconditioner_ = factory.create(preconditionerType_, 
-                                      Teuchos::rcp_const_cast<const LinSys::Matrix>(matrix_), 0);
+    preconditioner_ = factory.create(preconditionerType_, Teuchos::rcp_const_cast<const LinSys::Matrix>(matrix_), 0);
     preconditioner_->setParameters(*paramsPrecond_);
 
     // delay initialization for some preconditioners
@@ -146,7 +145,7 @@ int TpetraLinearSolver::solve(Teuchos::RCP<LinSys::Vector> sln, int & iters, dou
     solver_->setParameters(params);
 
     problem_->setProblem();
-    solver_->solve();
+    solver_->solve(); // Actually call the solver and let it do its inner iterations
 
     iters = solver_->getNumIters();
     residual_norm(whichNorm, sln, finalResidNrm);

@@ -54,9 +54,9 @@ class Realm;
 class LinearSolver;
 class TpetraLinearSolver;
 
+/** Abstract class of a linear system that serves as input for the linear solver*/
 class LinearSystem {
 public:
-
     LinearSystem(Realm & realm, const unsigned numDof, EquationSystem *eqSys, LinearSolver *linearSolver);
     virtual ~LinearSystem();
 
@@ -81,7 +81,7 @@ public:
     /** Process nodes as belonging to a Dirichlet-type row
      *
      *  See the documentation/implementation of
-     *  sierra::nalu::FixPressureAtNodeAlgorithm for an example of this use case.
+     *  FixPressureAtNodeAlgorithm for an example of this use case.
      */
     virtual void buildDirichletNodeGraph(const std::vector<stk::mesh::Entity> &) {}
 

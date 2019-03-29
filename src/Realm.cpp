@@ -1390,3 +1390,7 @@ Realm::post_converged_work()
 {
   equationSystems_.post_converged_work();
 }
+
+bool Realm::debug() const {
+    return root()->debug_;
+}

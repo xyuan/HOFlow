@@ -25,7 +25,7 @@ class stk::mesh::Part;
 
 typedef std::vector<stk::mesh::Part *> PartVector;
 
-//! Stores a equation system specified in the input file. Base class representation of a PDE
+//! Represents a equation system specified in the input file. Base class representation of a PDE
 
 //! EquationSystem defines the API supported by allconcrete implementations
 //! of PDEs for performing the following actions:
@@ -51,6 +51,7 @@ public:
     virtual void register_interior_algorithm(stk::mesh::Part * part) {}
     virtual void register_wall_bc(stk::mesh::Part * part, const stk::topology & theTopo, const WallBoundaryConditionData & wallBCData) {}
     
+    /** Reads parameters from the input file like name and max_iterations*/
     virtual void load(const YAML::Node & node);
     virtual bool system_is_converged();
     virtual void assemble_and_solve(stk::mesh::FieldBase *deltaSolution);
