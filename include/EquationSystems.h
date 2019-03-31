@@ -49,11 +49,18 @@ class Realm;
 
 typedef std::vector<EquationSystem *> EquationSystemVector;
 
-//! Stores one or multiple equation systems (objects of the class EqationSystem)
+/** Container class that creates an stores one or multiple equation systems*/
 class EquationSystems {
 public:
+    /** Initializes some variables*/
     EquationSystems(Realm & realm);
+    
+    /** Deletes all objects created and stored*/
     ~EquationSystems();
+    
+    /** Creates a objet of specialized class for each equation system
+     * specified in the input file
+     */
     void load(const YAML::Node & node);
     std::string get_solver_block_name(const std::string eqName);
     void register_nodal_fields(const std::vector<std::string> targetNames);
@@ -85,10 +92,14 @@ public:
     Simulation * root();
     Realm * parent();
     
-    //! Ease of access function, an object of EquationSystems can treated like an array and its elements accessed
+    /** Ease of access function, an object of EquationSystems can treated 
+     * like an array and its elements accessed
+     */ 
     size_t size() { return equationSystemVector_.size(); }
     
-    //! Ease of access function, an object of EquationSystems can treated like an array and its elements accessed
+    /** Ease of access function, an object of EquationSystems can treated
+     * like an array and its elements accessed
+     */
     EquationSystem *operator[](int i) { return equationSystemVector_[i]; }
     
     Realm & realm_;

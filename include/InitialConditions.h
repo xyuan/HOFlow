@@ -15,17 +15,29 @@ class Realm;
 
 typedef std::vector<InitialCondition *> InitialConditionVector;
 
-//! Stores one or multiple initial conditions (objects of the class InitialCondition)
+/** Container class that creates and stores one or multiple
+ * objects of type InitialCondition
+ */
 class InitialConditions {
 public:
+    /** Initializes some variables*/
     InitialConditions(Realm & realm);
+    
     ~InitialConditions();
+    
+    /** Creates a object for every initial condition specified in the
+     * input file.
+     */
     InitialConditions * load(YAML::Node node);
     
-    //! Ease of access function, an object of InitialConditions can treated like an array and checked for size
+    /** Ease of access function, an object of InitialConditions can treated 
+     * like an array and checked for size
+     */
     size_t size() { return initialConditionVector_.size(); }
     
-    //! Ease of access function, an object of InitialConditions can treated like an array and its elements accessed
+    /** Ease of access function, an object of InitialConditions can treated 
+     * like an array and its elements accessed
+     */
     InitialCondition *operator[](int i) { return initialConditionVector_[i];}
     
     Realm & realm_;

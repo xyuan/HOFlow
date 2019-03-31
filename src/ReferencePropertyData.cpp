@@ -7,8 +7,10 @@
 ReferencePropertyData::ReferencePropertyData() :
     speciesName_("na")
 {
+    // nothing to do
 }
 
 ReferencePropertyData::~ReferencePropertyData() {
+    // nothing to do
 }
 

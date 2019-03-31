@@ -28,13 +28,12 @@ typedef Teuchos::ScalarTraits<Scalar> STS;
 
 const LocalOrdinal INVALID = std::numeric_limits<LocalOrdinal>::max();
 
-//! Helper Class that is used within TpetraLinearSystem class
-
-//! LocalGraphArrays is a helper class for building the arrays describing
-//! the local csr graph, rowPointers and colIndices. These arrays are passed
-//! to the TpetraCrsGraph::setAllIndices method. This helper class is used
-//! within nalu's TpetraLinearSystem class.
-//! See unit-tests in UnitTestLocalGraphArrays.C.
+/** Helper Class for building the arrays describing the local csr graph,
+ * rowPointers and colIndices.
+ * 
+ * These arrays are passed to the TpetraCrsGraph::setAllIndices method.
+ * This helper class is used within the TpetraLinerSystem class.
+ */
 class LocalGraphArrays {
 public:
     LocalGraphArrays(const Kokkos::View<size_t *,HostSpace> & rowLengths);

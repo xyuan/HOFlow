@@ -19,37 +19,51 @@ public:
     virtual ~LinearSolverConfig() = default;
     virtual void load(const YAML::Node &) = 0;
     
-    inline std::string name() const
-    { return name_ ; }
+    inline std::string name() const { 
+        return name_ ; 
+    }
 
-    const Teuchos::RCP<Teuchos::ParameterList> & params() const
-    { return params_; }
+    const Teuchos::RCP<Teuchos::ParameterList> & params() const { 
+        return params_; 
+    }
 
-    const Teuchos::RCP<Teuchos::ParameterList> & paramsPrecond() const
-    { return paramsPrecond_; }
+    const Teuchos::RCP<Teuchos::ParameterList> & paramsPrecond() const { 
+        return paramsPrecond_; 
+    }
 
-    inline bool getWriteMatrixFiles() const
-    { return writeMatrixFiles_; }
+    inline bool getWriteMatrixFiles() const { 
+        return writeMatrixFiles_; 
+    }
 
-    inline bool recomputePreconditioner() const
-    { return recomputePreconditioner_; }
+    inline bool recomputePreconditioner() const { 
+        return recomputePreconditioner_; 
+    }
 
-    inline bool reusePreconditioner() const
-    { return reusePreconditioner_; }
+    inline bool reusePreconditioner() const { 
+        return reusePreconditioner_; 
+    }
 
-    std::string get_method() const
-    {return method_;}
+    std::string get_method() const {
+        return method_;
+    }
 
-    std::string preconditioner_type() const
-    { return preconditionerType_;}
+    std::string preconditioner_type() const { 
+        return preconditionerType_;
+    }
 
-    inline double tolerance() const { return tolerance_; }
-    inline double finalTolerance() const { return finalTolerance_; }
-
-    std::string solver_type() const
-    { return solverType_; }
+    inline double tolerance() const { 
+        return tolerance_; 
+    }
     
-    protected:
+    inline double finalTolerance() const { 
+        return finalTolerance_; 
+    }
+
+    std::string solver_type() const { 
+        return solverType_; 
+    }
+    
+protected:
     std::string solverType_;
     std::string name_;
     std::string method_;

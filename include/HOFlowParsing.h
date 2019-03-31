@@ -102,10 +102,6 @@ void get_if_present_no_default(const YAML::Node & node, const std::string & key,
     }
 };
 
-//template<> struct convert<WallUserData> {
-//    static bool decode(const YAML::Node & node, WallUserData & rhs);
-//};
-
 /// this version requires the @param key to be present
 template<typename T> void get_required(const YAML::Node & node, const std::string & key, T & result) {
     if (node[key]) {

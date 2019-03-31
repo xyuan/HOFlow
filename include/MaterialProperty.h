@@ -17,14 +17,26 @@ class ReferencePropertyData;
 class PropertyEvaluator;
 class YAML::Node;
 
-//! Stores a material property specified in the input file
+/** Stores a material property specified in the input file
+ * 
+ * Reads the value in the input file and stores it.
+ * The property value itself is stored in a object
+ * of type MaterialPropertyData
+ */
 class MaterialProperty {
 public:
+    /** Initialize some variables*/
     MaterialProperty(MaterialProperties & materialProperties, const std::string materialBlockName);
-    ~MaterialProperty();
-    void load(const YAML::Node & y_prop);
-    MaterialProperties * parent();
     
+    /** Deletes the property objects created*/
+    ~MaterialProperty();
+    
+    /** Reads the value in the input file and creates Objects
+     * to store the value.
+     */
+    void load(const YAML::Node & y_prop);
+    
+    MaterialProperties * parent();
     MaterialProperties & materialProperties_;
     const std::string materialBlockName_;
     std::string propertyTableName_;

@@ -7,6 +7,12 @@
 
 #include <Enums.h>
 
+/** Material property data container
+ * 
+ * For the constant property inmpelented so far
+ * not so interesting. Can become more advanced
+ * with property tables and functions.
+ */
 class MaterialPropertyData {
 public:
     MaterialPropertyData();

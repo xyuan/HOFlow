@@ -25,14 +25,15 @@ class stk::mesh::Part;
 
 typedef std::vector<stk::mesh::Part *> PartVector;
 
-//! Represents a equation system specified in the input file. Base class representation of a PDE
-
-//! EquationSystem defines the API supported by allconcrete implementations
-//! of PDEs for performing the following actions:
-//!
-//! - Register computational fields
-//! - Register computational algorithms for interior domain and boundary conditions
-//! - Manage solve and update fo the PDE for a given timestep
+/** Represents a equation system specified in the input file. Base class representation of a PDE
+ *
+ * EquationSystem defines the API supported by allconcrete implementations
+ * of PDEs for performing the following actions:
+ *
+ * - Register computational fields
+ * - Register computational algorithms for interior domain and boundary conditions
+ * - Manage solve and update fo the PDE for a given timestep
+ */
 class EquationSystem {
 public:
     EquationSystem(EquationSystems & eqSystems,

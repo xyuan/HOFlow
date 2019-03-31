@@ -76,67 +76,53 @@ void operator >>(const YAML::Node & node, ConstantInitialConditionData & constIC
     constIC.icName_ = node["constant"].as<std::string>();
     const YAML::Node & targets = node["target_name"];
 
-    if (targets.Type() == YAML::NodeType::Scalar)
-    {
-      constIC.targetNames_.resize(1);
-      constIC.targetNames_[0] = targets.as<std::string>();
-      HOFlowEnv::self().hoflowOutputP0() << "constant IC: name: " << constIC.icName_ << " , target[" << 0 << "] = " << constIC.targetNames_[0] << std::endl;
-      if (constIC.targetNames_[0].find(',') != std::string::npos)
-      {
-        throw std::runtime_error(
-          "In " + constIC.icName_
-              + " found ',' in target name - you must enclose in '[...]' for multiple targets");
-      }
-
-    } else
-    {
+    if (targets.Type() == YAML::NodeType::Scalar) {
+        constIC.targetNames_.resize(1);
+        constIC.targetNames_[0] = targets.as<std::string>();
+        HOFlowEnv::self().hoflowOutputP0() << "constant IC: name: " << constIC.icName_ << " , target[" << 0 << "] = " << constIC.targetNames_[0] << std::endl;
+        if (constIC.targetNames_[0].find(',') != std::string::npos) {
+            throw std::runtime_error(
+                "In " + constIC.icName_
+                + " found ',' in target name - you must enclose in '[...]' for multiple targets");
+        }
+    } else {
       constIC.targetNames_.resize(targets.size());
-      for (size_t i = 0; i < targets.size(); ++i)
-      {
+      for (size_t i = 0; i < targets.size(); ++i) {
         constIC.targetNames_[i] = targets[i].as<std::string>();
         if (constIC.root()->debug())
-          HOFlowEnv::self().hoflowOutputP0() << "constant IC: name: " << constIC.icName_ << " , target[" << i << "] = " << constIC.targetNames_[i] << std::endl;
+            HOFlowEnv::self().hoflowOutputP0() << "constant IC: name: " << constIC.icName_ << " , target[" << i << "] = " << constIC.targetNames_[i] << std::endl;
         }
       }
     const YAML::Node value_node = node["value"];
     size_t value_size = value_node.size();
     constIC.fieldNames_.resize(value_size);
     constIC.data_.resize(value_size);
-    if (constIC.root()->debug())
-    {
-      HOFlowEnv::self().hoflowOutputP0() << "fieldNames_.size()= " << constIC.fieldNames_.size()
-      << " value.size= " << constIC.data_.size() << std::endl;
+    if (constIC.root()->debug()) {
+        HOFlowEnv::self().hoflowOutputP0() << "fieldNames_.size()= " << constIC.fieldNames_.size()
+        << " value.size= " << constIC.data_.size() << std::endl;
     }
     size_t jv = 0;
-    for (YAML::const_iterator i = value_node.begin(); i != value_node.end();
-        ++i, ++jv)
-    {
-      const YAML::Node key = i->first;
-      const YAML::Node value = i->second;
-      constIC.fieldNames_[jv] = key.as<std::string>();
-      size_t nvals = value.size();
-      if (nvals)
-      {
-        constIC.data_[jv].resize(nvals);
-        for (size_t iv = 0; iv < nvals; ++iv)
-        {
-          constIC.data_[jv][iv] = value[iv].as<double>();
-          if (constIC.root()->debug())
-          {
-            HOFlowEnv::self().hoflowOutputP0() << "fieldNames_= " << constIC.fieldNames_[jv] << " value= "
-            << constIC.data_[jv][iv] << std::endl;
-          }
+    for (YAML::const_iterator i = value_node.begin(); i != value_node.end(); ++i, ++jv) {
+        const YAML::Node key = i->first;
+        const YAML::Node value = i->second;
+        constIC.fieldNames_[jv] = key.as<std::string>();
+        size_t nvals = value.size();
+        if (nvals) {
+            constIC.data_[jv].resize(nvals);
+            for (size_t iv = 0; iv < nvals; ++iv) {
+                constIC.data_[jv][iv] = value[iv].as<double>();
+                if (constIC.root()->debug()) {
+                    HOFlowEnv::self().hoflowOutputP0() << "fieldNames_= " << constIC.fieldNames_[jv] << " value= "
+                    << constIC.data_[jv][iv] << std::endl;
+                }
+            }
+        } else {
+            constIC.data_[jv].resize(1);
+            constIC.data_[jv][0] = value.as<double>();
+            if (constIC.root()->debug()) {
+                HOFlowEnv::self().hoflowOutputP0() << "fieldNames_= " << constIC.fieldNames_[jv] << " value= " << constIC.data_[jv][0] << std::endl;
+            }
         }
-      } else
-      {
-        constIC.data_[jv].resize(1);
-        constIC.data_[jv][0] = value.as<double>();
-        if (constIC.root()->debug())
-        {
-          HOFlowEnv::self().hoflowOutputP0() << "fieldNames_= " << constIC.fieldNames_[jv] << " value= " << constIC.data_[jv][0] << std::endl;
-        }
-      }
-
     }
 }
 
@@ -248,154 +234,16 @@ bool YAML::convert<Temperature>::decode(const YAML::Node & node, Temperature & t
   }
 
 bool YAML::convert<WallUserData>::decode(const YAML::Node & node, WallUserData & wallData) {
-    // constant data; all optional
-//    if (node["velocity"])
-//    {
-//      wallData.u_ = node["velocity"].as<Velocity>();
-//      wallData.bcDataSpecifiedMap_["velocity"] = true;
-//      wallData.bcDataTypeMap_["velocity"] = CONSTANT_UD;
-//    }
-//
-//    if (node["mesh_displacement"])
-//    {
-//      wallData.dx_ = node["mesh_displacement"].as<Velocity>();
-//      wallData.bcDataSpecifiedMap_["mesh_displacement"] = true;
-//      wallData.bcDataTypeMap_["mesh_displacement"] = CONSTANT_UD;
-//    }
-    
-//    if (node["turbulent_ke"])
-//    {
-//      wallData.tke_ = node["turbulent_ke"].as<TurbKinEnergy>();
-//      wallData.bcDataSpecifiedMap_["turbulent_ke"] = true;
-//      wallData.bcDataTypeMap_["turbulent_ke"] = CONSTANT_UD;
-//    }
-    
     if (node["temperature"]) {
         wallData.temperature_ = node["temperature"].as<Temperature>();
         wallData.bcDataSpecifiedMap_["temperature"] = true;
         wallData.bcDataTypeMap_["temperature"] = CONSTANT_UD;
         wallData.tempSpec_ = true;
     }
-
-//    if (node["mixture_fraction"])
-//    {
-//      wallData.mixFrac_ = node["mixture_fraction"].as<
-//          MixtureFraction>();
-//      wallData.bcDataSpecifiedMap_["mixture_fraction"] = true;
-//      wallData.bcDataTypeMap_["mixture_fraction"] = CONSTANT_UD;
-//    }
-//
-//    if (node["mass_fraction"])
-//    {
-//      wallData.massFraction_ = node["mass_fraction"].as<
-//          MassFraction>();
-//      wallData.bcDataSpecifiedMap_["mass_fraction"] = true;
-//      wallData.bcDataTypeMap_["mass_fraction"] = CONSTANT_UD;
-//    }
-//    
-//    if (node["emissivity"])
-//    {
-//      wallData.emissivity_ = node["emissivity"].as<Emissivity>();
-//      wallData.emissSpec_ = true;
-//    }
-//    
-//    if (node["transmissivity"])
-//    {
-//      wallData.transmissivity_ = node["transmissivity"].as<
-//          Transmissivity>();
-//    }
-//    
-//    if (node["environmental_temperature"])
-//    {
-//      wallData.environmentalT_ = node["environmental_temperature"].as<
-//          EnvironmentalT>();
-//    }
     
     if (node["adiabatic"]) {
         wallData.isAdiabatic_ = node["adiabatic"].as<bool>();
     }
-    
-//    if (node["interface"])
-//    {
-//      wallData.isInterface_ = node["interface"].as<bool>();
-//    }
-//
-//    if (node["reference_temperature"])
-//    {
-//      wallData.referenceTemperature_ = node["reference_temperature"].as<
-//          ReferenceTemperature>();
-//      wallData.refTempSpec_ = true;
-//    }
-//    
-//    if (node["gravity_vector_component"])
-//    {
-//      wallData.gravityComponent_ =
-//          node["gravity_vector_component"].as<unsigned>();
-//    }
-//    
-//    if (node["roughness_height"])
-//    {
-//      wallData.z0_ =
-//          node["roughness_height"].as<RoughnessHeight>();
-//    }
-//    
-//    if (node["heat_transfer_coefficient"])
-//    {
-//      wallData.heatTransferCoefficient_ = node["heat_transfer_coefficient"].as<
-//          HeatTransferCoefficient>();
-//      wallData.htcSpec_ = true;
-//    }
-//    
-//    if (node["irradiation"])
-//    {
-//      wallData.irradiation_ =
-//          node["irradiation"].as<Irradiation>();
-//      wallData.irradSpec_ = true;
-//    }
-//    
-//    if (node["robin_coupling_parameter"])
-//    {
-//      wallData.robinCouplingParameter_ = node["robin_coupling_parameter"].as<
-//          RobinCouplingParameter>();
-//      wallData.robinParameterSpec_ = true;
-//    }
-//    
-//    if (node["use_wall_function"])
-//    {
-//      wallData.wallFunctionApproach_ = node["use_wall_function"].as<bool>();
-//    }
-//    
-//    if (node["use_abl_wall_function"])
-//    {
-//      wallData.wallFunctionApproach_ = node["use_abl_wall_function"].as<bool>();
-//      wallData.ablWallFunctionApproach_ =
-//          node["use_abl_wall_function"].as<bool>();
-//    }
-//    
-//    if (node["pressure"])
-//    {
-//      wallData.pressure_ = node["pressure"].as<Pressure>();
-//      wallData.bcDataSpecifiedMap_["pressure"] = true;
-//      wallData.bcDataTypeMap_["pressure"] = CONSTANT_UD;
-//    }
-//    
-//    if (node["fsi_interface"])
-//    {
-//      wallData.isFsiInterface_ = node["fsi_interface"].as<bool>();
-//    }
-//
-//    // not appropriate
-//    if (node["specific_dissipation_rate"])
-//    {
-//      throw std::runtime_error(
-//        "specific_dissipation rate at walls is provided by a model, not the user");
-//    }
-//
-//    if (node["heat_flux"])
-//    {
-//      wallData.q_ = node["heat_flux"].as<NormalHeatFlux>();
-//      wallData.heatFluxSpec_ = true;
-//    }
 
     // function data
     const bool optional = true;
@@ -429,12 +277,6 @@ bool YAML::convert<WallUserData>::decode(const YAML::Node & node, WallUserData &
 bool YAML::convert<BoundaryConditionOptions>::decode(const YAML::Node & node, BoundaryConditionOptions & bcOptions) {
     bcOptions.bcSetName_ = node["boundary_conditions"].as<std::string>();
     node["wall_boundary_condition"] >> bcOptions.wallbc_;
-//    node["inflow_boundary_condition"] >> bcOptions.inflowbc_;
-//    node["open_boundary_condition"] >> bcOptions.openbc_;
-//    node["overset_boundary_condition"] >> bcOptions.oversetbc_;
-//    node["symmetry_boundary_condition"] >> bcOptions.symmetrybc_;
-//    node["periodic_boundary_condition"] >> bcOptions.periodicbc_;
-//    node["non_confomal_boundary_condition"] >> bcOptions.nonConformalbc_;
 
     return true;
 }

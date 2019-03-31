@@ -7,7 +7,11 @@
 
 #include <stk_mesh/base/Entity.hpp>
 
-//! Abstract class for various properties
+/** Abstract class to evaluate a property
+ * 
+ * @note Seems like this is not needed anywhere
+ *       -> can be deleted but safely
+ */
 class PropertyEvaluator {
 public:
     PropertyEvaluator();

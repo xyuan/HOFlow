@@ -14,34 +14,29 @@
 
 class Realm;
 
-class SupplementalAlgorithm
-{
+class SupplementalAlgorithm {
 public:
-  
-  SupplementalAlgorithm(
-    Realm &realm);
-  
-  virtual ~SupplementalAlgorithm() {}
+    SupplementalAlgorithm(Realm &realm);
+    virtual ~SupplementalAlgorithm() {}
+    virtual void setup() {}
 
-  virtual void setup() {}
+    virtual void elem_execute(
+      double *lhs,
+      double *rhs,
+      stk::mesh::Entity element,
+      MasterElement *meSCS,
+      MasterElement *meSCV) {}
 
-  virtual void elem_execute(
-    double *lhs,
-    double *rhs,
-    stk::mesh::Entity element,
-    MasterElement *meSCS,
-    MasterElement *meSCV) {}
-  
-  virtual void node_execute(
-    double *lhs,
-    double *rhs,
-    stk::mesh::Entity node) {}
-  
-  virtual void elem_resize(
-    MasterElement *meSCS,
-    MasterElement *meSCV) {}
+    virtual void node_execute(
+      double *lhs,
+      double *rhs,
+      stk::mesh::Entity node) {}
 
-  Realm &realm_;  
+    virtual void elem_resize(
+      MasterElement *meSCS,
+      MasterElement *meSCV) {}
+
+    Realm &realm_;  
 };
 
 #endif /* SUPPLEMENTALALGORITHM_H */

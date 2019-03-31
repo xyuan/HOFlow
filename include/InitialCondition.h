@@ -14,11 +14,17 @@ class Simulation;
 class InitialConditions;
 class YAML::Node;
 
-//! Stores a initial condition specified in the input file
+/** Stores a initial condition specified in the input file*/
 class InitialCondition {
 public:
+    /** Initializes some variables*/
     InitialCondition(InitialConditions & ics);
+    
     virtual ~InitialCondition();
+    
+    /** Reads the parameters of the initial condition in the input
+     * file and stores them in a object.
+     */
     InitialCondition * load(const YAML::Node & node);
     Simulation * root();
     InitialConditions * parent();

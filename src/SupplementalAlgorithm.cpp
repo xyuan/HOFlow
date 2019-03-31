@@ -7,17 +7,8 @@
 // stk_mesh/base/fem
 #include <stk_mesh/base/Entity.hpp>
 
-//==========================================================================
-// Class Definition
-//==========================================================================
-// SupplementalAlgorithm - base class for algorithm
-//==========================================================================
-//--------------------------------------------------------------------------
-//-------- constructor -----------------------------------------------------
-//--------------------------------------------------------------------------
-SupplementalAlgorithm::SupplementalAlgorithm(
-  Realm &realm) 
-  : realm_(realm)
+SupplementalAlgorithm::SupplementalAlgorithm(Realm &realm) : 
+    realm_(realm)
 {
-  // nothing to do
+    // nothing to do
 }

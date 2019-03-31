@@ -46,6 +46,7 @@ LocalGraphArrays::LocalGraphArrays(const Kokkos::View<size_t *,HostSpace> & rowL
 }
 
 LocalGraphArrays::~LocalGraphArrays() {
+    // nothing to do
 }
 
 size_t LocalGraphArrays::get_row_length(size_t localRow) const { 

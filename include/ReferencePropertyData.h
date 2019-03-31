@@ -7,6 +7,11 @@
 
 #include <string>
 
+/** Reference Property Data
+ * 
+ * @note Seems like this class is not needed anywhere
+ *       seriously, can be deleted but safely
+ */
 class ReferencePropertyData {
 public:
     ReferencePropertyData();

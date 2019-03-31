@@ -8,36 +8,29 @@
 #include<SolverAlgorithm.h>
 #include<FieldTypeDef.h>
 
-namespace stk {
-namespace mesh {
-class Part;
-}
-}
-
+class stk::mesh::Part;
 class Realm;
 
-class AssembleScalarElemDiffSolverAlgorithm : public SolverAlgorithm
-{
+class AssembleScalarElemDiffSolverAlgorithm : public SolverAlgorithm {
 public:
+    AssembleScalarElemDiffSolverAlgorithm(
+        Realm &realm,
+        stk::mesh::Part *part,
+        EquationSystem *eqSystem,
+        ScalarFieldType *scalarQ,
+        VectorFieldType *dqdx,
+        ScalarFieldType *diffFluxCoeff);
+    virtual ~AssembleScalarElemDiffSolverAlgorithm() {}
+    virtual void initialize_connectivity();
+    virtual void execute();
 
-  AssembleScalarElemDiffSolverAlgorithm(
-    Realm &realm,
-    stk::mesh::Part *part,
-    EquationSystem *eqSystem,
-    ScalarFieldType *scalarQ,
-    VectorFieldType *dqdx,
-    ScalarFieldType *diffFluxCoeff);
-  virtual ~AssembleScalarElemDiffSolverAlgorithm() {}
-  virtual void initialize_connectivity();
-  virtual void execute();
+  private:
 
-private:
+    ScalarFieldType *scalarQ_;
+    ScalarFieldType *diffFluxCoeff_;
+    VectorFieldType *coordinates_;
 
-  ScalarFieldType *scalarQ_;
-  ScalarFieldType *diffFluxCoeff_;
-  VectorFieldType *coordinates_;
-
-  const bool shiftedGradOp_;
+    const bool shiftedGradOp_;
 };
 
 #endif /* ASSEMBLESCALARELEMDIFFSOLVERALGORITHM_H */

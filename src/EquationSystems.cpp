@@ -139,10 +139,7 @@ void EquationSystems::register_interior_algorithm(const std::vector<std::string>
         }
     }
 }
-//! Creates objects for each equation system specified in the input file
 
-//! For each specified equation systeam a new object of a specialized class
-//! is created and the parameters of the equation system is written to the object. 
 void EquationSystems::load(const YAML::Node & y_node) {
     const YAML::Node y_equation_system = expect_map(y_node,"equation_systems");
     get_required(y_equation_system, "name", name_);

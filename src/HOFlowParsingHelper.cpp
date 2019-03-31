@@ -8,9 +8,11 @@
 #include <vector>
 
 HOFlowParsingHelper::HOFlowParsingHelper() {
+    // nothing to do
 }
 
 HOFlowParsingHelper::~HOFlowParsingHelper() {
+    // nothing to do
 }
 
 void HOFlowParsingHelper::emit(YAML::Emitter & emout, const YAML::Node & node) {
