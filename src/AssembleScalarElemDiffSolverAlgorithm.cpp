@@ -36,10 +36,10 @@ AssembleScalarElemDiffSolverAlgorithm::AssembleScalarElemDiffSolverAlgorithm(
     ScalarFieldType *scalarQ,
     VectorFieldType *dqdx,
     ScalarFieldType *diffFluxCoeff) : 
-    SolverAlgorithm(realm, part, eqSystem),
-    scalarQ_(scalarQ),
-    diffFluxCoeff_(diffFluxCoeff),
-    shiftedGradOp_(realm.get_shifted_grad_op(scalarQ_->name()))
+        SolverAlgorithm(realm, part, eqSystem),
+        scalarQ_(scalarQ),
+        diffFluxCoeff_(diffFluxCoeff),
+        shiftedGradOp_(realm.get_shifted_grad_op(scalarQ_->name()))
 {
     // save off fields
     stk::mesh::MetaData & meta_data = realm_.meta_data();

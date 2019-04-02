@@ -56,6 +56,8 @@ int main(int argc, char** argv) {
     
     // HOFlowEnv singleton
     HOFlowEnv & hoflowEnv = HOFlowEnv::self();
+    Kokkos::initialize(argc, argv);
+    {
       
     stk::diag::setEnabledTimerMetricsMask(stk::diag::METRICS_CPU_TIME | stk::diag::METRICS_WALL_TIME);
     Simulation::rootTimer().start();
@@ -199,7 +201,8 @@ int main(int argc, char** argv) {
                                 false, hoflowEnv.parallel_comm());
 
     stk::diag::deleteRootTimer(Simulation::rootTimer());
- 
+    }
+    Kokkos::finalize_all();
     return 0;
 }
 

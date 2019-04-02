@@ -60,7 +60,7 @@ public:
     LinearSystem(Realm & realm, const unsigned numDof, EquationSystem *eqSys, LinearSolver *linearSolver);
     virtual ~LinearSystem();
 
-    static LinearSystem *create(Realm & realm, const unsigned numDof, EquationSystem *eqSys, LinearSolver *linearSolver);
+    static LinearSystem * create(Realm & realm, const unsigned numDof, EquationSystem *eqSys, LinearSolver *linearSolver);
 
     // Graph/Matrix Construction
     virtual void buildNodeGraph(const stk::mesh::PartVector & parts)=0; // for nodal assembly (e.g., lumped mass and source)

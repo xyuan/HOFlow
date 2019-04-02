@@ -26,9 +26,9 @@ public:
 
   private:
 
-    ScalarFieldType *scalarQ_;
-    ScalarFieldType *diffFluxCoeff_;
-    VectorFieldType *coordinates_;
+    ScalarFieldType * scalarQ_;
+    ScalarFieldType * diffFluxCoeff_;
+    VectorFieldType * coordinates_;
 
     const bool shiftedGradOp_;
 };
