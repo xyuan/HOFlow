@@ -761,24 +761,11 @@ void Realm::evaluate_properties() {
     timerPropertyEval_ += (end_time - start_time);
 }
 
-stk::mesh::BucketVector const& Realm::get_buckets( stk::mesh::EntityRank rank,
-                                                   const stk::mesh::Selector & selector ,
-                                                   bool get_all) const
+stk::mesh::BucketVector const & Realm::get_buckets( stk::mesh::EntityRank rank,
+                                                    const stk::mesh::Selector & selector ,
+                                                    bool get_all) const
 {
-    if (metaData_->spatial_dimension() == 3 && rank == stk::topology::EDGE_RANK)
-        return bulkData_->get_buckets(rank, selector);
-
-//    if (!get_all && solutionOptions_->useAdapter_ && solutionOptions_->maxRefinementLevel_ > 0) {
-//        stk::mesh::Selector new_selector = selector;
-//        if (rank != stk::topology::NODE_RANK) {
-//            // adapterSelector_ avoids parent elements
-//            new_selector = selector & adapterSelector_[rank];
-//        }
-//        return bulkData_->get_buckets(rank, new_selector);
-//    }
-//    else {
-        return bulkData_->get_buckets(rank, selector);
-//    }
+    return bulkData_->get_buckets(rank, selector);
 }
 
 bool Realm::get_consistent_mass_matrix_png(const std::string dofName ) {

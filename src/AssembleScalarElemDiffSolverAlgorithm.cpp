@@ -75,7 +75,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
       supplementalAlg_[i]->setup();
 
     // deal with state
-    ScalarFieldType &scalarQNp1   = scalarQ_->field_of_state(stk::mesh::StateNP1);
+    ScalarFieldType & scalarQNp1   = scalarQ_->field_of_state(stk::mesh::StateNP1);
 
     // nodal fields to gather
     std::vector<double> ws_coordinates;
@@ -93,20 +93,21 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
     stk::mesh::Selector s_locally_owned_union = meta_data.locally_owned_part()
         & stk::mesh::selectUnion(partVec_) 
         & !(realm_.get_inactive_selector());
-
-    stk::mesh::BucketVector const& elem_buckets = realm_.get_buckets( stk::topology::ELEMENT_RANK, s_locally_owned_union );
+    
+    // Iterate through all element buckets
+    stk::mesh::BucketVector const & elem_buckets = realm_.get_buckets( stk::topology::ELEMENT_RANK, s_locally_owned_union );
     for ( stk::mesh::BucketVector::const_iterator ib = elem_buckets.begin(); ib != elem_buckets.end() ; ++ib ) {
-        stk::mesh::Bucket & b = **ib ;
-        const stk::mesh::Bucket::size_type length   = b.size();
+        stk::mesh::Bucket & b = **ib;
+        const stk::mesh::Bucket::size_type length = b.size();
 
         // extract master element
-        MasterElement *meSCS = MasterElementRepo::get_surface_master_element(b.topology());
-        MasterElement *meSCV = MasterElementRepo::get_volume_master_element(b.topology());
+        MasterElement * meSCS = MasterElementRepo::get_surface_master_element(b.topology());
+        MasterElement * meSCV = MasterElementRepo::get_volume_master_element(b.topology());
 
         // extract master element specifics
         const int nodesPerElement = meSCS->nodesPerElement_;
         const int numScsIp = meSCS->numIntPoints_;
-        const int *lrscv = meSCS->adjacentNodes();
+        const int * lrscv = meSCS->adjacentNodes();
 
         // resize some things; matrix related
         const int lhsSize = nodesPerElement*nodesPerElement;
@@ -128,16 +129,16 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
         ws_shape_function.resize(numScsIp*nodesPerElement);
 
         // pointer to lhs/rhs
-        double *p_lhs = &lhs[0];
-        double *p_rhs = &rhs[0];
+        double * p_lhs = &lhs[0];
+        double * p_rhs = &rhs[0];
 
-        double *p_coordinates = &ws_coordinates[0];
+        double * p_coordinates = &ws_coordinates[0];
 
-        double *p_scalarQNp1 = &ws_scalarQNp1[0];
-        double *p_diffFluxCoeff = &ws_diffFluxCoeff[0];
-        double *p_scs_areav = &ws_scs_areav[0];
-        double *p_dndx = &ws_dndx[0];
-        double *p_shape_function = &ws_shape_function[0];
+        double * p_scalarQNp1 = &ws_scalarQNp1[0];
+        double * p_diffFluxCoeff = &ws_diffFluxCoeff[0];
+        double * p_scs_areav = &ws_scs_areav[0];
+        double * p_dndx = &ws_dndx[0];
+        double * p_shape_function = &ws_shape_function[0];
 
         // extract shape function
         meSCS->shape_fcn(&p_shape_function[0]);
@@ -145,7 +146,8 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
         // resize possible supplemental element alg
         for ( size_t i = 0; i < supplementalAlgSize; ++i )
             supplementalAlg_[i]->elem_resize(meSCS, meSCV);
-
+        
+        // Iterate through each element in bucket
         for ( size_t k = 0 ; k < length ; ++k ) {
             // get elem
             stk::mesh::Entity elem = b[k];
@@ -164,7 +166,8 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
 
             // sanity check on num nodes
             ThrowAssert( num_nodes == nodesPerElement );
-
+            
+            // Iterate through each node in element
             for ( int ni = 0; ni < num_nodes; ++ni ) {
                 stk::mesh::Entity node = node_rels[ni];
 
@@ -194,7 +197,8 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 meSCS->shifted_grad_op(1, &ws_coordinates[0], &ws_dndx[0], &ws_deriv[0], &ws_det_j[0], &scs_error);
             else
                 meSCS->grad_op(1, &ws_coordinates[0], &ws_dndx[0], &ws_deriv[0], &ws_det_j[0], &scs_error);
-
+            
+            // Iterate through all integration points
             for ( int ip = 0; ip < numScsIp; ++ip ) {
                 // left and right nodes for this ip
                 const int il = lrscv[2*ip];
@@ -213,6 +217,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 }
 
                 double qDiff = 0.0;
+                // Iterate through all nodes of a element
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) {
                     // diffusion
                     double lhsfacDiff = 0.0;
