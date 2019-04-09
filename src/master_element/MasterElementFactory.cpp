@@ -7,13 +7,16 @@
 
 //#include "master_element/Hex8CVFEM.h"
 //#include "master_element/Hex27CVFEM.h"
-#include "master_element/Tet4CVFEM.h"
 //#include "master_element/Pyr5CVFEM.h"
 //#include "master_element/Wed6CVFEM.h"
 //#include "master_element/Quad43DCVFEM.h"
 //#include "master_element/Quad42DCVFEM.h"
 //#include "master_element/Quad92DCVFEM.h"
-//#include "master_element/Tri32DCVFEM.h"
+#include "master_element/Tet4CVFEM.h"
+#include "master_element/Tri32DCVFEM.h"
+#include "master_element/Tri3DSCS.h"
+#include "master_element/Tri2DSCV.h"
+#include "master_element/Edge2DSCS.h"
 //#include "master_element/MasterElementHO.h"
 
 #include "HOFlowEnv.h"
@@ -64,11 +67,11 @@ std::unique_ptr<MasterElement> create_surface_master_element(stk::topology topo)
 //    case stk::topology::QUAD_9_2D:
 //      return make_unique<Quad92DSCS>();
 //
-//    case stk::topology::TRI_3_2D:
-//      return make_unique<Tri32DSCS>();
+    case stk::topology::TRI_3_2D:
+      return make_unique<Tri32DSCS>();
 //
-//    case stk::topology::LINE_2:
-//      return make_unique<Edge2DSCS>();
+    case stk::topology::LINE_2:
+      return make_unique<Edge2DSCS>();
 //
 //    case stk::topology::LINE_3:
 //      return make_unique<Edge32DSCS>();
@@ -123,8 +126,8 @@ std::unique_ptr<MasterElement> create_volume_master_element(stk::topology topo) 
 //    case stk::topology::QUAD_9_2D:
 //      return make_unique<Quad92DSCV>();
 //
-//    case stk::topology::TRI_3_2D:
-//      return make_unique<Tri32DSCV>();
+    case stk::topology::TRI_3_2D:
+      return make_unique<Tri32DSCV>();
 
     default:
       HOFlowEnv::self().hoflowOutputP0() << "sorry, we only support tet4 volume elements" << std::endl;
