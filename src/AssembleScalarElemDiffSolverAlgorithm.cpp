@@ -13,6 +13,7 @@
 #include <SupplementalAlgorithm.h>
 #include <TimeIntegrator.h>
 #include <master_element/MasterElement.h>
+#include <iostream>
 
 // stk_mesh/base/fem
 #include <stk_mesh/base/BulkData.hpp>
@@ -174,14 +175,14 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 // set connected nodes
                 connected_nodes[ni] = node;
 
-                // pointers to real data
+                // pointers to real data, get coordinates of the node
                 const double * coords = stk::mesh::field_data(*coordinates_, node );
 
-                // gather scalars
+                // gather scalars, get field value of the node
                 p_scalarQNp1[ni]    = *stk::mesh::field_data(scalarQNp1, node );
                 p_diffFluxCoeff[ni] = *stk::mesh::field_data(*diffFluxCoeff_, node );
 
-                // gather vectors
+                // gather vectors, get coordinates for each dimension of the node
                 const int niNdim = ni*nDim;
                 for ( int i=0; i < nDim; ++i ) {
                     p_coordinates[niNdim+i] = coords[i];
@@ -211,19 +212,27 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 // save off ip values; offset to Shape Function
                 double muIp = 0.0;
                 const int offSetSF = ip*nodesPerElement;
+                
+                // Iterate through all nodes of a element to get the flux coefficient
+                // contribution of each node to the current integration point
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) {
                     const double r = p_shape_function[offSetSF+ic];
                     muIp += r*p_diffFluxCoeff[ic];
                 }
 
                 double qDiff = 0.0;
-                // Iterate through all nodes of a element
+                
+                // Iterate through all nodes of a element to get the face flux coefficient
+                // contribution of each node to the current integration point
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) {
                     // diffusion
                     double lhsfacDiff = 0.0;
                     const int offSetDnDx = nDim*nodesPerElement*ip + ic*nDim;
+                    // Iterate through all spatial dimensions
                     for ( int j = 0; j < nDim; ++j ) {
-                      lhsfacDiff += -muIp*p_dndx[offSetDnDx+j]*p_scs_areav[ip*nDim+j];
+                        lhsfacDiff += -muIp*p_dndx[offSetDnDx+j]*p_scs_areav[ip*nDim+j];
+                        std::cout << "p_dndx[offSetDnDx+j] = " << p_dndx[offSetDnDx+j] << std::endl;
+                        std::cout << "p_scs_areav[ip*nDim+j] = " << p_scs_areav[ip*nDim+j] << std::endl;
                     }
 
                     qDiff += lhsfacDiff*p_scalarQNp1[ic];

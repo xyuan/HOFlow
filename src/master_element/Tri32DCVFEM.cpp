@@ -322,99 +322,100 @@ void Tri32DSCV::determinant(
 //--------------------------------------------------------------------------
 //-------- constructor -----------------------------------------------------
 //--------------------------------------------------------------------------
-Tri32DSCS::Tri32DSCS()
-  : MasterElement()
+Tri32DSCS::Tri32DSCS() : 
+    MasterElement()
 {
-  nDim_ = 2;
-  nodesPerElement_ = 3;
-  numIntPoints_ = 3;
+    nDim_ = 2;
+    nodesPerElement_ = 3;
+    numIntPoints_ = 3;
 
-  // define L/R mappings
-  lrscv_.resize(6);
-  lrscv_[0]  = 0; lrscv_[1]  = 1;
-  lrscv_[2]  = 1; lrscv_[3]  = 2;
-  lrscv_[4]  = 0; lrscv_[5]  = 2;
+    // define L/R mappings
+    lrscv_.resize(6);
+    lrscv_[0]  = 0; lrscv_[1]  = 1;
+    lrscv_[2]  = 1; lrscv_[3]  = 2;
+    lrscv_[4]  = 0; lrscv_[5]  = 2;
 
-  // elem-edge mapping from ip
-  scsIpEdgeOrd_.resize(numIntPoints_);
-  scsIpEdgeOrd_[0] = 0; scsIpEdgeOrd_[1] = 1; scsIpEdgeOrd_[2] = 2; 
+    // elem-edge mapping from ip
+    scsIpEdgeOrd_.resize(numIntPoints_);
+    scsIpEdgeOrd_[0] = 0; scsIpEdgeOrd_[1] = 1; scsIpEdgeOrd_[2] = 2; 
 
-  // define opposing node
-  oppNode_.resize(6);
-  // face 0; nodes 0,1
-  oppNode_[0] = 2; oppNode_[1] = 2;
-  // face 1; nodes 1,2
-  oppNode_[2] = 0; oppNode_[3] = 0;
-  // face 2; nodes 2,0
-  oppNode_[4] = 1; oppNode_[5] = 1;
+    // define opposing node
+    oppNode_.resize(6);
+    // face 0; nodes 0,1
+    oppNode_[0] = 2; oppNode_[1] = 2;
+    // face 1; nodes 1,2
+    oppNode_[2] = 0; oppNode_[3] = 0;
+    // face 2; nodes 2,0
+    oppNode_[4] = 1; oppNode_[5] = 1;
 
-  // define opposing face
-  oppFace_.resize(6);
-  // face 0
-  oppFace_[0]  = 2; oppFace_[1] = 1;
-  // face 1
-  oppFace_[2]  = 0; oppFace_[3] = 2;
-  // face 2
-  oppFace_[4]  = 1; oppFace_[5] = 0;  
+    // define opposing face
+    // Starting with index 0, every second value in the vector
+    // returns the node opposed to the face, e.g face 0 oppFace[0]
+    // returns 2 (node number 2), face 1 oppFace[2] returns 0
+    // (node number 0)
+    oppFace_.resize(6);
+    // face 0
+    oppFace_[0] = 2; oppFace_[1] = 1;
+    // face 1
+    oppFace_[2] = 0; oppFace_[3] = 2;
+    // face 2
+    oppFace_[4] = 1; oppFace_[5] = 0;  
 
-  // standard integration location
-  const double five12ths = 5.0/12.0;
-  const double one6th = 1.0/6.0;
-  intgLoc_.resize(6);    
-  intgLoc_[0] = five12ths; intgLoc_[1] = one6th;    // surf 1; 0->1
-  intgLoc_[2] = five12ths; intgLoc_[3] = five12ths; // surf 2; 1->3
-  intgLoc_[4] = one6th;    intgLoc_[5] = five12ths; // surf 3; 0->2
+    // standard integration location
+    const double five12ths = 5.0/12.0;
+    const double one6th = 1.0/6.0;
+    intgLoc_.resize(6);    
+    intgLoc_[0] = five12ths; intgLoc_[1] = one6th;    // surf 1; 0->1
+    intgLoc_[2] = five12ths; intgLoc_[3] = five12ths; // surf 2; 1->3
+    intgLoc_[4] = one6th;    intgLoc_[5] = five12ths; // surf 3; 0->2
 
-  // shifted
-  intgLocShift_.resize(6);
-  intgLocShift_[0] = 0.50; intgLocShift_[1] = 0.00;  // surf 1; 0->1
-  intgLocShift_[2] = 0.50; intgLocShift_[3] = 0.50;  // surf 1; 1->3
-  intgLocShift_[4] = 0.00; intgLocShift_[5] = 0.50;  // surf 1; 0->2
+    // shifted
+    intgLocShift_.resize(6);
+    intgLocShift_[0] = 0.50; intgLocShift_[1] = 0.00;  // surf 1; 0->1
+    intgLocShift_[2] = 0.50; intgLocShift_[3] = 0.50;  // surf 1; 1->3
+    intgLocShift_[4] = 0.00; intgLocShift_[5] = 0.50;  // surf 1; 0->2
 
-  // exposed face
-  intgExpFace_.resize(12);
-  // face 0; scs 0, 1; nodes 0,1
-  intgExpFace_[0]  = 0.25; intgExpFace_[1]  = 0.00; 
-  intgExpFace_[2]  = 0.75; intgExpFace_[3]  = 0.00;
-  // face 1; scs 0, 1; nodes 1,2
-  intgExpFace_[4]  = 0.75; intgExpFace_[5]  = 0.25;
-  intgExpFace_[6]  = 0.25; intgExpFace_[7]  = 0.75;
-  // face 2, surf 0, 1; nodes 2,0
-  intgExpFace_[8]  = 0.00; intgExpFace_[9]  = 0.75;
-  intgExpFace_[10] = 0.00; intgExpFace_[11] = 0.25;
-  
-  // boundary integration point ip node mapping (ip on an ordinal to local node number)
-  ipNodeMap_.resize(6); // 2 ips * 3 faces
-  // face 0;
-  ipNodeMap_[0] = 0;  ipNodeMap_[1] = 1; 
-  // face 1; 
-  ipNodeMap_[2] = 1;  ipNodeMap_[3] = 2; 
-  // face 2;
-  ipNodeMap_[4] = 2;  ipNodeMap_[5] = 0;  
+    // exposed face
+    intgExpFace_.resize(12);
+    // face 0; scs 0, 1; nodes 0,1
+    intgExpFace_[0]  = 0.25; intgExpFace_[1]  = 0.00; 
+    intgExpFace_[2]  = 0.75; intgExpFace_[3]  = 0.00;
+    // face 1; scs 0, 1; nodes 1,2
+    intgExpFace_[4]  = 0.75; intgExpFace_[5]  = 0.25;
+    intgExpFace_[6]  = 0.25; intgExpFace_[7]  = 0.75;
+    // face 2, surf 0, 1; nodes 2,0
+    intgExpFace_[8]  = 0.00; intgExpFace_[9]  = 0.75;
+    intgExpFace_[10] = 0.00; intgExpFace_[11] = 0.25;
+
+    // boundary integration point ip node mapping (ip on an ordinal to local node number)
+    ipNodeMap_.resize(6); // 2 ips * 3 faces
+    // face 0;
+    ipNodeMap_[0] = 0;  ipNodeMap_[1] = 1; 
+    // face 1; 
+    ipNodeMap_[2] = 1;  ipNodeMap_[3] = 2; 
+    // face 2;
+    ipNodeMap_[4] = 2;  ipNodeMap_[5] = 0;  
 
 
-  sideNodeOrdinals_ = {
-      0, 1,  // ordinal 0
-      1, 2,  // ordinal 1
-      2, 0   // ordinal 2
-  };
+    sideNodeOrdinals_ = {
+        0, 1,  // ordinal 0
+        1, 2,  // ordinal 1
+        2, 0   // ordinal 2
+    };
 
-  std::vector<std::vector<double>> nodeLocations =
-  {
-      {0.0,0.0}, {1.0,0}, {0.0,1.0}
-  };
-  intgExpFaceShift_.resize(12);
-  int index = 0;
-  stk::topology topo = stk::topology::TRIANGLE_3_2D;
-  for (unsigned k = 0; k < topo.num_sides(); ++k) {
-    stk::topology side_topo = topo.side_topology(k);
-    const int* ordinals = side_node_ordinals(k);
-    for (unsigned n = 0; n < side_topo.num_nodes(); ++n) {
-      intgExpFaceShift_[2*index + 0] = nodeLocations[ordinals[n]][0];
-      intgExpFaceShift_[2*index + 1] = nodeLocations[ordinals[n]][1];
-      ++index;
+    std::vector<std::vector<double>> nodeLocations = { {0.0, 0.0}, {1.0, 0}, {0.0, 1.0} };
+    intgExpFaceShift_.resize(12);
+    int index = 0;
+    stk::topology topo = stk::topology::TRIANGLE_3_2D;
+    for (unsigned k = 0; k < topo.num_sides(); ++k) {
+        stk::topology side_topo = topo.side_topology(k);
+        const int* ordinals = side_node_ordinals(k);
+        for (unsigned n = 0; n < side_topo.num_nodes(); ++n) {
+            intgExpFaceShift_[2*index + 0] = nodeLocations[ordinals[n]][0];
+            intgExpFaceShift_[2*index + 1] = nodeLocations[ordinals[n]][1];
+            ++index;
+        }
     }
-  }
 }
 
 //--------------------------------------------------------------------------
@@ -805,21 +806,18 @@ Tri32DSCS::shifted_shape_fcn(double *shpfc)
 //--------------------------------------------------------------------------
 //-------- tri_shape_fcn ---------------------------------------------------
 //--------------------------------------------------------------------------
-void
-Tri32DSCS::tri_shape_fcn(
-  const int  &npts,
-  const double *isoParCoord, 
-  double *shape_fcn)
-{
-  for (int j = 0; j < npts; ++j ) {
-    const int threej = 3*j;
-    const int k = 2*j;
-    const double xi = isoParCoord[k];
-    const double eta = isoParCoord[k+1];
-    shape_fcn[threej] = 1.0 - xi - eta;
-    shape_fcn[1 + threej] = xi;
-    shape_fcn[2 + threej] = eta;
-  }
+void Tri32DSCS::tri_shape_fcn(const int & npts, const double * isoParCoord, double * shape_fcn) {
+    
+    // Iterate through integration points
+    for (int j = 0; j < npts; ++j ) {
+        const int threej = 3*j; // offset because shape functions for all ip's and nodes are in one vector
+        const int k = 2*j;
+        const double xi = isoParCoord[k]; // get value from constructor, either five12ths ore one6th
+        const double eta = isoParCoord[k+1]; // dito
+        shape_fcn[threej] = 1.0 - xi - eta;
+        shape_fcn[1 + threej] = xi;
+        shape_fcn[2 + threej] = eta;
+    }
 }
 
 //--------------------------------------------------------------------------
