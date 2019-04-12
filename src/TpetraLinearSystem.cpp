@@ -1314,44 +1314,44 @@ void sum_into_row_vec_3(
   }
 }
 
-template <typename RowViewType>
-void sum_into_row (
-  RowViewType row_view,
-  const int num_entities, const int numDof,
-  const int* localIds,
-  const int* sort_permutation,
-  const double* input_values)
+template <typename RowViewType> 
+void sum_into_row (RowViewType row_view,
+                   const int num_entities, 
+                   const int numDof,
+                   const int * localIds,
+                   const int * sort_permutation,
+                   const double * input_values)
 {
-  if (numDof == 3) {
-    sum_into_row_vec_3(row_view, num_entities, localIds, sort_permutation, input_values);
-    return;
-  }
-
-  constexpr bool forceAtomic = !std::is_same<DeviceSpace, Kokkos::Serial>::value;
-  const LocalOrdinal length = row_view.length;
-
-  const int numCols = num_entities * numDof;
-  LocalOrdinal offset = 0;
-  for (int j = 0; j < numCols; ++j) {
-    const LocalOrdinal perm_index = sort_permutation[j];
-    const LocalOrdinal cur_local_column_idx = localIds[j];
-
-    // since the columns are sorted, we pass through the column idxs once,
-    // updating the offset as we go
-    while (row_view.colidx(offset) != cur_local_column_idx && offset < length) {
-      ++offset;
+    if (numDof == 3) {
+        sum_into_row_vec_3(row_view, num_entities, localIds, sort_permutation, input_values);
+        return;
     }
 
-    if (offset < length) {
-      ThrowAssertMsg(std::isfinite(input_values[perm_index]), "Inf or NAN lhs");
-      if (forceAtomic) {
-        Kokkos::atomic_add(&(row_view.value(offset)), input_values[perm_index]);
-      }
-      else {
-        row_view.value(offset) += input_values[perm_index];
-      }
+    constexpr bool forceAtomic = !std::is_same<DeviceSpace, Kokkos::Serial>::value;
+    const LocalOrdinal length = row_view.length;
+
+    const int numCols = num_entities * numDof;
+    LocalOrdinal offset = 0;
+    for (int j = 0; j < numCols; ++j) {
+        const LocalOrdinal perm_index = sort_permutation[j];
+        const LocalOrdinal cur_local_column_idx = localIds[j];
+
+        // since the columns are sorted, we pass through the column idxs once,
+        // updating the offset as we go
+        while (row_view.colidx(offset) != cur_local_column_idx && offset < length) {
+            ++offset;
+        }
+
+        if (offset < length) {
+            ThrowAssertMsg(std::isfinite(input_values[perm_index]), "Inf or NAN lhs");
+            if (forceAtomic) {
+                Kokkos::atomic_add(&(row_view.value(offset)), input_values[perm_index]);
+            }
+            else {
+                row_view.value(offset) += input_values[perm_index];
+            }
+        }
     }
-  }
 }
 
 }
@@ -1423,59 +1423,65 @@ TpetraLinearSystem::sumInto(
   }
 }
 
-void
-TpetraLinearSystem::sumInto(
-  const std::vector<stk::mesh::Entity> & entities,
-  std::vector<int> &scratchIds,
-  std::vector<double> &scratchVals,
-  const std::vector<double> & rhs,
-  const std::vector<double> & lhs,
-  const char *trace_tag
-  )
+// Fills the coefficients calculated from the solver algorithm 
+// into the matrix of the system of equations
+void TpetraLinearSystem::sumInto(const std::vector<stk::mesh::Entity> & entities,
+                                 std::vector<int> &scratchIds,
+                                 std::vector<double> &scratchVals,
+                                 const std::vector<double> & rhs,
+                                 const std::vector<double> & lhs,
+                                 const char *trace_tag)
 {
-  const size_t n_obj = entities.size();
-  const unsigned numRows = n_obj * numDof_;
+    const size_t n_obj = entities.size();
+    const unsigned numRows = n_obj * numDof_;
 
-  ThrowAssert(numRows == rhs.size());
-  ThrowAssert(numRows*numRows == lhs.size());
+    ThrowAssert(numRows == rhs.size());
+    ThrowAssert(numRows*numRows == lhs.size());
 
-  scratchIds.resize(numRows);
-  sortPermutation_.resize(numRows);
-  for(size_t i = 0; i < n_obj; i++) {
-    const stk::mesh::Entity entity = entities[i];
-    const LocalOrdinal localOffset = entityToColLID_[entity.local_offset()];
-    for(size_t d=0; d < numDof_; ++d) {
-      size_t lid = i*numDof_ + d;
-      scratchIds[lid] = localOffset + d;
+    scratchIds.resize(numRows);
+    sortPermutation_.resize(numRows);
+    
+    // Iterate through entities, e.g. nodes
+    for(size_t i = 0; i < n_obj; i++) {
+        const stk::mesh::Entity entity = entities[i];
+        const LocalOrdinal localOffset = entityToColLID_[entity.local_offset()];
+        for(size_t d=0; d < numDof_; ++d) {
+            size_t lid = i*numDof_ + d;
+            scratchIds[lid] = localOffset + d;
+        }
     }
-  }
 
-  for (unsigned i = 0; i < numRows; ++i) {
-    sortPermutation_[i] = i;
-  }
-  Tpetra::Details::shellSortKeysAndValues(scratchIds.data(), sortPermutation_.data(), (int)numRows);
-
-  for (unsigned r = 0; r < numRows; r++) {
-    int i = sortPermutation_[r]/numDof_;
-    LocalOrdinal rowLid = entityToLID_[entities[i].local_offset()];
-    rowLid += sortPermutation_[r]%numDof_;
-    const LocalOrdinal cur_perm_index = sortPermutation_[r];
-    const double* const cur_lhs = &lhs[cur_perm_index*numRows];
-    const double cur_rhs = rhs[cur_perm_index];
-    ThrowAssertMsg(std::isfinite(cur_rhs), "Invalid rhs");
-
-    if(rowLid < maxOwnedRowId_) {
-      sum_into_row(ownedLocalMatrix_.row(rowLid),  n_obj, numDof_, scratchIds.data(), sortPermutation_.data(), cur_lhs);
-      ownedLocalRhs_(rowLid,0) += cur_rhs;
+    for (unsigned i = 0; i < numRows; ++i) {
+        sortPermutation_[i] = i;
     }
-    else if (rowLid < maxSharedNotOwnedRowId_) {
-      LocalOrdinal actualLocalId = rowLid - maxOwnedRowId_;
-      sum_into_row(sharedNotOwnedLocalMatrix_.row(actualLocalId),  n_obj, numDof_,
-        scratchIds.data(), sortPermutation_.data(), cur_lhs);
+    
+    Tpetra::Details::shellSortKeysAndValues(scratchIds.data(), sortPermutation_.data(), (int)numRows);
 
-      sharedNotOwnedLocalRhs_(actualLocalId,0) += cur_rhs;
+    for (unsigned r = 0; r < numRows; r++) {
+        int i = sortPermutation_[r]/numDof_;
+        LocalOrdinal rowLid = entityToLID_[entities[i].local_offset()];
+        rowLid += sortPermutation_[r]%numDof_;
+        std::cout << "rowLid = " << rowLid << std::endl;
+        
+        const LocalOrdinal cur_perm_index = sortPermutation_[r];
+        std::cout << "cur_perm_index = " << cur_perm_index << std::endl;
+        
+        const double * const cur_lhs = &lhs[cur_perm_index*numRows];
+        const double cur_rhs = rhs[cur_perm_index];
+        ThrowAssertMsg(std::isfinite(cur_rhs), "Invalid rhs");
+
+        if(rowLid < maxOwnedRowId_) {
+            sum_into_row(ownedLocalMatrix_.row(rowLid),  n_obj, numDof_, scratchIds.data(), sortPermutation_.data(), cur_lhs);
+            ownedLocalRhs_(rowLid,0) += cur_rhs;
+        }
+        else if (rowLid < maxSharedNotOwnedRowId_) {
+            LocalOrdinal actualLocalId = rowLid - maxOwnedRowId_;
+            sum_into_row(sharedNotOwnedLocalMatrix_.row(actualLocalId),  n_obj, numDof_,
+                scratchIds.data(), sortPermutation_.data(), cur_lhs);
+
+            sharedNotOwnedLocalRhs_(actualLocalId,0) += cur_rhs;
+        }
     }
-  }
 }
 
 void

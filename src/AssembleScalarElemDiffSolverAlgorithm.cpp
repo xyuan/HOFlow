@@ -231,8 +231,12 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                     // Iterate through all spatial dimensions
                     for ( int j = 0; j < nDim; ++j ) {
                         lhsfacDiff += -muIp*p_dndx[offSetDnDx+j]*p_scs_areav[ip*nDim+j];
-                        std::cout << "p_dndx[offSetDnDx+j] = " << p_dndx[offSetDnDx+j] << std::endl;
-                        std::cout << "p_scs_areav[ip*nDim+j] = " << p_scs_areav[ip*nDim+j] << std::endl;
+                        
+//                        std::cout << "Node: " << ic << " Dimension: " << j << std::endl;
+//                        std::cout << "lhsfacDiff sum = " << lhsfacDiff << std::endl;
+//                        std::cout << "p_dndx[offSetDnDx+j] = " << p_dndx[offSetDnDx+j] << std::endl;
+//                        std::cout << "p_scs_areav[ip*nDim+j] = " << p_scs_areav[ip*nDim+j] << std::endl;
+//                        std::cout << std::endl;
                     }
 
                     qDiff += lhsfacDiff*p_scalarQNp1[ic];
