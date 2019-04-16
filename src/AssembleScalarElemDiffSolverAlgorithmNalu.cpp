@@ -2,7 +2,7 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "AssembleScalarElemDiffSolverAlgorithm.h"
+#include "AssembleScalarElemDiffSolverAlgorithmNalu.h"
 
 #include <EquationSystem.h>
 #include <SolverAlgorithm.h>
@@ -25,12 +25,12 @@
 //==========================================================================
 // Class Definition
 //==========================================================================
-// AssembleScalarElemDiffSolverAlgorithm - add LHS/RHS for scalar diff
+// AssembleScalarElemDiffSolverAlgorithmNalu - add LHS/RHS for scalar diff
 //==========================================================================
 //--------------------------------------------------------------------------
 //-------- constructor -----------------------------------------------------
 //--------------------------------------------------------------------------
-AssembleScalarElemDiffSolverAlgorithm::AssembleScalarElemDiffSolverAlgorithm(
+AssembleScalarElemDiffSolverAlgorithmNalu::AssembleScalarElemDiffSolverAlgorithmNalu(
     Realm &realm,
     stk::mesh::Part *part,
     EquationSystem *eqSystem,
@@ -50,14 +50,14 @@ AssembleScalarElemDiffSolverAlgorithm::AssembleScalarElemDiffSolverAlgorithm(
 //--------------------------------------------------------------------------
 //-------- initialize_connectivity -----------------------------------------
 //--------------------------------------------------------------------------
-void AssembleScalarElemDiffSolverAlgorithm::initialize_connectivity() {
+void AssembleScalarElemDiffSolverAlgorithmNalu::initialize_connectivity() {
     eqSystem_->linsys_->buildElemToNodeGraph(partVec_);
 }
 
 //--------------------------------------------------------------------------
 //-------- execute ---------------------------------------------------------
 //--------------------------------------------------------------------------
-void AssembleScalarElemDiffSolverAlgorithm::execute() {
+void AssembleScalarElemDiffSolverAlgorithmNalu::execute() {
     stk::mesh::BulkData & bulk_data = realm_.bulk_data();
     stk::mesh::MetaData & meta_data = realm_.meta_data();
 
@@ -76,7 +76,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
       supplementalAlg_[i]->setup();
 
     // deal with state
-    ScalarFieldType & scalarQNp1 = scalarQ_->field_of_state(stk::mesh::StateNP1);
+    ScalarFieldType & scalarQNp1   = scalarQ_->field_of_state(stk::mesh::StateNP1);
 
     // nodal fields to gather
     std::vector<double> ws_coordinates;
@@ -202,8 +202,8 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
             // Iterate through all integration points
             for ( int ip = 0; ip < numScsIp; ++ip ) {
                 // left and right nodes for this ip
-                const int il = getLeftNode(lrscv, &ip);
-                const int ir = getRightNode(lrscv, &ip);
+                const int il = lrscv[2*ip];
+                const int ir = lrscv[2*ip+1];
 
                 // corresponding matrix rows
                 const int rowL = il*nodesPerElement;
@@ -216,8 +216,8 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 // Iterate through all nodes of a element to get the flux coefficient
                 // contribution of each node to the current integration point
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) {
-                    const double sf = getSFValue(p_shape_function, &offSetSF, &ic);
-                    muIp += sf*p_diffFluxCoeff[ic];
+                    const double r = p_shape_function[offSetSF+ic];
+                    muIp += r*p_diffFluxCoeff[ic];
                 }
 
                 double qDiff = 0.0;
@@ -230,10 +230,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                     const int offSetDnDx = nDim*nodesPerElement*ip + ic*nDim;
                     // Iterate through all spatial dimensions
                     for ( int j = 0; j < nDim; ++j ) {
-                        const double dndx = getSFDeriv(p_dndx, &offSetDnDx, &j);
-                        const double areav = getFaceDet(p_scs_areav, &nDim, &ip, &j);
-                        
-                        lhsfacDiff += -muIp*dndx*areav;
+                        lhsfacDiff += -muIp*p_dndx[offSetDnDx+j]*p_scs_areav[ip*nDim+j];
                         
 //                        std::cout << "Node: " << ic << " Dimension: " << j << std::endl;
 //                        std::cout << "lhsfacDiff sum = " << lhsfacDiff << std::endl;
@@ -261,31 +258,4 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
             apply_coeff(connected_nodes, scratchIds, scratchVals, rhs, lhs, __FILE__);
         }
     }
-}
-
-inline int AssembleScalarElemDiffSolverAlgorithm::getLeftNode(const int * lrscv, int * ip) {
-    return lrscv[2 * (*ip)];
-}
-
-inline int AssembleScalarElemDiffSolverAlgorithm::getRightNode(const int * lrscv, int * ip) {
-    return lrscv[2* (*ip) + 1];
-}
-
-inline double AssembleScalarElemDiffSolverAlgorithm::getSFValue(const double * shapeFunction, 
-                                                                const int * offset, 
-                                                                int * node) {
-    return shapeFunction[*offset + *node];
-}
-
-inline double AssembleScalarElemDiffSolverAlgorithm::getSFDeriv(const double * shapeFunctionDeriv, 
-                                                                const int * offset, 
-                                                                int * dim) {
-    return shapeFunctionDeriv[*offset + *dim];
-}
-
-inline double AssembleScalarElemDiffSolverAlgorithm::getFaceDet(const double * areav, 
-                                                                const int * nDim, 
-                                                                int * ip, 
-                                                                int * dim) {
-    return areav[*ip * (*nDim) + *dim];
 }
