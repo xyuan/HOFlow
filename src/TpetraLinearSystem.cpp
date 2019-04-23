@@ -1356,71 +1356,69 @@ void sum_into_row (RowViewType row_view,
 
 }
 
-void
-TpetraLinearSystem::sumInto(
-      unsigned numEntities,
-      const stk::mesh::Entity* entities,
-      const SharedMemView<const double*> & rhs,
-      const SharedMemView<const double**> & lhs,
-      const SharedMemView<int*> & localIds,
-      const SharedMemView<int*> & sortPermutation,
-      const char * trace_tag)
+void TpetraLinearSystem::sumInto(unsigned numEntities,
+                                 const stk::mesh::Entity* entities,
+                                 const SharedMemView<const double*> & rhs,
+                                 const SharedMemView<const double**> & lhs,
+                                 const SharedMemView<int*> & localIds,
+                                 const SharedMemView<int*> & sortPermutation,
+                                 const char * trace_tag)
 {
-  constexpr bool forceAtomic = !std::is_same<DeviceSpace, Kokkos::Serial>::value;
+    constexpr bool forceAtomic = !std::is_same<DeviceSpace, Kokkos::Serial>::value;
 
-  ThrowAssertMsg(lhs.is_contiguous(), "LHS assumed contiguous");
-  ThrowAssertMsg(rhs.is_contiguous(), "RHS assumed contiguous");
-  ThrowAssertMsg(localIds.is_contiguous(), "localIds assumed contiguous");
-  ThrowAssertMsg(sortPermutation.is_contiguous(), "sortPermutation assumed contiguous");
+    ThrowAssertMsg(lhs.is_contiguous(), "LHS assumed contiguous");
+    ThrowAssertMsg(rhs.is_contiguous(), "RHS assumed contiguous");
+    ThrowAssertMsg(localIds.is_contiguous(), "localIds assumed contiguous");
+    ThrowAssertMsg(sortPermutation.is_contiguous(), "sortPermutation assumed contiguous");
 
-  const int n_obj = numEntities;
-  const int numRows = n_obj * numDof_;
+    const int n_obj = numEntities;
+    const int numRows = n_obj * numDof_;
 
-  for(int i = 0; i < n_obj; i++) {
-    const stk::mesh::Entity entity = entities[i];
-    const LocalOrdinal localOffset = entityToColLID_[entity.local_offset()];
-    for(size_t d=0; d < numDof_; ++d) {
-      size_t lid = i*numDof_ + d;
-      localIds[lid] = localOffset + d;
+    for (int i = 0; i < n_obj; i++) {
+        const stk::mesh::Entity entity = entities[i];
+        const LocalOrdinal localOffset = entityToColLID_[entity.local_offset()];
+        for (size_t d=0; d < numDof_; ++d) {
+            size_t lid = i*numDof_ + d;
+            localIds[lid] = localOffset + d;
+        }
     }
-  }
 
-  for (int i = 0; i < numRows; ++i) {
-    sortPermutation[i] = i;
-  }
-  Tpetra::Details::shellSortKeysAndValues(localIds.data(), sortPermutation.data(), numRows);
-
-  for (int r = 0; r < numRows; ++r) {
-    int i = sortPermutation[r]/numDof_;
-    LocalOrdinal rowLid = entityToLID_[entities[i].local_offset()];
-    rowLid += sortPermutation[r]%numDof_;
-    const LocalOrdinal cur_perm_index = sortPermutation[r];
-    const double* const cur_lhs = &lhs(cur_perm_index, 0);
-    const double cur_rhs = rhs[cur_perm_index];
-    ThrowAssertMsg(std::isfinite(cur_rhs), "Inf or NAN rhs");
-
-    if(rowLid < maxOwnedRowId_) {
-      sum_into_row(ownedLocalMatrix_.row(rowLid), n_obj, numDof_, localIds.data(), sortPermutation.data(), cur_lhs);
-      if (forceAtomic) {
-        Kokkos::atomic_add(&ownedLocalRhs_(rowLid,0), cur_rhs);
-      }
-      else {
-        ownedLocalRhs_(rowLid,0) += cur_rhs;
-      }
+    for (int i = 0; i < numRows; ++i) {
+        sortPermutation[i] = i;
     }
-    else if (rowLid < maxSharedNotOwnedRowId_) {
-      LocalOrdinal actualLocalId = rowLid - maxOwnedRowId_;
-      sum_into_row(sharedNotOwnedLocalMatrix_.row(actualLocalId), n_obj, numDof_,
-        localIds.data(), sortPermutation.data(), cur_lhs);
+    Tpetra::Details::shellSortKeysAndValues(localIds.data(), sortPermutation.data(), numRows);
 
-      if (forceAtomic) {
-        Kokkos::atomic_add(&sharedNotOwnedLocalRhs_(actualLocalId,0), cur_rhs);
-      }
-      else {
-        sharedNotOwnedLocalRhs_(actualLocalId,0) += cur_rhs;
-      }
+    for (int r = 0; r < numRows; ++r) {
+        int i = sortPermutation[r]/numDof_;
+        LocalOrdinal rowLid = entityToLID_[entities[i].local_offset()];
+        rowLid += sortPermutation[r]%numDof_;
+        const LocalOrdinal cur_perm_index = sortPermutation[r];
+        const double* const cur_lhs = &lhs(cur_perm_index, 0);
+        const double cur_rhs = rhs[cur_perm_index];
+        ThrowAssertMsg(std::isfinite(cur_rhs), "Inf or NAN rhs");
+
+        if(rowLid < maxOwnedRowId_) {
+            sum_into_row(ownedLocalMatrix_.row(rowLid), n_obj, numDof_, localIds.data(), sortPermutation.data(), cur_lhs);
+            if (forceAtomic) {
+              Kokkos::atomic_add(&ownedLocalRhs_(rowLid,0), cur_rhs);
+            }
+            else {
+              ownedLocalRhs_(rowLid,0) += cur_rhs;
+            }
+        }
+        else if (rowLid < maxSharedNotOwnedRowId_) {
+            LocalOrdinal actualLocalId = rowLid - maxOwnedRowId_;
+            sum_into_row(sharedNotOwnedLocalMatrix_.row(actualLocalId), n_obj, numDof_,
+                localIds.data(), sortPermutation.data(), cur_lhs);
+
+            if (forceAtomic) {
+                Kokkos::atomic_add(&sharedNotOwnedLocalRhs_(actualLocalId,0), cur_rhs);
+            }
+            else {
+                sharedNotOwnedLocalRhs_(actualLocalId,0) += cur_rhs;
+            }
+        }
     }
-  }
 }
 
 // Fills the coefficients calculated from the solver algorithm 
@@ -1442,7 +1440,7 @@ void TpetraLinearSystem::sumInto(const std::vector<stk::mesh::Entity> & entities
     sortPermutation_.resize(numRows);
     
     // Iterate through entities, e.g. nodes
-    for(size_t i = 0; i < n_obj; i++) {
+    for (size_t i = 0; i < n_obj; i++) {
         const stk::mesh::Entity entity = entities[i];
         const LocalOrdinal localOffset = entityToColLID_[entity.local_offset()];
         for(size_t d=0; d < numDof_; ++d) {
@@ -1461,10 +1459,10 @@ void TpetraLinearSystem::sumInto(const std::vector<stk::mesh::Entity> & entities
         int i = sortPermutation_[r]/numDof_;
         LocalOrdinal rowLid = entityToLID_[entities[i].local_offset()];
         rowLid += sortPermutation_[r]%numDof_;
-        std::cout << "rowLid = " << rowLid << std::endl;
+//        std::cout << "rowLid = " << rowLid << std::endl;
         
         const LocalOrdinal cur_perm_index = sortPermutation_[r];
-        std::cout << "cur_perm_index = " << cur_perm_index << std::endl;
+//        std::cout << "cur_perm_index = " << cur_perm_index << std::endl;
         
         const double * const cur_lhs = &lhs[cur_perm_index*numRows];
         const double cur_rhs = rhs[cur_perm_index];

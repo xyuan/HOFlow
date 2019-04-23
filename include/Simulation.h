@@ -72,6 +72,7 @@ public:
     Realms * realms_;
     LinearSolvers * linearSolvers_;
     static bool debug_;
+    std::string simType_;
 };
 
 #endif /* SIMULATION_H */

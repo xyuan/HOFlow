@@ -119,7 +119,8 @@ Realm::Realm(Realms & realms, const YAML::Node & node) :
     timerPromoteMesh_(0.0),
     timerSortExposedFace_(0.0),
     wallTimeStart_(stk::wall_time()),
-    inputMeshIdx_(-1)
+    inputMeshIdx_(-1),
+    simType_(root()->simType_)
 {
     // nothing to do
 }
@@ -801,8 +802,11 @@ std::string Realm::name() {
 }
 
 int Realm::number_of_states() {
-  const int numStates = (timeIntegrator_->secondOrderTimeAccurate_) ? 3 : 2;
-  return numStates;
+    int numStates = 2;
+    if ( simType_ == "transient") {
+        numStates = (timeIntegrator_->secondOrderTimeAccurate_) ? 3 : 2;
+    }
+    return numStates;
 }
 
 
@@ -1102,19 +1106,19 @@ Realm::provide_memory_summary()
 //--------------------------------------------------------------------------
 //-------- get_current_time() ----------------------------------------------
 //--------------------------------------------------------------------------
-double
-Realm::get_current_time()
-{
-  return timeIntegrator_->get_current_time();
+double Realm::get_current_time() {
+    double time = 0;
+    if (simType_ == "transient") {
+        time = timeIntegrator_->get_current_time();
+    }
+    return time;
 }
 
 //--------------------------------------------------------------------------
 //-------- get_time_step() ----------------------------------------------
 //--------------------------------------------------------------------------
-double
-Realm::get_time_step()
-{
-  return timeIntegrator_->get_time_step();
+double Realm::get_time_step() {
+    return timeIntegrator_->get_time_step();
 }
 
 double 

@@ -2,11 +2,8 @@
 #
 # Example HOFlow input file for a heat conduction problem
 #
-
-Simulations:
-  - name: sim1
-    time_integrator: ti_1
-    optimizer: opt1
+simulation:
+  type: steady
 
 linear_solvers:
   - name: solve_scalar

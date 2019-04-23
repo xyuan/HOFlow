@@ -41,15 +41,12 @@ void AuxFunctionAlgorithm::execute() {
 
     const unsigned nDim = meta_data.spatial_dimension();
     const double time = realm_.get_current_time();
-    VectorFieldType *coordinates = meta_data.get_field<VectorFieldType>(stk::topology::NODE_RANK, realm_.get_coordinates_name());
+    VectorFieldType * coordinates = meta_data.get_field<VectorFieldType>(stk::topology::NODE_RANK, realm_.get_coordinates_name());
     
     auxFunction_->setup(time);
 
-    stk::mesh::Selector selector = stk::mesh::selectUnion(partVec_) &
-      stk::mesh::selectField(*field_);
-
-    stk::mesh::BucketVector const& buckets =
-      realm_.get_buckets( entityRank_, selector );
+    stk::mesh::Selector selector = stk::mesh::selectUnion(partVec_) & stk::mesh::selectField(*field_);
+    stk::mesh::BucketVector const & buckets = realm_.get_buckets( entityRank_, selector );
 
     for ( stk::mesh::BucketVector::const_iterator ib = buckets.begin(); ib != buckets.end() ; ++ib ) {
         stk::mesh::Bucket & b = **ib ;

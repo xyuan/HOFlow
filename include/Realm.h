@@ -255,6 +255,8 @@ public:
     std::map<PropertyIdentifier, ScalarFieldType *> propertyMap_;
     std::vector<Algorithm *> initCondAlg_;
     std::vector<Algorithm *> propertyAlg_;
+    
+    std::string simType_;
 };
 
 #endif /* REALM_H */
