@@ -689,7 +689,15 @@ void Realm::provide_output() {
 
         // process output via io
         const double currentTime = get_current_time();
-        const int timeStepCount = get_time_step_count();
+        double tempTimeStepCount = 0;
+        
+        if (simType_ == "transient") {
+            tempTimeStepCount = get_time_step_count();
+        } else {
+            tempTimeStepCount = 1;
+        }
+        
+        const int timeStepCount = tempTimeStepCount;
         const int modStep = timeStepCount - outputInfo_->outputStart_;
 
         // check for elapsed WALL time threshold
@@ -711,12 +719,18 @@ void Realm::provide_output() {
                 dump_simulation_time();
             }
         }
-
-        const bool isOutput = (timeStepCount >=outputInfo_->outputStart_ && modStep % outputInfo_->outputFreq_ == 0) || forcedOutput;
-
+        bool isOutput = false;
+        if (simType_ == "transient" ) {
+            isOutput = (timeStepCount >=outputInfo_->outputStart_ && modStep % outputInfo_->outputFreq_ == 0) || forcedOutput;
+        } else {
+            isOutput = (modStep % outputInfo_->outputFreq_ == 0) || forcedOutput;
+        }
+            
         if ( isOutput ) {
-            HOFlowEnv::self().hoflowOutputP0() << "Realm shall provide output files at : currentTime/timeStepCount: "
-                                           << currentTime << "/" <<  timeStepCount << " (" << name_ << ")" << std::endl;      
+            if (simType_ == "transient") {
+                HOFlowEnv::self().hoflowOutputP0() << "Realm shall provide output files at : currentTime/timeStepCount: "
+                                                   << currentTime << "/" <<  timeStepCount << " (" << name_ << ")" << std::endl;   
+            }
             // not set up for globals
             ioBroker_->process_output_request(resultsFileIndex_, currentTime);
             
@@ -1356,6 +1370,50 @@ Realm::advance_time_step()
     }
   }
 
+}
+
+void Realm::run_steady_state() {
+    HOFlowEnv::self().hoflowOutputP0() << name_ << "::run_steady() " << std::endl;
+
+    HOFlowEnv::self().hoflowOutputP0() << "NLI"
+                    << std::setw(8) << std::right << "Name"
+                    << std::setw(22) << std::right << "Linear Iter"
+                    << std::setw(16) << std::right << "Linear Res"
+                    << std::setw(16) << std::right << "NLinear Res"
+                    << std::setw(14) << std::right << "Scaled NLR" << std::endl;
+
+    HOFlowEnv::self().hoflowOutputP0() << "---"
+                    << std::setw(8) << std::right << "----"
+                    << std::setw(22) << std::right << "-----------"
+                    << std::setw(16) << std::right << "----------"
+                    << std::setw(16) << std::right << "-----------"
+                    << std::setw(14) << std::right << "----------" << std::endl;
+
+
+    // evaluate properties based on latest state including boundary and and possible xfer
+    evaluate_properties();
+
+    const int numNonLinearIterations = equationSystems_.maxIterations_;
+    for ( int i = 0; i < numNonLinearIterations; ++i ) {
+        currentNonlinearIteration_ = i+1;
+        HOFlowEnv::self().hoflowOutputP0()
+            << currentNonlinearIteration_
+            << "/" << numNonLinearIterations
+            << std::setw(29) << std::right << "Equation System Iteration" << std::endl;
+
+        isFinalOuterIter_ = ((i+1) == numNonLinearIterations);
+
+        const bool isConverged = equationSystems_.solve_and_update();
+
+        // evaluate properties based on latest np1 solution
+        evaluate_properties();
+
+        if ( isConverged ) {
+            HOFlowEnv::self().hoflowOutputP0() << "norm convergence criteria met for all equation systems: " << std::endl;
+            HOFlowEnv::self().hoflowOutputP0() << "max scaled norm is: " << equationSystems_.provide_system_norm() << std::endl;
+            break;
+        }
+    }
 }
 
 bool

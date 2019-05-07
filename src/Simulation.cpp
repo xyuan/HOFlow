@@ -8,6 +8,7 @@
 #include <HOFlowEnv.h>
 #include <HOFlowParsing.h>
 #include <TimeIntegrator.h>
+#include <SteadyState.h>
 
 #include <iostream>
 #include <yaml-cpp/yaml.h>
@@ -18,6 +19,7 @@ bool Simulation::debug_ = false;
 Simulation::Simulation(const YAML::Node& root_node) :
     m_root_node(root_node),
     timeIntegrator_(NULL),
+    steadyState_(NULL),
     realms_(NULL),
     linearSolvers_(NULL),
     simType_("")
@@ -28,6 +30,7 @@ Simulation::Simulation(const YAML::Node& root_node) :
 Simulation::~Simulation() {
     delete realms_;
     delete timeIntegrator_;
+    delete steadyState_;
     delete linearSolvers_;
 }
 
@@ -71,13 +74,18 @@ void Simulation::load(const YAML::Node & node) {
         HOFlowEnv::self().hoflowOutputP0() << "=========================" << std::endl;
         timeIntegrator_ = new TimeIntegrator(this);
         timeIntegrator_->load(node);
+    } else {
+        steadyState_ = new SteadyState(this);
     }
 }
 
 void Simulation::breadboard() {
     realms_->breadboard();
-    if (simType_ == "transient")
+    if (simType_ == "transient") {
         timeIntegrator_->breadboard();
+    } else {
+        steadyState_->breadboard();
+    }
 }
 
 void Simulation::initialize() {
@@ -91,8 +99,11 @@ void Simulation::run() {
     HOFlowEnv::self().hoflowOutputP0() << "*******************************************************" << std::endl;
     HOFlowEnv::self().hoflowOutputP0() << "Simulation Shall Commence: number of processors = " << HOFlowEnv::self().parallel_size() << std::endl;
     HOFlowEnv::self().hoflowOutputP0() << "*******************************************************" << std::endl;
-    if (simType_ == "transient")
+    if (simType_ == "transient") {
         timeIntegrator_->integrate_realm();
+    } else {
+        steadyState_->run_realm();
+    }
 }
 
 void Simulation::high_level_banner() {

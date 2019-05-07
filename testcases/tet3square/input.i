@@ -3,7 +3,7 @@
 # Example HOFlow input file for a heat conduction problem
 #
 simulation:
-  type: transient
+  type: steady
 
 linear_solvers:
   - name: solve_scalar
@@ -86,7 +86,7 @@ Time_Integrators:
   - StandardTimeIntegrator:
       name: ti_1
       start_time: 0
-      termination_step_count: 300
+      termination_step_count: 100
       time_step: 0.1 
       time_stepping_type: fixed
       time_step_count: 0

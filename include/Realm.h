@@ -110,6 +110,7 @@ public:
     virtual void pre_timestep_work();
     virtual void output_banner();
     virtual void advance_time_step();
+    virtual void run_steady_state();
     virtual bool active_time_step();
     virtual void initial_work();
   

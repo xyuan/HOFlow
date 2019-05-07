@@ -295,16 +295,18 @@ void HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) 
         AssembleNodeSolverAlgorithm * theAlg = new AssembleNodeSolverAlgorithm(realm_, part, this);
         solverAlgDriver_->solverAlgMap_[algMass] = theAlg;
 
-        // now create the supplemental alg for mass term
-        if ( realm_.number_of_states() == 2 ) {
-            // 1st order time accuracy, bdf1 = backwards euler aka implicit euler
-            HeatCondMassBackwardEulerNodeSuppAlg * theMass = new HeatCondMassBackwardEulerNodeSuppAlg(realm_);
-            theAlg->supplementalAlg_.push_back(theMass);
-        }
-        else {
-            // 2nd order time accuracy, backward differentiation formula bdf2
-            HeatCondMassBDF2NodeSuppAlg * theMass = new HeatCondMassBDF2NodeSuppAlg(realm_);
-            theAlg->supplementalAlg_.push_back(theMass);
+        if (realm_.simType_ == "transient") {
+            // now create the supplemental alg for mass term
+            if ( realm_.number_of_states() == 2 ) {
+                // 1st order time accuracy, bdf1 = backwards euler aka implicit euler
+                HeatCondMassBackwardEulerNodeSuppAlg * theMass = new HeatCondMassBackwardEulerNodeSuppAlg(realm_);
+                theAlg->supplementalAlg_.push_back(theMass);
+            }
+            else {
+                // 2nd order time accuracy, backward differentiation formula bdf2
+                HeatCondMassBDF2NodeSuppAlg * theMass = new HeatCondMassBDF2NodeSuppAlg(realm_);
+                theAlg->supplementalAlg_.push_back(theMass);
+            }
         }
 
 //        // Add src term supp alg...; limited number supported

@@ -12,6 +12,7 @@
 class YAML::Node;
 class LinearSolvers;
 class TimeIntegrator;
+class SteadyState;
 class Realms;
 
 /** Container class that holds all data regarding the simulation.
@@ -69,6 +70,7 @@ public:
     const YAML::Node & m_root_node;
     
     TimeIntegrator * timeIntegrator_;
+    SteadyState * steadyState_;
     Realms * realms_;
     LinearSolvers * linearSolvers_;
     static bool debug_;
