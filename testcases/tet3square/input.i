@@ -57,12 +57,12 @@ realms:
     - wall_boundary_condition: left
       target_name: left
       wall_user_data:
-        heat_flux: 100
+      temperature: 50
 
     - wall_boundary_condition: right
       target_name: right
       wall_user_data:
-        heat_transfer_coefficient: 1000
+      temperature: 100
 
     - wall_boundary_condition: top
       target_name: top

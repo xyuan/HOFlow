@@ -258,6 +258,7 @@ public:
     std::vector<Algorithm *> propertyAlg_;
     
     std::string simType_;
+    int outputCounter_;
 };
 
 #endif /* REALM_H */

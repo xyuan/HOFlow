@@ -118,6 +118,7 @@ Realm::Realm(Realms & realms, const YAML::Node & node) :
     timerSkinMesh_(0.0),
     timerPromoteMesh_(0.0),
     timerSortExposedFace_(0.0),
+    outputCounter_(0),
     wallTimeStart_(stk::wall_time()),
     inputMeshIdx_(-1),
     simType_(root()->simType_)
@@ -693,8 +694,6 @@ void Realm::provide_output() {
         
         if (simType_ == "transient") {
             tempTimeStepCount = get_time_step_count();
-        } else {
-            tempTimeStepCount = 1;
         }
         
         const int timeStepCount = tempTimeStepCount;
@@ -727,6 +726,7 @@ void Realm::provide_output() {
         }
             
         if ( isOutput ) {
+            outputCounter_++;
             if (simType_ == "transient") {
                 HOFlowEnv::self().hoflowOutputP0() << "Realm shall provide output files at : currentTime/timeStepCount: "
                                                    << currentTime << "/" <<  timeStepCount << " (" << name_ << ")" << std::endl;   
@@ -1125,6 +1125,8 @@ double Realm::get_current_time() {
     double time = 0;
     if (simType_ == "transient") {
         time = timeIntegrator_->get_current_time();
+    } else {
+        time = double(outputCounter_);
     }
     return time;
 }
