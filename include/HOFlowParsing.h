@@ -167,6 +167,14 @@ template<> struct YAML::convert<Temperature> {
     static bool decode(const YAML::Node & node, Temperature & rhs);
 };
 
+template<> struct YAML::convert<HeatTransferCoefficient> {
+    static bool decode(const YAML::Node & node, HeatTransferCoefficient & rhs);
+};
+
+template<> struct YAML::convert<NormalHeatFlux> {
+    static bool decode(const YAML::Node & node, NormalHeatFlux & rhs);
+};
+
 template<> struct YAML::convert<UserData> {
     static bool decode(const YAML::Node & node, UserData & rhs);
 };

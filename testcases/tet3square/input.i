@@ -17,7 +17,7 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: tet3square_small.exo
+    mesh: tet3square.exo
 
     equation_systems:
       name: theEqSys
@@ -37,42 +37,42 @@ realms:
       - constant: ic_1
         target_name: unspecified-2-triangle
         value:
-         temperature: 10.0
+         temperature: 0
 
     material_properties:
       target_name: unspecified-2-triangle
       specifications:
         - name: density
           type: constant
-          value: 1.0
+          value: 1000
         - name: thermal_conductivity
           type: constant
           value: 1.0
         - name: specific_heat
           type: constant
-          value: 1.0
+          value: 1000
 
     boundary_conditions:
 
     - wall_boundary_condition: left
       target_name: left
       wall_user_data:
-        temperature: 10.0
+        heat_flux: 100
 
     - wall_boundary_condition: right
       target_name: right
       wall_user_data:
-        temperature: 20.0
+        heat_transfer_coefficient: 1000
 
     - wall_boundary_condition: top
       target_name: top
       wall_user_data:
-        heat_flux: 0.0
+        adiabatic: true
 
     - wall_boundary_condition: bottom
       target_name: bottom
       wall_user_data:
-        heat_flux: 0.0
+        adiabatic: true
 
     output:
       output_data_base_name: femHC.e
@@ -86,8 +86,8 @@ Time_Integrators:
   - StandardTimeIntegrator:
       name: ti_1
       start_time: 0
-      termination_step_count: 20
-      time_step: 10.0 
+      termination_step_count: 300
+      time_step: 0.1 
       time_stepping_type: fixed
       time_step_count: 0
       second_order_accuracy: no

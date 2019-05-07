@@ -227,11 +227,25 @@ bool YAML::convert<Temperature>::decode(const YAML::Node & node, Temperature & t
     if (!node.IsScalar()) {
         return false;
     }
-
     t.temperature_ = node.as<double>();
-
     return true;
-  }
+}
+
+bool YAML::convert<NormalHeatFlux>::decode(const YAML::Node & node, NormalHeatFlux & q) {
+    if (!node.IsScalar()) {
+      return false;
+    }
+    q.qn_ = node.as<double>();
+    return true;
+}
+
+bool YAML::convert<HeatTransferCoefficient>::decode(const YAML::Node & node, HeatTransferCoefficient & htc) {
+    if (!node.IsScalar()) {
+      return false;
+    }
+    htc.heatTransferCoefficient_ = node.as<double>();
+    return true;
+}
 
 bool YAML::convert<WallUserData>::decode(const YAML::Node & node, WallUserData & wallData) {
     if (node["temperature"]) {
@@ -243,6 +257,14 @@ bool YAML::convert<WallUserData>::decode(const YAML::Node & node, WallUserData &
     
     if (node["adiabatic"]) {
         wallData.isAdiabatic_ = node["adiabatic"].as<bool>();
+    }
+    if (node["heat_transfer_coefficient"]) {
+        wallData.heatTransferCoefficient_ = node["heat_transfer_coefficient"].as<HeatTransferCoefficient>();
+        wallData.htcSpec_ = true;
+    }
+    if (node["heat_flux"]) {
+        wallData.q_ = node["heat_flux"].as<NormalHeatFlux>();
+        wallData.heatFluxSpec_ = true;
     }
 
     // function data
