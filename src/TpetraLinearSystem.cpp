@@ -1482,83 +1482,87 @@ void TpetraLinearSystem::sumInto(const std::vector<stk::mesh::Entity> & entities
     }
 }
 
-void
-TpetraLinearSystem::applyDirichletBCs(
-  stk::mesh::FieldBase * solutionField,
-  stk::mesh::FieldBase * bcValuesField,
-  const stk::mesh::PartVector & parts,
-  const unsigned beginPos,
-  const unsigned endPos)
+void TpetraLinearSystem::applyDirichletBCs(stk::mesh::FieldBase * solutionField,
+                                           stk::mesh::FieldBase * bcValuesField,
+                                           const stk::mesh::PartVector & parts,
+                                           const unsigned beginPos,
+                                           const unsigned endPos)
 {
-  stk::mesh::MetaData & metaData = realm_.meta_data();
+    stk::mesh::MetaData & metaData = realm_.meta_data();
 
-  double adbc_time = -HOFlowEnv::self().hoflow_time();
+    double adbc_time = -HOFlowEnv::self().hoflow_time();
 
-  const stk::mesh::Selector selector 
-    = (metaData.locally_owned_part() | metaData.globally_shared_part())
-    & stk::mesh::selectUnion(parts)
-    & stk::mesh::selectField(*solutionField) 
-    & !(realm_.get_inactive_selector());
+    const stk::mesh::Selector selector = (metaData.locally_owned_part() | metaData.globally_shared_part())
+                                         & stk::mesh::selectUnion(parts)
+                                         & stk::mesh::selectField(*solutionField) 
+                                         & !(realm_.get_inactive_selector());
 
-  stk::mesh::BucketVector const& buckets =
-    realm_.get_buckets( stk::topology::NODE_RANK, selector );
+    stk::mesh::BucketVector const & buckets = realm_.get_buckets( stk::topology::NODE_RANK, selector );
 
-  const bool internalMatrixIsSorted = true;
-  int nbc=0;
-  for(const stk::mesh::Bucket* bptr : buckets) {
-    const stk::mesh::Bucket & b = *bptr;
+    const bool internalMatrixIsSorted = true;
+    int nbc = 0;
+    
+    // Iterate through all selected buckets
+    for(const stk::mesh::Bucket * bptr : buckets) {
+        const stk::mesh::Bucket & b = *bptr;
 
-    const unsigned fieldSize = field_bytes_per_entity(*solutionField, b) / sizeof(double);
-    ThrowRequire(fieldSize == numDof_);
+        const unsigned fieldSize = field_bytes_per_entity(*solutionField, b) / sizeof(double);
+        ThrowRequire(fieldSize == numDof_);
 
-    const stk::mesh::Bucket::size_type length   = b.size();
-    const double * solution = (double*)stk::mesh::field_data(*solutionField, *b.begin());
-    const double * bcValues = (double*)stk::mesh::field_data(*bcValuesField, *b.begin());
+        const stk::mesh::Bucket::size_type length = b.size();
+        const double * solution = (double*)stk::mesh::field_data(*solutionField, *b.begin());
+        const double * bcValues = (double*)stk::mesh::field_data(*bcValuesField, *b.begin());
 
-    Teuchos::ArrayView<const LocalOrdinal> indices;
-    Teuchos::ArrayView<const double> values;
-    std::vector<double> new_values;
+        Teuchos::ArrayView<const LocalOrdinal> indices;
+        Teuchos::ArrayView<const double> values;
+        std::vector<double> new_values;
+        
+        // Iterate through each element in bucket
+        for (stk::mesh::Bucket::size_type k = 0 ; k < length ; ++k ) {
+            const stk::mesh::Entity entity = b[k];
+            const stk::mesh::EntityId hoflowId = *stk::mesh::field_data(*realm_.hoflowGlobalId_, entity);
+            const LocalOrdinal localIdOffset = lookup_myLID(myLIDs_, hoflowId, "applyDirichletBCs");
 
-    for (stk::mesh::Bucket::size_type k = 0 ; k < length ; ++k ) {
-      const stk::mesh::Entity entity = b[k];
-      const stk::mesh::EntityId hoflowId = *stk::mesh::field_data(*realm_.hoflowGlobalId_, entity);
-      const LocalOrdinal localIdOffset = lookup_myLID(myLIDs_, hoflowId, "applyDirichletBCs");
+            // From specified begin to end, usually 0 to 1
+            for (unsigned d=beginPos; d < endPos; ++d) {
+                const LocalOrdinal localId = localIdOffset + d;
+                const bool useOwned = localId < maxOwnedRowId_;
+                const LocalOrdinal actualLocalId = useOwned ? localId : localId - maxOwnedRowId_;
+                Teuchos::RCP<LinSys::Matrix> matrix = useOwned ? ownedMatrix_ : sharedNotOwnedMatrix_;
+                const LinSys::Matrix::local_matrix_type & local_matrix = useOwned ? ownedLocalMatrix_ : sharedNotOwnedLocalMatrix_;
 
-      for(unsigned d=beginPos; d < endPos; ++d) {
-        const LocalOrdinal localId = localIdOffset + d;
-        const bool useOwned = localId < maxOwnedRowId_;
-        const LocalOrdinal actualLocalId = useOwned ? localId : localId - maxOwnedRowId_;
-        Teuchos::RCP<LinSys::Matrix> matrix = useOwned ? ownedMatrix_ : sharedNotOwnedMatrix_;
-        const LinSys::Matrix::local_matrix_type& local_matrix = useOwned ? ownedLocalMatrix_ : sharedNotOwnedLocalMatrix_;
+                if (localId > maxSharedNotOwnedRowId_) {
+                    std::cerr << "localId > maxSharedNotOwnedRowId_:: localId= " 
+                              << localId << " maxSharedNotOwnedRowId_= " 
+                              << maxSharedNotOwnedRowId_ 
+                              << " useOwned = " 
+                              << (localId < maxOwnedRowId_ ) 
+                              << std::endl;
+                    throw std::runtime_error("logic error: localId > maxSharedNotOwnedRowId_");
+                }
 
-        if(localId > maxSharedNotOwnedRowId_) {
-          std::cerr << "localId > maxSharedNotOwnedRowId_:: localId= " << localId << " maxSharedNotOwnedRowId_= " << maxSharedNotOwnedRowId_ << " useOwned = " << (localId < maxOwnedRowId_ ) << std::endl;
-          throw std::runtime_error("logic error: localId > maxSharedNotOwnedRowId_");
+                // Adjust the LHS
+                const double diagonal_value = useOwned ? 1.0 : 0.0;
+
+                matrix->getLocalRowView(actualLocalId, indices, values);
+                const size_t rowLength = values.size();
+                if (rowLength > 0) {
+                    new_values.resize(rowLength);
+                    for(size_t i=0; i < rowLength; ++i) {
+                        new_values[i] = (indices[i] == localId) ? diagonal_value : 0;
+                    }
+                    local_matrix.replaceValues(actualLocalId, &indices[0], rowLength, new_values.data(), internalMatrixIsSorted);
+                }
+
+                // Replace the RHS residual with (desired - actual)
+                Teuchos::RCP<LinSys::Vector> rhs = useOwned ? ownedRhs_: sharedNotOwnedRhs_;
+                const double bc_residual = useOwned ? (bcValues[k*fieldSize + d] - solution[k*fieldSize + d]) : 0.0;
+                rhs->replaceLocalValue(actualLocalId, bc_residual);
+                ++nbc;
+            }
         }
-
-        // Adjust the LHS
-
-        const double diagonal_value = useOwned ? 1.0 : 0.0;
-
-        matrix->getLocalRowView(actualLocalId, indices, values);
-        const size_t rowLength = values.size();
-        if (rowLength > 0) {
-          new_values.resize(rowLength);
-          for(size_t i=0; i < rowLength; ++i) {
-              new_values[i] = (indices[i] == localId) ? diagonal_value : 0;
-          }
-          local_matrix.replaceValues(actualLocalId, &indices[0], rowLength, new_values.data(), internalMatrixIsSorted);
-        }
-
-        // Replace the RHS residual with (desired - actual)
-        Teuchos::RCP<LinSys::Vector> rhs = useOwned ? ownedRhs_: sharedNotOwnedRhs_;
-        const double bc_residual = useOwned ? (bcValues[k*fieldSize + d] - solution[k*fieldSize + d]) : 0.0;
-        rhs->replaceLocalValue(actualLocalId, bc_residual);
-        ++nbc;
-      }
     }
-  }
-  adbc_time += HOFlowEnv::self().hoflow_time();
+    adbc_time += HOFlowEnv::self().hoflow_time();
 }
 
 void
@@ -1707,10 +1711,10 @@ TpetraLinearSystem::solve(
   double finalResidNorm;
   
   // memory diagnostic
-//  if ( realm_.get_activate_memory_diagnostic() ) {
-//    HOFlowEnv::self().hoflowOutputP0() << "NaluMemory::TpetraLinearSystem::solve() PreSolve: " << eqSysName_ << std::endl;
-//    realm_.provide_memory_summary();
-//  }
+  if ( realm_.get_activate_memory_diagnostic() ) {
+    HOFlowEnv::self().hoflowOutputP0() << "HOFlowMemory::TpetraLinearSystem::solve() PreSolve: " << eqSysName_ << std::endl;
+    realm_.provide_memory_summary();
+  }
 
   const int status = linearSolver->solve(
       sln_,

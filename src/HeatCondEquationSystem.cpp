@@ -10,7 +10,7 @@
 //#include "AssembleScalarEdgeDiffSolverAlgorithm.h"
 #include "AssembleScalarElemDiffSolverAlgorithm.h"
 //#include "AssembleScalarDiffNonConformalSolverAlgorithm.h"
-//#include "AssembleScalarFluxBCSolverAlgorithm.h"
+#include "AssembleScalarFluxBCSolverAlgorithm.h"
 #include "AssembleNodalGradAlgorithmDriver.h"
 //#include "AssembleNodalGradEdgeAlgorithm.h"
 #include "AssembleNodalGradElemAlgorithm.h"
@@ -206,7 +206,7 @@ void HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) 
         }
     }
 
-  // solver; interior edge/element contribution (diffusion)
+    // solver; interior edge/element contribution (diffusion)
     if (!realm_.solutionOptions_->useConsolidatedSolverAlg_) {
         // Not consolidated solver algorithm
         
@@ -336,10 +336,9 @@ void HeatCondEquationSystem::register_interior_algorithm(stk::mesh::Part *part) 
     }
 }
 
-void HeatCondEquationSystem::register_wall_bc(
-    stk::mesh::Part * part,
-    const stk::topology & partTopo,
-    const WallBoundaryConditionData & wallBCData)
+void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
+                                              const stk::topology & partTopo,
+                                              const WallBoundaryConditionData & wallBCData)
 {
     const AlgorithmType algType = WALL;
 
@@ -367,11 +366,12 @@ void HeatCondEquationSystem::register_wall_bc(
     WallUserData userData = wallBCData.userData_;
     std::string temperatureName = "temperature";
     UserDataType theDataType = get_bc_data_type(userData, temperatureName);
-
+    
+    // If temperature specified (Dirichlet)
     if ( userData.tempSpec_ ||  FUNCTION_UD == theDataType ) {
 
         // register boundary data; temperature_bc
-        ScalarFieldType *theBcField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "temperature_bc"));
+        ScalarFieldType * theBcField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "temperature_bc"));
         stk::mesh::put_field_on_mesh(*theBcField, *part, nullptr);
 
         AuxFunction * theAuxFunc = NULL;
@@ -444,11 +444,12 @@ void HeatCondEquationSystem::register_wall_bc(
             }
         }
     }
-    /*else if( userData.heatFluxSpec_ && !userData.robinParameterSpec_ ) {
+    // If heat flux is specified (Neumann)
+    else if( userData.heatFluxSpec_ ) { // used to contain the following: && !userData.robinParameterSpec_
 
         const AlgorithmType algTypeHF = WALL_HF;
 
-        ScalarFieldType *theBcField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "heat_flux_bc"));
+        ScalarFieldType * theBcField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "heat_flux_bc"));
         stk::mesh::put_field_on_mesh(*theBcField, *part, nullptr);
 
         NormalHeatFlux heatFlux = userData.q_;
@@ -456,29 +457,24 @@ void HeatCondEquationSystem::register_wall_bc(
         userSpec[0] = heatFlux.qn_;
 
         // new it
-        ConstantAuxFunction *theAuxFunc = new ConstantAuxFunction(0, 1, userSpec);
+        ConstantAuxFunction * theAuxFunc = new ConstantAuxFunction(0, 1, userSpec);
 
         // bc data alg
-        AuxFunctionAlgorithm *auxAlg
-          = new AuxFunctionAlgorithm(realm_, part,
-                                     theBcField, theAuxFunc,
-                                     stk::topology::NODE_RANK);
+        AuxFunctionAlgorithm * auxAlg = new AuxFunctionAlgorithm(realm_, part,
+                                                                theBcField, theAuxFunc,
+                                                                stk::topology::NODE_RANK);
         bcDataAlg_.push_back(auxAlg);
 
         // solver; lhs; same for edge and element-based scheme
-        std::map<AlgorithmType, SolverAlgorithm *>::iterator itsi =
-            solverAlgDriver_->solverAlgMap_.find(algTypeHF);
+        std::map<AlgorithmType, SolverAlgorithm *>::iterator itsi = solverAlgDriver_->solverAlgMap_.find(algTypeHF);
         if ( itsi == solverAlgDriver_->solverAlgMap_.end() ) {
-          AssembleScalarFluxBCSolverAlgorithm *theAlg
-            = new AssembleScalarFluxBCSolverAlgorithm(realm_, part, this,
-                theBcField, realm_.realmUsesEdges_);
-          solverAlgDriver_->solverAlgMap_[algTypeHF] = theAlg;
+            AssembleScalarFluxBCSolverAlgorithm * theAlg = new AssembleScalarFluxBCSolverAlgorithm(realm_, part, this, theBcField);
+            solverAlgDriver_->solverAlgMap_[algTypeHF] = theAlg;
         }
         else {
-          itsi->second->partVec_.push_back(part);
+            itsi->second->partVec_.push_back(part);
         }
-
-    }*/
+    }
     /*else if ( userData.irradSpec_ ) {
 
         const AlgorithmType algTypeRAD = WALL_RAD;
@@ -738,7 +734,7 @@ void HeatCondEquationSystem::solve_and_update() {
             realm_.meta_data(),
             realm_.bulk_data(),
             1.0, *tTmp_,
-            1.0, *temperature_, 
+            1.0, *temperature_,
             realm_.get_activate_aura());
         double timeB = HOFlowEnv::self().hoflow_time();
         timerAssemble_ += (timeB-timeA);

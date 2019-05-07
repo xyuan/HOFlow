@@ -181,6 +181,8 @@ void EquationSystems::register_wall_bc(const std::string targetName, const WallB
     else {
         // found the part
         const std::vector<stk::mesh::Part *> & mesh_parts = targetPart->subsets();
+        
+        // Loop through faces
         for( std::vector<stk::mesh::Part *>::const_iterator i = mesh_parts.begin(); i != mesh_parts.end(); ++i ) {
             ThrowRequire(*i != nullptr);
             stk::mesh::Part * const part = *i;

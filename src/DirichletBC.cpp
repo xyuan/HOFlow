@@ -25,20 +25,14 @@ DirichletBC::DirichletBC(
     // nothing to do
 }
 
-void
-DirichletBC::initialize_connectivity()
-{
-  eqSystem_->linsys_->buildDirichletNodeGraph(partVec_);
+void DirichletBC::initialize_connectivity() {
+    eqSystem_->linsys_->buildDirichletNodeGraph(partVec_);
 }
 
-void
-DirichletBC::execute()
-{
-
-  eqSystem_->linsys_->applyDirichletBCs(
-    field_,
-    bcValues_,
-    partVec_,
-    beginPos_,
-    endPos_);
+void DirichletBC::execute() {
+    eqSystem_->linsys_->applyDirichletBCs(field_,
+                                          bcValues_,
+                                          partVec_,
+                                          beginPos_,
+                                          endPos_);
 }

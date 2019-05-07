@@ -668,6 +668,7 @@ void Realm::register_wall_bc(stk::mesh::Part * part, const stk::topology & theTo
     //====================================================
     const AlgorithmType algType = WALL;
     std::map<AlgorithmType, Algorithm *>::iterator it = computeGeometryAlgDriver_->algMap_.find(algType);
+    // Create if not exist
     if ( it == computeGeometryAlgDriver_->algMap_.end() ) {
         ComputeGeometryBoundaryAlgorithm * theAlg = new ComputeGeometryBoundaryAlgorithm(*this, part);
         computeGeometryAlgDriver_->algMap_[algType] = theAlg;

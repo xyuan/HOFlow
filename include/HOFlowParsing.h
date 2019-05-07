@@ -37,6 +37,20 @@ struct Coordinates {
     {}
 };
 
+struct NormalHeatFlux {
+    double qn_;
+    NormalHeatFlux()
+        : qn_(0.0)
+    {}
+};
+
+struct HeatTransferCoefficient {
+    double heatTransferCoefficient_;
+    HeatTransferCoefficient()
+        : heatTransferCoefficient_(0.0)
+    {}
+};
+
 // base class
 struct UserData {
     std::map<std::string, bool> bcDataSpecifiedMap_;
@@ -56,11 +70,18 @@ struct UserData {
 };
 
 struct WallUserData : public UserData {
+    NormalHeatFlux q_;
+    HeatTransferCoefficient heatTransferCoefficient_;
+    
     bool isAdiabatic_;
+    bool heatFluxSpec_;
+    bool htcSpec_;
 
     WallUserData() : 
         UserData(),
-        isAdiabatic_(false)
+        isAdiabatic_(false),
+        heatFluxSpec_(false),
+        htcSpec_(false)
     {}    
 };
 

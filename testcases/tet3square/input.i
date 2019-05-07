@@ -3,7 +3,7 @@
 # Example HOFlow input file for a heat conduction problem
 #
 simulation:
-  type: steady
+  type: transient
 
 linear_solvers:
   - name: solve_scalar
@@ -57,7 +57,7 @@ realms:
     - wall_boundary_condition: left
       target_name: left
       wall_user_data:
-        temperature: 20.0
+        temperature: 10.0
 
     - wall_boundary_condition: right
       target_name: right
@@ -67,12 +67,12 @@ realms:
     - wall_boundary_condition: top
       target_name: top
       wall_user_data:
-        temperature: 20.0
+        heat_flux: 0.0
 
     - wall_boundary_condition: bottom
       target_name: bottom
       wall_user_data:
-        temperature: 20.0
+        heat_flux: 0.0
 
     output:
       output_data_base_name: femHC.e

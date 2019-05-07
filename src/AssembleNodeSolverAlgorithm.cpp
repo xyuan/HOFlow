@@ -94,7 +94,7 @@ AssembleNodeSolverAlgorithm::execute()
       for ( int i = 0; i < rhsSize; ++i )
         p_rhs[i] = 0.0;
 
-      // call supplemental
+      // call supplemental, e.g. temporal solver
       for ( size_t i = 0; i < supplementalAlgSize; ++i )
         supplementalAlg_[i]->node_execute( &lhs[0], &rhs[0], node);
 
