@@ -722,16 +722,18 @@ void HeatCondEquationSystem::solve_and_update() {
         isInit_ = false;
     }
     
-    // outer solving loop
+    // Linear Solving Loop
     for ( int k = 0; k < maxIterations_; ++k ) {
         HOFlowEnv::self().hoflowOutputP0() << " " << k+1 << "/" << maxIterations_
                                            << std::setw(15) << std::right << userSuppliedName_ << std::endl;
 
-        // heat conduction assemble, load_complete and solve
+        // heat conduction assemble, load_complete and solve for tTmp (delta solution)
         assemble_and_solve(tTmp_);
 
         // update
         double timeA = HOFlowEnv::self().hoflow_time();
+        
+        // Add tTmp (delta solution) to current solution temperature
         field_axpby(
             realm_.meta_data(),
             realm_.bulk_data(),

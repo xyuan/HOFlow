@@ -1395,6 +1395,7 @@ void Realm::run_steady_state() {
     // evaluate properties based on latest state including boundary and and possible xfer
     evaluate_properties();
 
+    // Non-Linear Solving Loop
     const int numNonLinearIterations = equationSystems_.maxIterations_;
     for ( int i = 0; i < numNonLinearIterations; ++i ) {
         currentNonlinearIteration_ = i+1;
