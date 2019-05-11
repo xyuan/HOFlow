@@ -17,7 +17,7 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: tet3square.exo
+    mesh: tet3square_small.exo
 
     equation_systems:
       name: theEqSys
@@ -37,7 +37,7 @@ realms:
       - constant: ic_1
         target_name: unspecified-2-triangle
         value:
-         temperature: 75
+         temperature: 10
 
     material_properties:
       target_name: unspecified-2-triangle
@@ -57,12 +57,12 @@ realms:
     - wall_boundary_condition: left
       target_name: left
       wall_user_data:
-        temperature: 50
+        temperature: 200
 
     - wall_boundary_condition: right
       target_name: right
       wall_user_data:
-        temperature: 100
+        temperature: 500
 
     - wall_boundary_condition: top
       target_name: top
