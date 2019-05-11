@@ -13,6 +13,7 @@
 #include <SupplementalAlgorithm.h>
 #include <TimeIntegrator.h>
 #include <master_element/MasterElement.h>
+#include <AlgorithmElementInfoSupplier.h>
 #include <iostream>
 
 // stk_mesh/base/fem
@@ -60,15 +61,9 @@ void AssembleScalarElemDiffSolverAlgorithm::initialize_connectivity() {
 void AssembleScalarElemDiffSolverAlgorithm::execute() {
     stk::mesh::BulkData & bulk_data = realm_.bulk_data();
     stk::mesh::MetaData & meta_data = realm_.meta_data();
-
-    const int nDim = meta_data.spatial_dimension();
-
-    // space for LHS/RHS; nodesPerElem*nodesPerElem* and nodesPerElem
-    std::vector<double> lhs;
-    std::vector<double> rhs;
-    std::vector<int> scratchIds;
-    std::vector<double> scratchVals;
-    std::vector<stk::mesh::Entity> connected_nodes;
+    
+    AlgorithmElementInfoSupplier Info(bulk_data, meta_data);
+    const int nDim = Info.nDim_;
 
     // supplemental algorithm setup
     const size_t supplementalAlgSize = supplementalAlg_.size();
@@ -97,8 +92,9 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
     
     // Iterate through all element buckets
     stk::mesh::BucketVector const & elem_buckets = realm_.get_buckets( stk::topology::ELEMENT_RANK, s_locally_owned_union );
-    for ( stk::mesh::BucketVector::const_iterator ib = elem_buckets.begin(); ib != elem_buckets.end() ; ++ib ) {
+    for ( stk::mesh::BucketVector::const_iterator ib = elem_buckets.begin(); ib != elem_buckets.end() ; ++ib ) {    
         stk::mesh::Bucket & b = **ib;
+        Info.initialize_bucket(b);
         const stk::mesh::Bucket::size_type length = b.size();
 
         // extract master element
