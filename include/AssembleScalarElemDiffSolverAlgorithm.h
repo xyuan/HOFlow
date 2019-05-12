@@ -32,13 +32,6 @@ private:
     ScalarFieldType * diffFluxCoeff_;
     VectorFieldType * coordinates_;
     const bool shiftedGradOp_;
-    
-    // Execution related stuff
-    int getLeftNode(const int * lrscv, int * ip);
-    int getRightNode(const int * lrscv, int * ip);
-    double getSFValue(const double * shapeFunction, const int * offset, int * node);
-    double getSFDeriv(const double * shapeFunctionDeriv, const int * offset, int * dim);
-    double getFaceDet(const double * areav, const int * nDim, int * ip, int * dim);
 };
 
 #endif /* ASSEMBLESCALARELEMDIFFSOLVERALGORITHM_H */

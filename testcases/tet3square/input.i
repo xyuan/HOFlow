@@ -17,7 +17,7 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: tet3square_small.exo
+    mesh: tet3square.exo
 
     equation_systems:
       name: theEqSys
