@@ -17,7 +17,7 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: tet3square.exo
+    mesh: tet3square_small.exo
 
     equation_systems:
       name: theEqSys
@@ -57,12 +57,13 @@ realms:
     - wall_boundary_condition: left
       target_name: left
       wall_user_data:
-        temperature: 200
+        heat_flux: 200
 
     - wall_boundary_condition: right
       target_name: right
       wall_user_data:
-        temperature: 500
+       temperature: 20
+
 
     - wall_boundary_condition: top
       target_name: top

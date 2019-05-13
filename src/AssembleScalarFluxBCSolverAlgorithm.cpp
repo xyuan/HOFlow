@@ -11,6 +11,8 @@
 #include <TimeIntegrator.h>
 #include <master_element/MasterElement.h>
 
+#include <iostream>
+
 // stk_mesh/base/fem
 #include <stk_mesh/base/BulkData.hpp>
 #include <stk_mesh/base/Field.hpp>
@@ -137,9 +139,11 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
                 // get the node and form connected_node
                 stk::mesh::Entity node = face_node_rels[ni];
                 connected_nodes[ni] = node;
+                std::cout << "node: " << node << std::endl;
 
                 // gather scalar
                 p_bcScalarQ[ni] = *stk::mesh::field_data(*bcScalarQ_, node);
+                std::cout << "node " << ni << ", " << "bcScalarQ = " << p_bcScalarQ[ni] << std::endl;
             }
 
             // pointer to face data
@@ -149,6 +153,7 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
             for ( int ip = 0; ip < numScsBip; ++ip ) {
                 const int localFaceNode = faceIpNodeMap[ip];
                 const int offSetSF_face = ip*nodesPerFace;
+                std::cout << "localFaceNode = " << localFaceNode << std::endl;
 
                 // interpolate to bip
                 double fluxBip = 0.0;
@@ -156,6 +161,7 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
                 // Iterate through each node of the face
                 for ( int ic = 0; ic < nodesPerFace; ++ic ) {
                     const double r = p_face_shape_function[offSetSF_face+ic];
+                    std::cout << "shape function of node " << ic << ": " << r << std::endl;
                     fluxBip += r*p_bcScalarQ[ic];
                 }
 

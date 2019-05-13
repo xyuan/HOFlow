@@ -5,6 +5,15 @@
 #include "AlgorithmElementInterface.h"
 
 #include <Realm.h>
+#include <master_element/MasterElement.h>
+
+// stk_mesh/base/fem
+#include <stk_mesh/base/BulkData.hpp>
+#include <stk_mesh/base/Field.hpp>
+#include <stk_mesh/base/GetBuckets.hpp>
+#include <stk_mesh/base/MetaData.hpp>
+#include <stk_mesh/base/Part.hpp>
+#include <stk_mesh/base/Entity.hpp>
 
 AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::PartVector & partVec, ScalarFieldType * scalarQ) :
     realm_(realm),
@@ -21,7 +30,7 @@ AlgorithmElementInterface::~AlgorithmElementInterface() {
     // nothing to do
 }
 
-inline stk::mesh::BucketVector const & AlgorithmElementInterface::get_elem_buckets() {
+stk::mesh::BucketVector const & AlgorithmElementInterface::get_elem_buckets() {
     // define some common selectors
     stk::mesh::Selector s_locally_owned_union = meta_data_.locally_owned_part()
         & stk::mesh::selectUnion(partVec_) 
@@ -30,7 +39,7 @@ inline stk::mesh::BucketVector const & AlgorithmElementInterface::get_elem_bucke
     return realm_.get_buckets( stk::topology::ELEMENT_RANK, s_locally_owned_union );
 }
 
-inline void AlgorithmElementInterface::bucket_pre_work(stk::mesh::Bucket & b) {
+void AlgorithmElementInterface::bucket_pre_work(stk::mesh::Bucket & b) {
     // extract master element
     meSCS_ = MasterElementRepo::get_surface_master_element(b.topology());
     meSCV_ = MasterElementRepo::get_volume_master_element(b.topology());
@@ -75,7 +84,7 @@ inline void AlgorithmElementInterface::bucket_pre_work(stk::mesh::Bucket & b) {
     meSCS_->shape_fcn(&p_shape_function_[0]);
 }
 
-inline void AlgorithmElementInterface::element_pre_work(stk::mesh::Entity & elem, 
+void AlgorithmElementInterface::element_pre_work(stk::mesh::Entity & elem, 
                                                         ScalarFieldType * diffFluxCoeff, 
                                                         VectorFieldType * coordinates, 
                                                         const bool shiftedGradOp) 
@@ -126,7 +135,7 @@ inline void AlgorithmElementInterface::element_pre_work(stk::mesh::Entity & elem
         meSCS_->grad_op(1, &ws_coordinates_[0], &ws_dndx_[0], &ws_deriv_[0], &ws_det_j_[0], &scs_error);
 }
 
-inline void AlgorithmElementInterface::ip_pre_work(int ip) {
+void AlgorithmElementInterface::ip_pre_work(int ip) {
     // left and right nodes for this ip
     node_left_ = lrscv_[2 * ip];
     node_right_ = lrscv_[2 * ip + 1];
@@ -136,11 +145,11 @@ inline void AlgorithmElementInterface::ip_pre_work(int ip) {
     row_right_ = node_right_ * nodesPerElement_;
 }
 
-inline void AlgorithmElementInterface::node_pre_work(int ip, int ic) {
+void AlgorithmElementInterface::node_pre_work(int ip, int ic) {
     offSetDnDx_ = (nDim_ * nodesPerElement_ * ip) + (ic * nDim_);
 }
 
-inline double AlgorithmElementInterface::compute_muIP(int ip) {
+double AlgorithmElementInterface::compute_muIP(int ip) {
     double muIp = 0.0;
     const int offSetSF = ip *nodesPerElement_;
                 
@@ -153,34 +162,34 @@ inline double AlgorithmElementInterface::compute_muIP(int ip) {
     return muIp;
 }
 
-inline double AlgorithmElementInterface::getSFValue(int offSetSF, int ic) {
+double AlgorithmElementInterface::getSFValue(int offSetSF, int ic) {
     return p_shape_function_[offSetSF + ic];
 }
 
-inline double AlgorithmElementInterface::getSFDeriv(int dim) {
+double AlgorithmElementInterface::getSFDeriv(int dim) {
     return p_dndx_[offSetDnDx_ + dim];
 }
 
-inline double AlgorithmElementInterface::getFaceDet(int ip, int dim) {
+double AlgorithmElementInterface::getFaceDet(int ip, int dim) {
     return p_scs_areav_[ip * nDim_ + dim];
 }
 
-inline void AlgorithmElementInterface::update_local_lhs(double lhsfacDiff, int ic) {
+void AlgorithmElementInterface::update_local_lhs(double lhsfacDiff, int ic) {
     // lhs; il then ir
-    p_lhs_[row_left_+ic] += lhsfacDiff;
-    p_lhs_[row_right_+ic] -= lhsfacDiff;
+    p_lhs_[row_left_ + ic] += lhsfacDiff;
+    p_lhs_[row_right_ + ic] -= lhsfacDiff;
 }
 
-inline void AlgorithmElementInterface::update_local_rhs(double qDiff) {
+void AlgorithmElementInterface::update_local_rhs(double qDiff) {
     // rhs; il then ir
     p_rhs_[node_left_] -= qDiff;
     p_rhs_[node_right_] += qDiff;
 }
 
-inline double AlgorithmElementInterface::getScalarQNP1(int ic) {
+double AlgorithmElementInterface::getScalarQNP1(int ic) {
     return p_scalarQNp1_[ic];
 }
 
-inline void AlgorithmElementInterface::update_global_lhs_rhs() {
+void AlgorithmElementInterface::update_global_lhs_rhs() {
 //    apply_coeff(connected_nodes_, scratchIds_, scratchVals_, rhs_, lhs_, __FILE__);
 }

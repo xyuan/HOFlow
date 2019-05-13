@@ -6,6 +6,7 @@
 
 #include <EquationSystem.h>
 #include <SolverAlgorithm.h>
+#include <AlgorithmElementInterface.h>
 
 #include <FieldTypeDef.h>
 #include <LinearSystem.h>
@@ -13,7 +14,6 @@
 #include <SupplementalAlgorithm.h>
 #include <TimeIntegrator.h>
 #include <master_element/MasterElement.h>
-#include <AlgorithmElementInterface.h>
 #include <iostream>
 
 // stk_mesh/base/fem

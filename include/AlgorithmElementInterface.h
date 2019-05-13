@@ -5,10 +5,7 @@
 #ifndef ALGORITHMELEMENTINTERFACE_H
 #define ALGORITHMELEMENTINTERFACE_H
 
-#include <master_element/MasterElement.h>
 #include <FieldTypeDef.h>
-#include <Realm.h>
-
 #include <vector>
 
 // stk_mesh/base/fem
@@ -17,9 +14,10 @@
 #include <stk_mesh/base/GetBuckets.hpp>
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/Part.hpp>
+#include <stk_mesh/base/Entity.hpp>
 
-class stk::mesh::Part;
 class Realm;
+class MasterElement;
 
 typedef std::vector<stk::mesh::Part *> PartVector;
 
@@ -37,7 +35,10 @@ public:
      */
     
     void bucket_pre_work(stk::mesh::Bucket & b);
-    void element_pre_work(stk::mesh::Entity & elem, ScalarFieldType * diffFluxCoeff, VectorFieldType * coordinates, const bool shiftedGradOp);
+    void element_pre_work(stk::mesh::Entity & elem, 
+                          ScalarFieldType * diffFluxCoeff, 
+                          VectorFieldType * coordinates, 
+                          const bool shiftedGradOp);
     void ip_pre_work(int ip);
     void node_pre_work(int ip, int ic);
     

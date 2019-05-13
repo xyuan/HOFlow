@@ -7,7 +7,6 @@
 
 #include <SolverAlgorithm.h>
 #include <FieldTypeDef.h>
-#include <AlgorithmElementInterface.h>
 
 class stk::mesh::Part;
 class Realm;
