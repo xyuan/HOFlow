@@ -5,8 +5,9 @@
 #ifndef ASSEMBLESCALARELEMDIFFSOLVERALGORITHM_H
 #define ASSEMBLESCALARELEMDIFFSOLVERALGORITHM_H
 
-#include<SolverAlgorithm.h>
-#include<FieldTypeDef.h>
+#include <SolverAlgorithm.h>
+#include <FieldTypeDef.h>
+#include <AlgorithmElementInterface.h>
 
 class stk::mesh::Part;
 class Realm;
@@ -16,13 +17,12 @@ class Realm;
  */
 class AssembleScalarElemDiffSolverAlgorithm : public SolverAlgorithm {
 public:
-    AssembleScalarElemDiffSolverAlgorithm(
-        Realm &realm,
-        stk::mesh::Part *part,
-        EquationSystem *eqSystem,
-        ScalarFieldType *scalarQ,
-        VectorFieldType *dqdx,
-        ScalarFieldType *diffFluxCoeff);
+    AssembleScalarElemDiffSolverAlgorithm(Realm &realm,
+                                          stk::mesh::Part *part,
+                                          EquationSystem *eqSystem,
+                                          ScalarFieldType *scalarQ,
+                                          VectorFieldType *dqdx,
+                                          ScalarFieldType *diffFluxCoeff);
     virtual ~AssembleScalarElemDiffSolverAlgorithm() {}
     virtual void initialize_connectivity();
     virtual void execute();

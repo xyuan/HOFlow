@@ -6,9 +6,10 @@
 
 #include <Realm.h>
 
-AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::PartVector & partVec) :
+AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::PartVector & partVec, ScalarFieldType * scalarQ) :
     realm_(realm),
     partVec_(partVec),
+    scalarQ_(scalarQ),
     bulk_data_(realm_.bulk_data()),
     meta_data_(realm_.meta_data()),
     nDim_(meta_data_.spatial_dimension())
@@ -17,6 +18,7 @@ AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::P
 }
 
 AlgorithmElementInterface::~AlgorithmElementInterface() {
+    // nothing to do
 }
 
 inline stk::mesh::BucketVector const & AlgorithmElementInterface::get_elem_buckets() {
@@ -74,12 +76,11 @@ inline void AlgorithmElementInterface::bucket_pre_work(stk::mesh::Bucket & b) {
 }
 
 inline void AlgorithmElementInterface::element_pre_work(stk::mesh::Entity & elem, 
-                                                        ScalarFieldType * scalarQ, 
                                                         ScalarFieldType * diffFluxCoeff, 
                                                         VectorFieldType * coordinates, 
                                                         const bool shiftedGradOp) 
 {
-    ScalarFieldType & scalarQNp1   = scalarQ->field_of_state(stk::mesh::StateNP1);
+    ScalarFieldType & scalarQNp1   = scalarQ_->field_of_state(stk::mesh::StateNP1);
     
     // zero lhs/rhs
     for ( int p = 0; p < lhsSize_; ++p )

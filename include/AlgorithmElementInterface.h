@@ -6,7 +6,7 @@
 #define ALGORITHMELEMENTINTERFACE_H
 
 #include <master_element/MasterElement.h>
-#include<FieldTypeDef.h>
+#include <FieldTypeDef.h>
 #include <Realm.h>
 
 #include <vector>
@@ -25,24 +25,37 @@ typedef std::vector<stk::mesh::Part *> PartVector;
 
 class AlgorithmElementInterface {
 public:
-    AlgorithmElementInterface(Realm & realm, stk::mesh::PartVector & partVec);
+    AlgorithmElementInterface(Realm & realm, stk::mesh::PartVector & partVec, ScalarFieldType * scalarQ);
     ~AlgorithmElementInterface();
-    stk::mesh::BucketVector const & get_elem_buckets();
+    
+    /** Methods to do some pre-computations
+     * Execute in the following order:
+     * 1. bucket_pre_work()
+     * 2. element_pre_work()
+     * 3. ip_pre_work()
+     * 4. node_pre_work()
+     */
+    
     void bucket_pre_work(stk::mesh::Bucket & b);
-    void element_pre_work(stk::mesh::Entity & elem, ScalarFieldType * scalarQ, ScalarFieldType * diffFluxCoeff, VectorFieldType * coordinates, const bool shiftedGradOp);
+    void element_pre_work(stk::mesh::Entity & elem, ScalarFieldType * diffFluxCoeff, VectorFieldType * coordinates, const bool shiftedGradOp);
     void ip_pre_work(int ip);
     void node_pre_work(int ip, int ic);
+    
+    // Methods to get some values
+    stk::mesh::BucketVector const & get_elem_buckets();
     double compute_muIP(int ip);
     double getSFValue(int offSetSF, int ic);
     double getSFDeriv(int dim);
     double getFaceDet(int ip, int dim);
     double getScalarQNP1(int ic);
+    
     void update_local_lhs(double lhsfacDiff, int ic);
     void update_local_rhs(double qDiff);
     void update_global_lhs_rhs();
     
     Realm & realm_;
     PartVector partVec_;
+    ScalarFieldType * scalarQ_;
     stk::mesh::BulkData & bulk_data_;
     stk::mesh::MetaData & meta_data_;
     
@@ -53,7 +66,6 @@ public:
     std::vector<int> scratchIds_;
     std::vector<double> scratchVals_;
     std::vector<stk::mesh::Entity> connected_nodes_;
-    ScalarFieldType & scalarQNp1_;
 
     // nodal fields to gather
     std::vector<double> ws_coordinates_;

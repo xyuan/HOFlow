@@ -31,13 +31,12 @@
 //--------------------------------------------------------------------------
 //-------- constructor -----------------------------------------------------
 //--------------------------------------------------------------------------
-AssembleScalarElemDiffSolverAlgorithm::AssembleScalarElemDiffSolverAlgorithm(
-    Realm & realm,
-    stk::mesh::Part * part,
-    EquationSystem * eqSystem,
-    ScalarFieldType * scalarQ,
-    VectorFieldType * dqdx,
-    ScalarFieldType * diffFluxCoeff) : 
+AssembleScalarElemDiffSolverAlgorithm::AssembleScalarElemDiffSolverAlgorithm(Realm & realm,
+                                                                             stk::mesh::Part * part,
+                                                                             EquationSystem * eqSystem,
+                                                                             ScalarFieldType * scalarQ,
+                                                                             VectorFieldType * dqdx,
+                                                                             ScalarFieldType * diffFluxCoeff) : 
         SolverAlgorithm(realm, part, eqSystem),
         scalarQ_(scalarQ),
         diffFluxCoeff_(diffFluxCoeff),
@@ -61,7 +60,7 @@ void AssembleScalarElemDiffSolverAlgorithm::initialize_connectivity() {
 void AssembleScalarElemDiffSolverAlgorithm::execute() {
     // Create AlgorithmElementInterface object to have easy 
     // access to the necessary data
-    AlgorithmElementInterface intf(realm_, partVec_);
+    AlgorithmElementInterface intf(realm_, partVec_, scalarQ_);
 
     // supplemental algorithm setup
     const size_t supplementalAlgSize = supplementalAlg_.size();
@@ -92,7 +91,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
         {
             // get elem
             stk::mesh::Entity elem = b[k];
-            intf.element_pre_work(elem, scalarQ_, diffFluxCoeff_, coordinates_, shiftedGradOp_);
+            intf.element_pre_work(elem, diffFluxCoeff_, coordinates_, shiftedGradOp_);
             
             //----------------------------------------------------
             // Iterate through all integration points
