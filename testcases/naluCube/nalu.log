@@ -1,0 +1,518 @@
+
+=================================================================
+                            Nalu:                                
+      A low Mach number, turbulent reacting flow code with       
+            coupling to PMR and object response (CHT)            
+=================================================================
+
+   Nalu Version: v1.2.0
+   Nalu GIT Commit SHA: 6a73b32fdae04966695e34f9f2eac1c01f2f72d1
+   Trilinos Version: 12.13-g9009f5ff
+
+   TPLs: Boost, HDF5, netCDF, STK, Trilinos, YAML_cpp and zlib   
+
+              Copyright 2014 Sandia Corporation.                 
+      This software is released under the license detailed       
+   in the file, LICENSE, which is located in the top-level Nalu  
+                     directory structure                         
+-----------------------------------------------------------------
+
+
+Realm Options Review: realm_1
+===========================
+Element-based scheme will be activated
+Warning: When using automatic_decomposition_type, one must have a serial file
+Nalu will deactivate aura ghosting
+
+Turbulence Model Review:   
+===========================
+Turbulence Model is: laminar 0
+
+PPE review:   
+===========================
+Realm::create_mesh(): Begin
+Realm::create_mesh() End
+
+Boundary Condition Review: 
+===========================
+Wall BC name:        bc_left on surface_1
+Wall BC name:        bc_right on surface_2
+
+Initial Condition Review:  
+===========================
+Initial Is Type constant 
+constant IC: name: ic_1 , target[0] = block_1
+
+Material Prop Review:      
+===========================
+density is a constant property: 1
+thermal_conductivity is a constant property: 1
+specific_heat is a constant property: 1
+
+EqSys/options Review:      
+===========================
+Edge projected nodal gradient for temperature: 0
+
+Realm memory Review:       realm_1
+===========================
+Node count from meta data = 9261
+Total memory estimate for Matrix solve (per core)= 0.00558899 GB.
+Total memory estimate (per core) = 0.00558899 GB.
+
+Time Integrator Review:  
+=========================
+StandardTimeIntegrator 
+ name=              ti_1
+ second order =     0
+ maxTimeStepCount = 25
+ fixed time step is active   with time step: 10
+StandardTimeIntegrator realm_name[0]= realm_1
+
+Transfer Review:         
+=========================
+Realm::initialize() Begin 
+Realm::ioBroker_->populate_mesh() Begin
+Realm::ioBroker_->populate_mesh() End
+Realm::ioBroker_->populate_field_data() Begin
+Realm::ioBroker_->populate_field_data() End
+Realm::create_output_mesh(): Begin
+Realm::create_output_mesh() End
+EquationSystems::initialize(): Begin 
+EquationSystems::initialize(): End 
+
+Realm memory Review:       realm_1
+===========================
+Total memory estimate for Matrix solve (per core)= 0.00558899 GB.
+Total memory estimate for Fields (per core)= 0.00167873 GB.
+Total memory estimate (per core) = 0.00726771 GB.
+Realm::initialize() End 
+
+*******************************************************
+Simulation Shall Commence: number of processors = 1
+*******************************************************
+Realm shall provide output files at : currentTime/timeStepCount: 0/0 (realm_1)
+*******************************************************
+Time Step Count: 1 Current Time: 10
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           12         0.0418128       0.640775             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           17       2.36163e-05    0.000434491    0.00067807
+Mean System Norm: 0.0004344905109363871 1 10
+*******************************************************
+Time Step Count: 2 Current Time: 20
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           15       0.000164701     0.00177341             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           15       1.40654e-07    1.71146e-06   0.000965067
+Mean System Norm: 1.711457496376216e-06 2 20
+*******************************************************
+Time Step Count: 3 Current Time: 30
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           15       3.13896e-06    6.12593e-05             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           14       2.29842e-09     3.2618e-08   0.000532457
+Mean System Norm: 3.261796931787691e-08 3 30
+*******************************************************
+Time Step Count: 4 Current Time: 40
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       2.02888e-07    2.38383e-06             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           17       1.84634e-10    2.10828e-09    0.00088441
+Mean System Norm: 2.108278978646738e-09 4 40
+*******************************************************
+Time Step Count: 5 Current Time: 50
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13        4.6671e-09    9.30204e-08             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           18        4.1357e-12    4.84973e-11   0.000521362
+Mean System Norm: 4.84973287051666e-11 5 50
+*******************************************************
+Time Step Count: 6 Current Time: 60
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       1.73284e-10    3.63029e-09             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           18       1.37676e-13    1.80065e-12   0.000496006
+Mean System Norm: 1.800647078860161e-12 6 60
+*******************************************************
+Time Step Count: 7 Current Time: 70
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       6.79924e-12     1.4168e-10             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           18       5.71577e-15    7.06544e-14   0.000498691
+Mean System Norm: 7.065436876737442e-14 7 70
+*******************************************************
+Time Step Count: 8 Current Time: 80
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       2.66062e-13    5.52936e-12             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           18       2.31301e-16     2.8232e-15   0.000510584
+Mean System Norm: 2.823201160059318e-15 8 80
+*******************************************************
+Time Step Count: 9 Current Time: 90
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       1.03929e-14    2.15796e-13             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       4.07362e-17    5.80767e-16    0.00269128
+Mean System Norm: 5.807671767558357e-16 9 90
+*******************************************************
+Time Step Count: 10 Current Time: 100
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       4.12768e-16     8.4392e-15             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            7       5.36856e-17    5.82244e-16     0.0689928
+Realm shall provide output files at : currentTime/timeStepCount: 100/10 (realm_1)
+Mean System Norm: 5.822440743700943e-16 10 100
+*******************************************************
+Time Step Count: 11 Current Time: 110
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS           13       3.66399e-17    6.04272e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.83208e-17    5.71551e-16      0.945851
+Mean System Norm: 5.715509272831443e-16 11 110
+*******************************************************
+Time Step Count: 12 Current Time: 120
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            9       4.37077e-17    4.97713e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       3.57463e-17    5.33866e-16       1.07264
+Mean System Norm: 5.338663101424427e-16 12 120
+*******************************************************
+Time Step Count: 13 Current Time: 130
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            8        4.1231e-17    4.87442e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       3.27079e-17    4.81096e-16       0.98698
+Mean System Norm: 4.810957530224728e-16 13 130
+*******************************************************
+Time Step Count: 14 Current Time: 140
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       4.39934e-17    4.80917e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6        4.2905e-17    4.78273e-16      0.994503
+Mean System Norm: 4.782733926577835e-16 14 140
+*******************************************************
+Time Step Count: 15 Current Time: 150
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.08848e-17    4.80963e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       4.05892e-17    4.78911e-16      0.995734
+Mean System Norm: 4.789107498196133e-16 15 150
+*******************************************************
+Time Step Count: 16 Current Time: 160
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.41488e-17    4.79885e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       3.86361e-17    4.77608e-16      0.995255
+Mean System Norm: 4.776083935667961e-16 16 160
+*******************************************************
+Time Step Count: 17 Current Time: 170
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6        3.4696e-17    4.78666e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5        4.1138e-17    4.79629e-16       1.00201
+Mean System Norm: 4.79629313344187e-16 17 170
+*******************************************************
+Time Step Count: 18 Current Time: 180
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.22291e-17    4.77319e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       3.16476e-17    4.73718e-16      0.992457
+Mean System Norm: 4.737183601942123e-16 18 180
+*******************************************************
+Time Step Count: 19 Current Time: 190
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.01031e-17    4.76982e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       4.53016e-17    4.77998e-16       1.00213
+Mean System Norm: 4.779982086101713e-16 19 190
+*******************************************************
+Time Step Count: 20 Current Time: 200
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6        4.2431e-17     4.7821e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       3.91058e-17    4.77728e-16      0.998991
+Realm shall provide output files at : currentTime/timeStepCount: 200/20 (realm_1)
+Mean System Norm: 4.777275024658465e-16 20 200
+*******************************************************
+Time Step Count: 21 Current Time: 210
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.34381e-17    4.77678e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       3.87285e-17    4.76622e-16       0.99779
+Mean System Norm: 4.766223992623478e-16 21 210
+*******************************************************
+Time Step Count: 22 Current Time: 220
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.17917e-17      4.799e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       3.55718e-17    4.75568e-16      0.990975
+Mean System Norm: 4.75568414510904e-16 22 220
+*******************************************************
+Time Step Count: 23 Current Time: 230
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       4.47462e-17    4.79785e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       4.18462e-17    4.76192e-16       0.99251
+Mean System Norm: 4.761918766925661e-16 23 230
+*******************************************************
+Time Step Count: 24 Current Time: 240
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       4.23621e-17    4.77347e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            5       4.18017e-17    4.76529e-16      0.998287
+Mean System Norm: 4.765294251432955e-16 24 240
+*******************************************************
+Time Step Count: 25 Current Time: 250
+ dtN: 10 dtNm1: 10 gammas: 1 -1 0
+   Realm Nonlinear Iteration: 1/1
+
+realm_1::advance_time_step() 
+NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
+---    ----           -----------      ----------     -----------    ----------
+1/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       3.92848e-17    4.77673e-16             1
+2/2    Equation System Iteration
+ 1/1           myHC
+        HeatCondEQS            6       3.63854e-17    4.75357e-16       0.99515
+Mean System Norm: 4.753566442048985e-16 25 250
+*******************************************************
+Simulation Shall Complete: time/timestep: 250/25
+*******************************************************
+
+-------------------------------- 
+Begin Timer Overview for Realm: realm_1
+-------------------------------- 
+Timing for Eq: myHC
+             init --   	avg: 0.0303309 	min: 0.0303309 	max: 0.0303309
+         assemble --   	avg: 0.826423 	min: 0.826423 	max: 0.826423
+    load_complete --   	avg: 0.00351119 	min: 0.00351119 	max: 0.00351119
+            solve --   	avg: 0.533828 	min: 0.533828 	max: 0.533828
+    precond setup --   	avg: 0.0061121 	min: 0.0061121 	max: 0.0061121
+             misc --   	avg: 0.251166 	min: 0.251166 	max: 0.251166
+linear iterations --  	avg: 9.42 	min: 5 	max: 18
+Timing for IO: 
+   io create mesh --   	avg: 0.00166893 	min: 0.00166893 	max: 0.00166893
+ io output fields --   	avg: 0.017591 	min: 0.017591 	max: 0.017591
+ io populate mesh --   	avg: 0.125546 	min: 0.125546 	max: 0.125546
+ io populate fd   --   	avg: 0.0028851 	min: 0.0028851 	max: 0.0028851
+Timing for connectivity/finalize lysys: 
+         eqs init --   	avg: 0.030333 	min: 0.030333 	max: 0.030333
+Timing for property evaluation:         
+            props --   	avg: 0.00233936 	min: 0.00233936 	max: 0.00233936
+
+Timing for Simulation: nprocs= 1
+           main() --   	avg: 1.83068 	min: 1.83068 	max: 1.83068
+Memory Overview: 
+nalu memory: total (over all cores) current/high-water mark=       84.3906 M      84.3906 M
+nalu memory:   min (over all cores) current/high-water mark=       84.3906 M      84.3906 M
+nalu memory:   max (over all cores) current/high-water mark=       84.3906 M      84.3906 M
+Min High-water memory usage 84.4 MB
+Avg High-water memory usage 84.4 MB
+Max High-water memory usage 84.4 MB
+
+Min Available memory per processor 5346.9 MB
+Avg Available memory per processor 5346.9 MB
+Max Available memory per processor 5346.9 MB
+
+Min No-output time 1.8132 sec
+Avg No-output time 1.8132 sec
+Max No-output time 1.8132 sec
+                 Timer                   Count       CPU Time              Wall Time
+---------------------------------------- ----- --------------------- ---------------------
+Nalu                                         1        1.779 (100.0%)        1.831 (100.0%)
+  Output                                    52        0.013 (0.742%)        0.018 (0.964%)
+
+Took 0.0001 seconds to generate the table above.

@@ -173,6 +173,7 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
                 areaNorm = std::sqrt(areaNorm);
 
                 p_rhs[localFaceNode] += fluxBip*areaNorm;
+                std::cout << "rhs value: " << fluxBip*areaNorm << std::endl;
             }
 
             apply_coeff(connected_nodes, scratchIds, scratchVals, rhs, lhs, __FILE__);

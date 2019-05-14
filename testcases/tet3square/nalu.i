@@ -1,9 +1,12 @@
 # -*- mode: yaml -*-
 #
-# Example HOFlow input file for a heat conduction problem
+# Example Nalu input file for a heat conduction problem
 #
-simulation:
-  type: transient
+
+Simulations:
+  - name: sim1
+    time_integrator: ti_1
+    optimizer: opt1
 
 linear_solvers:
   - name: solve_scalar
@@ -16,8 +19,11 @@ linear_solvers:
     output_level: 0
 
 realms:
+
   - name: realm_1
-    mesh: tet3square.exo
+    mesh: tet3square_small.exo
+    use_edges: no 
+    automatic_decomposition_type: rcb
 
     equation_systems:
       name: theEqSys
@@ -37,7 +43,7 @@ realms:
       - constant: ic_1
         target_name: unspecified-2-triangle
         value:
-         temperature: 10
+         temperature: 10.0
 
     material_properties:
       target_name: unspecified-2-triangle
@@ -76,20 +82,19 @@ realms:
         adiabatic: true
 
     output:
-      output_data_base_name: hf_output.e
+      output_data_base_name: nalu_output.e
       output_frequency: 10
       output_node_set: no 
       output_variables:
        - dual_nodal_volume
        - temperature
-       - heat_flux
 
 Time_Integrators:
   - StandardTimeIntegrator:
       name: ti_1
       start_time: 0
       termination_step_count: 500
-      time_step: 10
+      time_step: 10.0 
       time_stepping_type: fixed
       time_step_count: 0
       second_order_accuracy: no

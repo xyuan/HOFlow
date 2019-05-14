@@ -1,9 +1,12 @@
 # -*- mode: yaml -*-
 #
-# Example HOFlow input file for a heat conduction problem
+# Example Nalu input file for a heat conduction problem
 #
-simulation:
-  type: transient
+
+Simulations:
+  - name: sim1
+    time_integrator: ti_1
+    optimizer: opt1
 
 linear_solvers:
   - name: solve_scalar
@@ -16,8 +19,11 @@ linear_solvers:
     output_level: 0
 
 realms:
+
   - name: realm_1
-    mesh: tet3square.exo
+    mesh: periodic3d.g
+    use_edges: no 
+    automatic_decomposition_type: rcb
 
     equation_systems:
       name: theEqSys
@@ -35,61 +41,59 @@ realms:
     initial_conditions:
 
       - constant: ic_1
-        target_name: unspecified-2-triangle
+        target_name: block_1
         value:
-         temperature: 10
+         temperature: 10.0
 
     material_properties:
-      target_name: unspecified-2-triangle
+      target_name: block_1
       specifications:
         - name: density
           type: constant
-          value: 1000
+          value: 1.0
         - name: thermal_conductivity
           type: constant
           value: 1.0
         - name: specific_heat
           type: constant
-          value: 10
+          value: 1.0
 
     boundary_conditions:
 
-    - wall_boundary_condition: left
-      target_name: left
+    - wall_boundary_condition: bc_left
+      target_name: surface_1
       wall_user_data:
         heat_flux: 200
 
-    - wall_boundary_condition: right
-      target_name: right
+    - wall_boundary_condition: bc_right
+      target_name: surface_2
       wall_user_data:
-       temperature: 20
+        temperature: 20
 
-
-    - wall_boundary_condition: top
-      target_name: top
+    - wall_boundary_condition: bc_top
+      target_name: surface_3
       wall_user_data:
         adiabatic: true
 
-    - wall_boundary_condition: bottom
-      target_name: bottom
+    - wall_boundary_condition: bc_bottom
+      target_name: surface_4
       wall_user_data:
         adiabatic: true
 
     output:
-      output_data_base_name: hf_output.e
+      output_data_base_name: wo_options_neumann.e
       output_frequency: 10
       output_node_set: no 
       output_variables:
        - dual_nodal_volume
        - temperature
-       - heat_flux
 
 Time_Integrators:
   - StandardTimeIntegrator:
       name: ti_1
       start_time: 0
-      termination_step_count: 500
-      time_step: 10
+      termination_step_count: 25 
+      time_step: 10.0 
       time_stepping_type: fixed
       time_step_count: 0
       second_order_accuracy: no
