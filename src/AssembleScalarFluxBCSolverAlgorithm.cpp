@@ -143,7 +143,7 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
 
                 // gather scalar
                 p_bcScalarQ[ni] = *stk::mesh::field_data(*bcScalarQ_, node);
-                std::cout << "node " << ni << ", " << "bcScalarQ = " << p_bcScalarQ[ni] << std::endl;
+                std::cout << "bcScalarQ = " << p_bcScalarQ[ni] << std::endl;
             }
 
             // pointer to face data

@@ -21,7 +21,7 @@ linear_solvers:
 realms:
 
   - name: realm_1
-    mesh: tet3square_small.exo
+    mesh: tet3square_verylarge.exo
     use_edges: no 
     automatic_decomposition_type: rcb
 
@@ -43,7 +43,7 @@ realms:
       - constant: ic_1
         target_name: unspecified-2-triangle
         value:
-         temperature: 10.0
+          temperature: 10.0
 
     material_properties:
       target_name: unspecified-2-triangle
@@ -68,8 +68,7 @@ realms:
     - wall_boundary_condition: right
       target_name: right
       wall_user_data:
-       temperature: 20
-
+        temperature: 20
 
     - wall_boundary_condition: top
       target_name: top

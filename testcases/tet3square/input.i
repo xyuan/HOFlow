@@ -3,7 +3,7 @@
 # Example HOFlow input file for a heat conduction problem
 #
 simulation:
-  type: transient
+  type: steady
 
 linear_solvers:
   - name: solve_scalar
@@ -17,11 +17,11 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: tet3square.exo
+    mesh: tet3square_small.exo
 
     equation_systems:
       name: theEqSys
-      max_iterations: 2 
+      max_iterations: 2
   
       solver_system_specification:
         temperature: solve_scalar
@@ -37,7 +37,7 @@ realms:
       - constant: ic_1
         target_name: unspecified-2-triangle
         value:
-         temperature: 10
+          temperature: 10
 
     material_properties:
       target_name: unspecified-2-triangle
@@ -62,8 +62,7 @@ realms:
     - wall_boundary_condition: right
       target_name: right
       wall_user_data:
-       temperature: 20
-
+        temperature: 20
 
     - wall_boundary_condition: top
       target_name: top
@@ -82,7 +81,6 @@ realms:
       output_variables:
        - dual_nodal_volume
        - temperature
-       - heat_flux
 
 Time_Integrators:
   - StandardTimeIntegrator:
