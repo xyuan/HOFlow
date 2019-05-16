@@ -58,6 +58,8 @@
 #include <limits>
 #include <type_traits>
 
+#include <iostream>
+
 #include <sstream>
 #define KK_MAP
 
@@ -1466,6 +1468,7 @@ void TpetraLinearSystem::sumInto(const std::vector<stk::mesh::Entity> & entities
         
         const double * const cur_lhs = &lhs[cur_perm_index*numRows];
         const double cur_rhs = rhs[cur_perm_index];
+//        std::cout << "rhs row index: " << cur_perm_index << ", " << "value: " << rhs[cur_perm_index] << std::endl;
         ThrowAssertMsg(std::isfinite(cur_rhs), "Invalid rhs");
 
         if(rowLid < maxOwnedRowId_) {
@@ -1557,6 +1560,7 @@ void TpetraLinearSystem::applyDirichletBCs(stk::mesh::FieldBase * solutionField,
                 // Replace the RHS residual with (desired - actual)
                 Teuchos::RCP<LinSys::Vector> rhs = useOwned ? ownedRhs_: sharedNotOwnedRhs_;
                 const double bc_residual = useOwned ? (bcValues[k*fieldSize + d] - solution[k*fieldSize + d]) : 0.0;
+                std::cout << "bc_residual: " << bc_residual << std::endl;
                 rhs->replaceLocalValue(actualLocalId, bc_residual);
                 ++nbc;
             }
