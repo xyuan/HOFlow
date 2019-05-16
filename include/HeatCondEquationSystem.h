@@ -20,7 +20,7 @@ class EquationSystems;
 class TpetraLinearSystem;
 class ProjectedNodalGradientEquationSystem;
 
-/** Specific implementation of the head conduction equation system.
+/** Specific implementation of the heat conduction equation system.
  *
  * Derived class from EquationSystem
  * */

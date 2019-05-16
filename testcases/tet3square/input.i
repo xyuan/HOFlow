@@ -21,7 +21,7 @@ realms:
 
     equation_systems:
       name: theEqSys
-      max_iterations: 2
+      max_iterations: 1
   
       solver_system_specification:
         temperature: solve_scalar

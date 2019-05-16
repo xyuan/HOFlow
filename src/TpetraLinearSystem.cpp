@@ -1560,6 +1560,8 @@ void TpetraLinearSystem::applyDirichletBCs(stk::mesh::FieldBase * solutionField,
                 // Replace the RHS residual with (desired - actual)
                 Teuchos::RCP<LinSys::Vector> rhs = useOwned ? ownedRhs_: sharedNotOwnedRhs_;
                 const double bc_residual = useOwned ? (bcValues[k*fieldSize + d] - solution[k*fieldSize + d]) : 0.0;
+                std::cout << "bcValue: " << bcValues[k*fieldSize + d] << std::endl;
+                std::cout << "solution: " << solution[k*fieldSize + d] << std::endl;
                 std::cout << "bc_residual: " << bc_residual << std::endl;
                 rhs->replaceLocalValue(actualLocalId, bc_residual);
                 ++nbc;
