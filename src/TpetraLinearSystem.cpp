@@ -1697,6 +1697,7 @@ TpetraLinearSystem::solve(
   stk::mesh::FieldBase * linearSolutionField)
 {
 
+  writeToFile("rhs_vector", true);
   TpetraLinearSolver *linearSolver = reinterpret_cast<TpetraLinearSolver *>(linearSolver_);
 
   if ( realm_.debug() ) {
@@ -1722,11 +1723,7 @@ TpetraLinearSystem::solve(
     realm_.provide_memory_summary();
   }
 
-  const int status = linearSolver->solve(
-      sln_,
-      iters,
-      finalResidNorm,
-      realm_.isFinalOuterIter_);
+  const int status = linearSolver->solve(sln_, iters, finalResidNorm, realm_.isFinalOuterIter_);
 
   solve_time += HOFlowEnv::self().hoflow_time();
 
@@ -2203,3 +2200,17 @@ int getDofStatus_impl(stk::mesh::Entity node, const Realm & realm)
   return DS_SkippedDOF;
 }
 
+void TpetraLinearSystem::print_RHS() {
+//    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+//    HOFlowEnv::self().hoflowOutputP0() << "RHS Review: " << std::endl;
+//    HOFlowEnv::self().hoflowOutputP0() << "===========================" << std::endl;
+//    
+//    Teuchos::RCP<LinSys::Vector> rhs = ownedRhs_;
+//
+//    const size_t localLength = rhs->getLocalLength();
+//
+//    for (size_t k = 0; k < localLength; ++k) {
+//        HOFlowEnv::self().hoflowOutputP0() << rhs-> << " ";
+//    }
+//    HOFlowEnv::self().hoflowOutputP0() << std::endl;
+}

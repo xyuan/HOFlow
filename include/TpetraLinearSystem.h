@@ -150,6 +150,9 @@ private:
     void expand_unordered_map(unsigned newCapacityNeeded);
     void checkForNaN(bool useOwned);
     bool checkForZeroRow(bool useOwned, bool doThrow, bool doPrint=false);
+    
+    // Debug Methods
+    void print_RHS();
 
     std::vector<stk::mesh::Entity> ownedAndSharedNodes_;
     std::vector<std::vector<stk::mesh::Entity> > connections_;

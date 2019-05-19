@@ -37,7 +37,7 @@ realms:
       - constant: ic_1
         target_name: unspecified-2-triangle
         value:
-          temperature: 10
+          temperature: 500
 
     material_properties:
       target_name: unspecified-2-triangle
@@ -76,8 +76,8 @@ realms:
 
     output:
       output_data_base_name: hf_output.e
-      output_frequency: 10
-      output_node_set: no 
+      output_frequency: 1
+      output_node_set: yes
       output_variables:
        - dual_nodal_volume
        - temperature
