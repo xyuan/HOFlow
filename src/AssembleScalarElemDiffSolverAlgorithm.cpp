@@ -104,7 +104,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 std::cout << "######## NEW IP ##########" << std::endl;
                 
                 double muIp = intf.compute_muIP(ip);
-                //const Vector3 areav = intf.get_area_vector(ip);
+                const cfdVector areaNormVec = intf.get_area_normal_vector(ip);
                 double qDiff = 0.0;
                 
                 //------------------------------------------------
@@ -116,26 +116,26 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                     intf.node_pre_work(ip, ic);
                     
                     // Todo linear algebra style
-                    //const Vector3 dndx = intf.get_derived_shape_function(ip, ic);
-                    //const double lhsfacDiff = -muIP * dndx * areav;
+                    const cfdVector dndx = intf.get_derived_shape_function(ip, ic);
+                    const double lhsfacDiff = -muIP * dndx & areav;
                     
                     
-                    double lhsfacDiff = 0.0;
-            
-                    // Iterate through all spatial dimensions
-                    for ( int j = 0; j < nDim; ++j )
-                    {
-                        const double dndx = intf.getSFDeriv(j);
-                        const double areav = intf.getFaceDet(ip, j);
-                        lhsfacDiff += -muIp * dndx * areav;
-                    }
-                    const double scalarQNP1 = intf.getScalarQNP1(ic);
-                    std::cout << "------- new node --------" << std::endl;
-                    std::cout << "lhsfacDiff " << ic << " = " << lhsfacDiff << std::endl;
-                    std::cout << "scalarQNP1 " << ic << " = " << scalarQNP1 << std::endl;
-                    std::cout << "qDiff " << ic << " = " << lhsfacDiff * scalarQNP1 << std::endl;
-                    qDiff += lhsfacDiff * scalarQNP1;
-                    intf.update_local_lhs(lhsfacDiff, ic);
+//                    double lhsfacDiff = 0.0;
+//            
+//                    // Iterate through all spatial dimensions
+//                    for ( int j = 0; j < nDim; ++j )
+//                    {
+//                        const double dndx = intf.getSFDeriv(j);
+//                        const double areav = intf.getFaceDet(ip, j);
+//                        lhsfacDiff += -muIp * dndx * areav;
+//                    }
+//                    const double scalarQNP1 = intf.getScalarQNP1(ic);
+//                    std::cout << "------- new node --------" << std::endl;
+//                    std::cout << "lhsfacDiff " << ic << " = " << lhsfacDiff << std::endl;
+//                    std::cout << "scalarQNP1 " << ic << " = " << scalarQNP1 << std::endl;
+//                    std::cout << "qDiff " << ic << " = " << lhsfacDiff * scalarQNP1 << std::endl;
+//                    qDiff += lhsfacDiff * scalarQNP1;
+//                    intf.update_local_lhs(lhsfacDiff, ic);
                 }
                 intf.update_local_rhs(qDiff);     
             }

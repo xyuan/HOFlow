@@ -6,6 +6,7 @@
 #define ALGORITHMELEMENTINTERFACE_H
 
 #include <FieldTypeDef.h>
+#include <cfdVector.h>
 #include <vector>
 
 // stk_mesh/base/fem
@@ -50,9 +51,16 @@ public:
     double getFaceDet(int ip, int dim);
     double getScalarQNP1(int ic);
     
+    
+    
     void update_local_lhs(double lhsfacDiff, int ic);
     void update_local_rhs(double qDiff);
     void update_global_lhs_rhs();
+    
+    cfdVector derivSF_;
+    cfdVector SF_;
+    cfdVector coords_;
+    cfdVector areaNormVec_;
     
     Realm & realm_;
     PartVector partVec_;
