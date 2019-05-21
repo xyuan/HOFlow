@@ -104,6 +104,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 std::cout << "######## NEW IP ##########" << std::endl;
                 
                 double muIp = intf.compute_muIP(ip);
+                //const Vector3 areav = intf.get_area_vector(ip);
                 double qDiff = 0.0;
                 
                 //------------------------------------------------
@@ -113,6 +114,12 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) 
                 {
                     intf.node_pre_work(ip, ic);
+                    
+                    // Todo linear algebra style
+                    //const Vector3 dndx = intf.get_derived_shape_function(ip, ic);
+                    //const double lhsfacDiff = -muIP * dndx * areav;
+                    
+                    
                     double lhsfacDiff = 0.0;
             
                     // Iterate through all spatial dimensions
