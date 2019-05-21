@@ -44,22 +44,19 @@ public:
     void node_pre_work(int ip, int ic);
     
     // Methods to get some values
-    stk::mesh::BucketVector const & get_elem_buckets();
     double compute_muIP(int ip);
     double getSFValue(int offSetSF, int ic);
     double getSFDeriv(int dim);
     double getFaceDet(int ip, int dim);
     double getScalarQNP1(int ic);
-    
-    
+    cfdVector get_area_normal_vector(int ip);
+    cfdVector get_derived_shape_function(int ip, int ic);
     
     void update_local_lhs(double lhsfacDiff, int ic);
     void update_local_rhs(double qDiff);
     void update_global_lhs_rhs();
     
     cfdVector derivSF_;
-    cfdVector SF_;
-    cfdVector coords_;
     cfdVector areaNormVec_;
     
     Realm & realm_;

@@ -7,6 +7,7 @@
 #include <EquationSystem.h>
 #include <SolverAlgorithm.h>
 #include <AlgorithmElementInterface.h>
+#include <cfdVector.h>
 
 #include <FieldTypeDef.h>
 #include <LinearSystem.h>
@@ -66,8 +67,13 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
     const size_t supplementalAlgSize = supplementalAlg_.size();
     for ( size_t i = 0; i < supplementalAlgSize; ++i )
         supplementalAlg_[i]->setup();
+    
+    // Get buckets
+    stk::mesh::Selector s_locally_owned_union = realm_.meta_data.locally_owned_part()
+                                                & stk::mesh::selectUnion(partVec_) 
+                                                & !(realm_.get_inactive_selector());
 
-    stk::mesh::BucketVector const & elem_buckets = intf.get_elem_buckets();
+    stk::mesh::BucketVector const & elem_buckets = realm_.get_buckets( stk::topology::ELEMENT_RANK, s_locally_owned_union );
     
     // Iterate through all buckets
     for ( stk::mesh::BucketVector::const_iterator ib = elem_buckets.begin(); ib != elem_buckets.end() ; ++ib ) 
@@ -114,10 +120,10 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) 
                 {
                     intf.node_pre_work(ip, ic);
-                    
-                    // Todo linear algebra style
                     const cfdVector dndx = intf.get_derived_shape_function(ip, ic);
-                    const double lhsfacDiff = -muIP * dndx & areav;
+                    
+                    // Coefficient computation
+                    const double lhsfacDiff = -muIp * dndx & areaNormVec;
                     
                     
 //                    double lhsfacDiff = 0.0;

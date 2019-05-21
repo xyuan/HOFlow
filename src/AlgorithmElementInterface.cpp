@@ -23,20 +23,19 @@ AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::P
     meta_data_(realm_.meta_data()),
     nDim_(meta_data_.spatial_dimension())
 {
-    // nothing to do
+    if (nDim_ == 2) {
+        derivSF_ = cfdVector2();
+        areaNormVec_ = cfdVector2();
+    } else if (nDim_ == 3) {
+        derivSF_ = cfdVector3();
+        areaNormVec_ = cfdVector3();
+    } else {
+        throw std::runtime_error("undefined number of dimensions");
+    }
 }
 
 AlgorithmElementInterface::~AlgorithmElementInterface() {
     // nothing to do
-}
-
-stk::mesh::BucketVector const & AlgorithmElementInterface::get_elem_buckets() {
-    // define some common selectors
-    stk::mesh::Selector s_locally_owned_union = meta_data_.locally_owned_part()
-        & stk::mesh::selectUnion(partVec_) 
-        & !(realm_.get_inactive_selector());
-    
-    return realm_.get_buckets( stk::topology::ELEMENT_RANK, s_locally_owned_union );
 }
 
 void AlgorithmElementInterface::bucket_pre_work(stk::mesh::Bucket & b) {
@@ -192,4 +191,19 @@ double AlgorithmElementInterface::getScalarQNP1(int ic) {
 
 void AlgorithmElementInterface::update_global_lhs_rhs() {
 //    apply_coeff(connected_nodes_, scratchIds_, scratchVals_, rhs_, lhs_, __FILE__);
+}
+
+cfdVector AlgorithmElementInterface::get_area_normal_vector(int ip) {
+    for ( int j = 0; j < nDim_; ++j ) {
+        areaNormVec_[j] = p_scs_areav_[ip * nDim_ + j];
+    }
+    return areaNormVec_;
+}
+
+
+cfdVector AlgorithmElementInterface::get_derived_shape_function(int ip, int ic) {
+    for ( int j = 0; j < nDim_; ++j ) {
+        derivSF_[j] = p_dndx_[offSetDnDx_ + j];
+    }
+    return derivSF_;
 }
