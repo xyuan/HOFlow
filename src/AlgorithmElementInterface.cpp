@@ -24,18 +24,19 @@ AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::P
     nDim_(meta_data_.spatial_dimension())
 {
     if (nDim_ == 2) {
-        derivSF_ = cfdVector2();
-        areaNormVec_ = cfdVector2();
+        derivSF_ = new cfdVector2();
+        areaNormVec_ = new cfdVector2();
     } else if (nDim_ == 3) {
-        derivSF_ = cfdVector3();
-        areaNormVec_ = cfdVector3();
+        derivSF_ = new cfdVector3();
+        areaNormVec_ = new cfdVector3();
     } else {
         throw std::runtime_error("undefined number of dimensions");
     }
 }
 
 AlgorithmElementInterface::~AlgorithmElementInterface() {
-    // nothing to do
+    delete derivSF_;
+    delete areaNormVec_;
 }
 
 void AlgorithmElementInterface::bucket_pre_work(stk::mesh::Bucket & b) {

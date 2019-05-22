@@ -69,7 +69,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
         supplementalAlg_[i]->setup();
     
     // Get buckets
-    stk::mesh::Selector s_locally_owned_union = realm_.meta_data.locally_owned_part()
+    stk::mesh::Selector s_locally_owned_union = realm_.meta_data().locally_owned_part()
                                                 & stk::mesh::selectUnion(partVec_) 
                                                 & !(realm_.get_inactive_selector());
 
@@ -109,8 +109,8 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 
                 std::cout << "######## NEW IP ##########" << std::endl;
                 
-                double muIp = intf.compute_muIP(ip);
-                const cfdVector areaNormVec = intf.get_area_normal_vector(ip);
+                const double muIp = intf.compute_muIP(ip);
+                cfdVector areaNormVec = intf.get_area_normal_vector(ip);
                 double qDiff = 0.0;
                 
                 //------------------------------------------------
@@ -120,10 +120,11 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) 
                 {
                     intf.node_pre_work(ip, ic);
-                    const cfdVector dndx = intf.get_derived_shape_function(ip, ic);
+                    cfdVector dndx = intf.get_derived_shape_function(ip, ic);
                     
                     // Coefficient computation
-                    const double lhsfacDiff = -muIp * dndx & areaNormVec;
+                    cfdVector lhsfacDiff = -muIp * areaNormVec;
+//                    const double lhsfacDiff = -muIp * dndx & areaNormVec;
                     
                     
 //                    double lhsfacDiff = 0.0;

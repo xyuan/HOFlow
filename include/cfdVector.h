@@ -5,6 +5,8 @@
 #ifndef CFDVECTOR_H
 #define CFDVECTOR_H
 
+#include <cmath>
+
 typedef double scalar;
 typedef int label;
 
@@ -13,6 +15,9 @@ class cfdVector {
 public:
     cfdVector() {}
     virtual ~cfdVector() {}
+    inline scalar & operator[](const label idx) {}
+    inline cfdVector & operator=(cfdVector theVector) { return *this; }
+    inline cfdVector & operator=(scalar C) {}
 };
 
 /** Implementation of the 2D vector */
@@ -39,11 +44,22 @@ public:
         return *this;
     }
     
-    /** Product: Vector * scalar */
-    inline cfdVector2 operator*(const scalar r) const {
-        cfdVector2 result(data_[0]*r,
-                          data_[1]*r);
+    inline cfdVector2 & operator=(cfdVector2 theVector) {
+        data_[0] = theVector.data_[0];
+        data_[1] = theVector.data_[1];
+        return *this;
+    }
+    
+    /** Product: Vector * Scalar */
+    inline friend cfdVector2 operator*(const cfdVector2 & vec, const scalar & r) {
+        cfdVector2 result(vec.data_[0]*r,
+                          vec.data_[1]*r);
         return result;
+    }
+    
+    /** Product: Scalar * Vector */
+    inline friend cfdVector2 operator*(const scalar & r, const cfdVector2 & vec) {
+        return vec * r;
     }
     
     /** Dot-Product: Vector & Vector */
@@ -85,16 +101,28 @@ public:
         return *this;
     }
     
+    inline cfdVector3 & operator=(cfdVector3 theVector) {
+        data_[0] = theVector.data_[0];
+        data_[1] = theVector.data_[1];
+        data_[2] = theVector.data_[2];
+        return *this;
+    }
+    
     inline scalar & operator[](const label idx) {
         return  data_[idx];
     }
     
-    /** Product: Vector * scalar */
-    inline cfdVector3 operator*(const scalar r) const {
-        cfdVector3 result(data_[0]*r,
-                          data_[1]*r,
-                          data_[2]*r);
+    /** Product: Vector * Scalar */
+    inline friend cfdVector3 operator*(const cfdVector3 & vec, const scalar & r) {
+        cfdVector3 result(vec.data_[0]*r,
+                          vec.data_[1]*r,
+                          vec.data_[2]*r);
         return result;
+    }
+    
+    /** Product: Scalar * Vector */
+    inline friend cfdVector3 operator*(const scalar & r, const cfdVector3 & vec) {
+        return vec * r;
     }
     
     /** Dot-Product: Vector & Vector */
