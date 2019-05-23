@@ -49,15 +49,15 @@ public:
     double getSFDeriv(int dim);
     double getFaceDet(int ip, int dim);
     double getScalarQNP1(int ic);
-    cfdVector get_area_normal_vector(int ip);
-    cfdVector get_derived_shape_function(int ip, int ic);
+    cfdVector * get_area_normal_vector(int ip);
+    cfdVector * get_derived_shape_function(int ip, int ic);
     
     void update_local_lhs(double lhsfacDiff, int ic);
     void update_local_rhs(double qDiff);
     void update_global_lhs_rhs();
     
-    cfdVector derivSF_;
-    cfdVector areaNormVec_;
+    cfdVector * derivSF_;
+    cfdVector * areaNormVec_;
     
     Realm & realm_;
     PartVector partVec_;

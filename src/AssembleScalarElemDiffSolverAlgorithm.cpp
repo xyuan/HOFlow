@@ -123,7 +123,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                     cfdVector dndx = intf.get_derived_shape_function(ip, ic);
                     
                     // Coefficient computation
-                    cfdVector lhsfacDiff = -muIp * areaNormVec;
+//                    cfdVector lhsfacDiff = -muIp * areaNormVec;
 //                    const double lhsfacDiff = -muIp * dndx & areaNormVec;
                     
                     

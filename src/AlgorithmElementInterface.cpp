@@ -35,8 +35,8 @@ AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::P
 }
 
 AlgorithmElementInterface::~AlgorithmElementInterface() {
-    delete derivSF_;
-    delete areaNormVec_;
+//    delete derivSF_;
+//    delete areaNormVec_;
 }
 
 void AlgorithmElementInterface::bucket_pre_work(stk::mesh::Bucket & b) {
@@ -194,15 +194,14 @@ void AlgorithmElementInterface::update_global_lhs_rhs() {
 //    apply_coeff(connected_nodes_, scratchIds_, scratchVals_, rhs_, lhs_, __FILE__);
 }
 
-cfdVector AlgorithmElementInterface::get_area_normal_vector(int ip) {
+cfdVector * AlgorithmElementInterface::get_area_normal_vector(int ip) {
     for ( int j = 0; j < nDim_; ++j ) {
         areaNormVec_[j] = p_scs_areav_[ip * nDim_ + j];
     }
     return areaNormVec_;
 }
 
-
-cfdVector AlgorithmElementInterface::get_derived_shape_function(int ip, int ic) {
+cfdVector * AlgorithmElementInterface::get_derived_shape_function(int ip, int ic) {
     for ( int j = 0; j < nDim_; ++j ) {
         derivSF_[j] = p_dndx_[offSetDnDx_ + j];
     }
