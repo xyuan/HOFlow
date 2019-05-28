@@ -56,8 +56,8 @@ public:
     void update_local_rhs(double qDiff);
     void update_global_lhs_rhs();
     
-    cfdVector * derivSF_;
-    cfdVector * areaNormVec_;
+//    auto * derivSF_;
+//    auto * areaNormVec_;
     
     Realm & realm_;
     PartVector partVec_;

@@ -21,7 +21,7 @@ linear_solvers:
 realms:
 
   - name: realm_1
-    mesh: tet3square_small.exo
+    mesh: tet3square_verylarge.exo
     use_edges: no 
     automatic_decomposition_type: rcb
 
@@ -73,16 +73,26 @@ realms:
     - wall_boundary_condition: top
       target_name: top
       wall_user_data:
-        heat_flux: -30
+        adiabatic: true
 
     - wall_boundary_condition: bottom
       target_name: bottom
       wall_user_data:
         adiabatic: true
 
+    solution_options:
+      name: myOptions
+
+      use_consolidated_solver_algorithm: yes
+
+      options:
+ 
+      - element_source_terms:
+          temperature: FEM_DIFF
+
     output:
       output_data_base_name: nalu_output.e
-      output_frequency: 100
+      output_frequency: 10
       output_node_set: no 
       output_variables:
        - dual_nodal_volume
@@ -92,7 +102,7 @@ Time_Integrators:
   - StandardTimeIntegrator:
       name: ti_1
       start_time: 0
-      termination_step_count: 5000
+      termination_step_count: 500
       time_step: 10.0 
       time_stepping_type: fixed
       time_step_count: 0

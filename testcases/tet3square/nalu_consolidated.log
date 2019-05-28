@@ -1,0 +1,77 @@
+
+=================================================================
+                            Nalu:                                
+      A low Mach number, turbulent reacting flow code with       
+            coupling to PMR and object response (CHT)            
+=================================================================
+
+   Nalu Version: v1.2.0
+   Nalu GIT Commit SHA: 6a73b32fdae04966695e34f9f2eac1c01f2f72d1
+   Trilinos Version: 12.13-g9009f5ff
+
+   TPLs: Boost, HDF5, netCDF, STK, Trilinos, YAML_cpp and zlib   
+
+              Copyright 2014 Sandia Corporation.                 
+      This software is released under the license detailed       
+   in the file, LICENSE, which is located in the top-level Nalu  
+                     directory structure                         
+-----------------------------------------------------------------
+
+
+Realm Options Review: realm_1
+===========================
+Element-based scheme will be activated
+Warning: When using automatic_decomposition_type, one must have a serial file
+Nalu will deactivate aura ghosting
+
+Turbulence Model Review:   
+===========================
+Turbulence Model is: laminar 0
+
+PPE review:   
+===========================
+Realm::create_mesh(): Begin
+Realm::create_mesh() End
+
+Boundary Condition Review: 
+===========================
+Wall BC name:        left on left
+Wall BC name:        right on right
+Wall BC name:        top on top
+Wall BC name:        bottom on bottom
+
+Initial Condition Review:  
+===========================
+Initial Is Type constant 
+constant IC: name: ic_1 , target[0] = unspecified-2-triangle
+
+Material Prop Review:      
+===========================
+density is a constant property: 1000
+thermal_conductivity is a constant property: 1
+specific_heat is a constant property: 10
+
+EqSys/options Review:      
+===========================
+Edge projected nodal gradient for temperature: 0
+
+Realm memory Review:       realm_1
+===========================
+Node count from meta data = 15089
+Total memory estimate for Matrix solve (per core)= 0.00910617 GB.
+Total memory estimate (per core) = 0.00910617 GB.
+
+Time Integrator Review:  
+=========================
+StandardTimeIntegrator 
+ name=              ti_1
+ second order =     0
+ maxTimeStepCount = 500
+ fixed time step is active   with time step: 10
+StandardTimeIntegrator realm_name[0]= realm_1
+
+Transfer Review:         
+=========================
+Realm::initialize() Begin 
+The name of this part is TRIANGLE_3_2D
+Created the following interior elem alg: HeatCondEQS_AssembleElemSolverAlg_TRIANGLE_3_2D

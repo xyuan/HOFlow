@@ -21,7 +21,7 @@ linear_solvers:
 realms:
 
   - name: realm_1
-    mesh: tet3square_small.exo
+    mesh: periodic3d.g
     use_edges: no 
     automatic_decomposition_type: rcb
 
@@ -41,48 +41,57 @@ realms:
     initial_conditions:
 
       - constant: ic_1
-        target_name: unspecified-2-triangle
+        target_name: block_1
         value:
-          temperature: 10.0
+         temperature: 10.0
 
     material_properties:
-      target_name: unspecified-2-triangle
+      target_name: block_1
       specifications:
         - name: density
           type: constant
-          value: 1000
+          value: 1.0
         - name: thermal_conductivity
           type: constant
           value: 1.0
         - name: specific_heat
           type: constant
-          value: 10
+          value: 1.0
 
     boundary_conditions:
 
-    - wall_boundary_condition: left
-      target_name: left
+    - wall_boundary_condition: bc_left
+      target_name: surface_1
       wall_user_data:
         heat_flux: 200
 
-    - wall_boundary_condition: right
-      target_name: right
+    - wall_boundary_condition: bc_right
+      target_name: surface_2
       wall_user_data:
         temperature: 20
 
-    - wall_boundary_condition: top
-      target_name: top
+    - wall_boundary_condition: bc_top
+      target_name: surface_3
       wall_user_data:
         heat_flux: -30
 
-    - wall_boundary_condition: bottom
-      target_name: bottom
+    - wall_boundary_condition: bc_bottom
+      target_name: surface_4
       wall_user_data:
         adiabatic: true
 
+    solution_options:
+      name: myOptions
+
+      use_consolidated_solver_algorithm: yes
+
+      options:
+      - element_source_terms:
+          temperature: FEM_DIFF
+
     output:
-      output_data_base_name: nalu_output.e
-      output_frequency: 100
+      output_data_base_name: w_options_neumann.e
+      output_frequency: 10
       output_node_set: no 
       output_variables:
        - dual_nodal_volume
@@ -92,7 +101,7 @@ Time_Integrators:
   - StandardTimeIntegrator:
       name: ti_1
       start_time: 0
-      termination_step_count: 5000
+      termination_step_count: 25 
       time_step: 10.0 
       time_stepping_type: fixed
       time_step_count: 0

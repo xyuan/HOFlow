@@ -73,7 +73,7 @@ realms:
     - wall_boundary_condition: bc_top
       target_name: surface_3
       wall_user_data:
-        adiabatic: true
+        heat_flux: -30
 
     - wall_boundary_condition: bc_bottom
       target_name: surface_4

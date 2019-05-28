@@ -73,6 +73,9 @@ StandardTimeIntegrator realm_name[0]= realm_1
 Transfer Review:         
 =========================
 Realm::initialize() Begin 
+The name of this part is HEXAHEDRON_8
+Created the following interior elem alg: HeatCondEQS_AssembleElemSolverAlg_HEXAHEDRON_8
+Built Kernels for temperature are `FEM_DIFF'.
 Realm::ioBroker_->populate_mesh() Begin
 Realm::ioBroker_->populate_mesh() End
 Realm::ioBroker_->populate_field_data() Begin
@@ -103,11 +106,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           21         0.0377578       0.451567             1
+        HeatCondEQS           19         0.0398281       0.451567             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       2.67331e-05    0.000392354   0.000868872
-Mean System Norm: 0.0003923536068080119 1 10
+        HeatCondEQS           21       3.62648e-05    0.000413867   0.000916513
+Mean System Norm: 0.0004138667332747904 1 10
 *******************************************************
 Time Step Count: 2 Current Time: 20
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -118,11 +121,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19        0.00132608      0.0162208             1
+        HeatCondEQS           18       0.000831023      0.0162208             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           24       8.84974e-07    1.37797e-05   0.000849509
-Mean System Norm: 1.377973980008727e-05 2 20
+        HeatCondEQS           21       7.96104e-07    8.63544e-06    0.00053237
+Mean System Norm: 8.635436244793318e-06 2 20
 *******************************************************
 Time Step Count: 3 Current Time: 30
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -133,11 +136,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           17       0.000120036     0.00225464             1
+        HeatCondEQS           18        0.00013495     0.00225463             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           24       9.04223e-08    1.24733e-06   0.000553228
-Mean System Norm: 1.247330776377039e-06 3 30
+        HeatCondEQS           20        1.3414e-07    1.40231e-06   0.000621968
+Mean System Norm: 1.402310662604428e-06 3 30
 *******************************************************
 Time Step Count: 4 Current Time: 40
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -148,11 +151,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       2.42662e-05    0.000314737             1
+        HeatCondEQS           18        2.0696e-05    0.000314735             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       1.64738e-08    2.52158e-07    0.00080117
-Mean System Norm: 2.521576207405232e-07 4 40
+        HeatCondEQS           21        1.8875e-08    2.15059e-07   0.000683302
+Mean System Norm: 2.150591683701104e-07 4 40
 *******************************************************
 Time Step Count: 5 Current Time: 50
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -163,11 +166,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       3.41799e-06    4.39268e-05             1
+        HeatCondEQS           18       2.89538e-06    4.39265e-05             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       2.28741e-09    3.55175e-08   0.000808561
-Mean System Norm: 3.551747728039781e-08 5 50
+        HeatCondEQS           21       2.71207e-09    3.00868e-08   0.000684935
+Mean System Norm: 3.008680471913433e-08 5 50
 *******************************************************
 Time Step Count: 6 Current Time: 60
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -178,11 +181,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       4.77536e-07    6.13049e-06             1
+        HeatCondEQS           18        4.0418e-07    6.13045e-06             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       3.18647e-10    4.96223e-09   0.000809435
-Mean System Norm: 4.962234176308806e-09 6 60
+        HeatCondEQS           21       3.79811e-10    4.19997e-09   0.000685099
+Mean System Norm: 4.199967919655149e-09 6 60
 *******************************************************
 Time Step Count: 7 Current Time: 70
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -193,11 +196,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       6.66563e-08    8.55577e-07             1
+        HeatCondEQS           18       5.64093e-08    8.55571e-07             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       4.44421e-11    6.92648e-10   0.000809568
-Mean System Norm: 6.926478061585131e-10 7 70
+        HeatCondEQS           21         5.303e-11    5.86168e-10   0.000685119
+Mean System Norm: 5.86167905027266e-10 7 70
 *******************************************************
 Time Step Count: 8 Current Time: 80
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -208,11 +211,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       9.30288e-09    1.19405e-07             1
+        HeatCondEQS           18       7.87256e-09    1.19404e-07             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       6.20127e-12    9.66692e-11    0.00080959
-Mean System Norm: 9.666920838432778e-11 8 80
+        HeatCondEQS           21        7.4013e-12    8.18064e-11   0.000685122
+Mean System Norm: 8.180635888191997e-11 8 80
 *******************************************************
 Time Step Count: 9 Current Time: 90
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -223,11 +226,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       1.29832e-09    1.66643e-08             1
+        HeatCondEQS           18        1.0987e-09    1.66641e-08             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       8.65421e-13    1.34913e-11   0.000809596
-Mean System Norm: 1.349132675359106e-11 9 90
+        HeatCondEQS           21       1.03297e-12    1.14169e-11   0.000685121
+Mean System Norm: 1.141693589170859e-11 9 90
 *******************************************************
 Time Step Count: 10 Current Time: 100
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -238,12 +241,12 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       1.81195e-10    2.32568e-09             1
+        HeatCondEQS           18       1.53335e-10    2.32566e-09             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       1.20784e-13    1.88285e-12   0.000809591
+        HeatCondEQS           21       1.44175e-13    1.59338e-12   0.000685133
 Realm shall provide output files at : currentTime/timeStepCount: 100/10 (realm_1)
-Mean System Norm: 1.882849250154213e-12 10 100
+Mean System Norm: 1.593383551291344e-12 10 100
 *******************************************************
 Time Step Count: 11 Current Time: 110
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -254,11 +257,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       2.52878e-11    3.24574e-10             1
+        HeatCondEQS           18       2.13996e-11     3.2457e-10             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       1.68526e-14    2.62802e-13   0.000809684
-Mean System Norm: 2.628022470669725e-13 11 110
+        HeatCondEQS           21       2.01322e-14    2.22448e-13    0.00068536
+Mean System Norm: 2.224475286141047e-13 11 110
 *******************************************************
 Time Step Count: 12 Current Time: 120
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -269,11 +272,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       3.52921e-12    4.52978e-11             1
+        HeatCondEQS           18       2.98653e-12    4.52973e-11             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           23       2.36508e-15    3.69234e-14   0.000815126
-Mean System Norm: 3.692341544617121e-14 12 120
+        HeatCondEQS           21       2.78969e-15    3.11406e-14   0.000687471
+Mean System Norm: 3.114055217955837e-14 12 120
 *******************************************************
 Time Step Count: 13 Current Time: 130
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -284,11 +287,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       4.92528e-13     6.3218e-12             1
+        HeatCondEQS           18       4.16811e-13    6.32166e-12             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           22       6.17752e-16    6.62324e-15    0.00104768
-Mean System Norm: 6.623240310120106e-15 13 130
+        HeatCondEQS           19       4.79043e-16     5.5299e-15   0.000874755
+Mean System Norm: 5.529904627836234e-15 13 130
 *******************************************************
 Time Step Count: 14 Current Time: 140
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -299,11 +302,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       6.87298e-14    8.82288e-13             1
+        HeatCondEQS           18        5.8129e-14    8.82256e-13             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           18       4.03096e-16    4.25561e-15    0.00482339
-Mean System Norm: 4.255613133968798e-15 14 140
+        HeatCondEQS           19       2.08452e-16     3.3877e-15    0.00383981
+Mean System Norm: 3.387698049047201e-15 14 140
 *******************************************************
 Time Step Count: 15 Current Time: 150
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -314,11 +317,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       9.64621e-15    1.23201e-13             1
+        HeatCondEQS           18        8.1579e-15    1.23133e-13             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           15       3.71878e-16    4.16448e-15     0.0338024
-Mean System Norm: 4.164483601123026e-15 15 150
+        HeatCondEQS           18       3.20507e-16    3.35632e-15     0.0272577
+Mean System Norm: 3.35632072299766e-15 15 150
 *******************************************************
 Time Step Count: 16 Current Time: 160
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -329,11 +332,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19       1.40723e-15    1.75926e-14             1
+        HeatCondEQS           18       1.22595e-15    1.74688e-14             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            8       3.43716e-16     4.2254e-15      0.240181
-Mean System Norm: 4.225402385580303e-15 16 160
+        HeatCondEQS           17       3.02901e-16    3.33187e-15      0.190733
+Mean System Norm: 3.331865231899003e-15 16 160
 *******************************************************
 Time Step Count: 17 Current Time: 170
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -344,11 +347,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           19        2.4561e-16    4.42768e-15             1
+        HeatCondEQS           18       3.76407e-16    4.03465e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           10       3.86046e-16     4.1618e-15      0.939951
-Mean System Norm: 4.16180328510082e-15 17 170
+        HeatCondEQS           18       2.51045e-16    3.29882e-15      0.817622
+Mean System Norm: 3.298823856778363e-15 17 170
 *******************************************************
 Time Step Count: 18 Current Time: 180
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -359,11 +362,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           15        2.7371e-16    3.70843e-15             1
+        HeatCondEQS           16       3.00117e-16     3.1925e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       3.23688e-16    4.23594e-15       1.14225
-Mean System Norm: 4.235938423152581e-15 18 180
+        HeatCondEQS           18       2.11381e-16    3.30779e-15       1.03612
+Mean System Norm: 3.30779295727229e-15 18 180
 *******************************************************
 Time Step Count: 19 Current Time: 190
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -374,11 +377,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           13       2.74504e-16     3.7498e-15             1
+        HeatCondEQS           18       1.98396e-16    3.26785e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            7       3.35024e-16    4.15953e-15       1.10927
-Mean System Norm: 4.15952622883003e-15 19 190
+        HeatCondEQS           17       2.85789e-16    3.17245e-15      0.970808
+Mean System Norm: 3.17245304077298e-15 19 190
 *******************************************************
 Time Step Count: 20 Current Time: 200
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -389,12 +392,12 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS           13       3.13366e-16    3.68837e-15             1
+        HeatCondEQS           18       2.02475e-16    3.15357e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            7       2.73236e-16     3.7609e-15       1.01966
+        HeatCondEQS           17       2.71532e-16     3.2937e-15       1.04444
 Realm shall provide output files at : currentTime/timeStepCount: 200/20 (realm_1)
-Mean System Norm: 3.760898231217773e-15 20 200
+Mean System Norm: 3.293696147237145e-15 20 200
 *******************************************************
 Time Step Count: 21 Current Time: 210
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -405,11 +408,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            7       3.23733e-16     3.6028e-15             1
+        HeatCondEQS           17       2.49054e-16    3.26536e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            5        2.9615e-16    3.58158e-15      0.994111
-Mean System Norm: 3.581578038784387e-15 21 210
+        HeatCondEQS           17        2.3697e-16    3.15608e-15      0.966534
+Mean System Norm: 3.156079173968237e-15 21 210
 *******************************************************
 Time Step Count: 22 Current Time: 220
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -420,11 +423,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       2.78714e-16    3.56037e-15             1
+        HeatCondEQS           16        2.4654e-16    3.21122e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       2.83311e-16    3.56622e-15       1.00164
-Mean System Norm: 3.566216680050895e-15 22 220
+        HeatCondEQS           17       3.06936e-16    3.29386e-15       1.02573
+Mean System Norm: 3.293860978206659e-15 22 220
 *******************************************************
 Time Step Count: 23 Current Time: 230
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -435,11 +438,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       2.70132e-16    3.56336e-15             1
+        HeatCondEQS           17       2.67913e-16    3.14028e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       2.72344e-16    3.56262e-15       0.99979
-Mean System Norm: 3.562616136753476e-15 23 230
+        HeatCondEQS           18       1.97351e-16    3.09111e-15      0.984344
+Mean System Norm: 3.091111135170459e-15 23 230
 *******************************************************
 Time Step Count: 24 Current Time: 240
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -450,11 +453,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       3.06637e-16    3.56399e-15             1
+        HeatCondEQS           18       2.32074e-16    3.29614e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       2.61925e-16       3.58e-15       1.00449
-Mean System Norm: 3.579997364381233e-15 24 240
+        HeatCondEQS           16       2.99405e-16    3.31137e-15       1.00462
+Mean System Norm: 3.311372859192753e-15 24 240
 *******************************************************
 Time Step Count: 25 Current Time: 250
  dtN: 10 dtNm1: 10 gammas: 1 -1 0
@@ -465,11 +468,11 @@ NLI    Name           Linear Iter      Linear Res     NLinear Res    Scaled NLR
 ---    ----           -----------      ----------     -----------    ----------
 1/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6        3.2599e-16    3.54256e-15             1
+        HeatCondEQS           17       2.74232e-16    3.00209e-15             1
 2/2    Equation System Iteration
  1/1           myHC
-        HeatCondEQS            6       2.96923e-16    3.57307e-15       1.00861
-Mean System Norm: 3.573067295126267e-15 25 250
+        HeatCondEQS           18       2.39207e-16    3.00613e-15       1.00135
+Mean System Norm: 3.006130809881408e-15 25 250
 *******************************************************
 Simulation Shall Complete: time/timestep: 250/25
 *******************************************************
@@ -478,29 +481,31 @@ Simulation Shall Complete: time/timestep: 250/25
 Begin Timer Overview for Realm: realm_1
 -------------------------------- 
 Timing for Eq: myHC
-             init --   	avg: 0.0297329 	min: 0.0297329 	max: 0.0297329
-         assemble --   	avg: 0.820689 	min: 0.820689 	max: 0.820689
-    load_complete --   	avg: 0.00294685 	min: 0.00294685 	max: 0.00294685
-            solve --   	avg: 0.850094 	min: 0.850094 	max: 0.850094
-    precond setup --   	avg: 0.00442719 	min: 0.00442719 	max: 0.00442719
-             misc --   	avg: 0.254006 	min: 0.254006 	max: 0.254006
-linear iterations --  	avg: 15.9 	min: 5 	max: 24
+             init --   	avg: 0.0544519 	min: 0.0544519 	max: 0.0544519
+         assemble --   	avg: 0.781528 	min: 0.781528 	max: 0.781528
+    load_complete --   	avg: 0.00288177 	min: 0.00288177 	max: 0.00288177
+            solve --   	avg: 0.917279 	min: 0.917279 	max: 0.917279
+    precond setup --   	avg: 0.00425076 	min: 0.00425076 	max: 0.00425076
+             misc --   	avg: 0.24437 	min: 0.24437 	max: 0.24437
+linear iterations --  	avg: 18.48 	min: 16 	max: 21
 Timing for IO: 
-   io create mesh --   	avg: 0.000110865 	min: 0.000110865 	max: 0.000110865
- io output fields --   	avg: 0.0435047 	min: 0.0435047 	max: 0.0435047
- io populate mesh --   	avg: 0.121323 	min: 0.121323 	max: 0.121323
- io populate fd   --   	avg: 0.00399995 	min: 0.00399995 	max: 0.00399995
+   io create mesh --   	avg: 0.0263238 	min: 0.0263238 	max: 0.0263238
+ io output fields --   	avg: 0.0329044 	min: 0.0329044 	max: 0.0329044
+ io populate mesh --   	avg: 0.142069 	min: 0.142069 	max: 0.142069
+ io populate fd   --   	avg: 0.014447 	min: 0.014447 	max: 0.014447
 Timing for connectivity/finalize lysys: 
-         eqs init --   	avg: 0.0297341 	min: 0.0297341 	max: 0.0297341
+         eqs init --   	avg: 0.0544531 	min: 0.0544531 	max: 0.0544531
 Timing for property evaluation:         
-            props --   	avg: 0.00223017 	min: 0.00223017 	max: 0.00223017
+            props --   	avg: 0.00220799 	min: 0.00220799 	max: 0.00220799
+Timing for sort_mesh: 
+       sort_mesh  --  	avg: 0 	min: 0 	max: 0
 
 Timing for Simulation: nprocs= 1
-           main() --   	avg: 2.15919 	min: 2.15919 	max: 2.15919
+           main() --   	avg: 2.25758 	min: 2.25758 	max: 2.25758
 Memory Overview: 
-nalu memory: total (over all cores) current/high-water mark=       85.2266 M      85.2266 M
-nalu memory:   min (over all cores) current/high-water mark=       85.2266 M      85.2266 M
-nalu memory:   max (over all cores) current/high-water mark=       85.2266 M      85.2266 M
+nalu memory: total (over all cores) current/high-water mark=       85.1992 M      85.1992 M
+nalu memory:   min (over all cores) current/high-water mark=       85.1992 M      85.1992 M
+nalu memory:   max (over all cores) current/high-water mark=       85.1992 M      85.1992 M
 Min High-water memory usage 85.2 MB
 Avg High-water memory usage 85.2 MB
 Max High-water memory usage 85.2 MB
@@ -509,12 +514,12 @@ Min Available memory per processor 5346.9 MB
 Avg Available memory per processor 5346.9 MB
 Max Available memory per processor 5346.9 MB
 
-Min No-output time 2.1158 sec
-Avg No-output time 2.1158 sec
-Max No-output time 2.1158 sec
+Min No-output time 2.2247 sec
+Avg No-output time 2.2247 sec
+Max No-output time 2.2247 sec
                  Timer                   Count       CPU Time              Wall Time
 ---------------------------------------- ----- --------------------- ---------------------
-Nalu                                         1        2.119 (100.0%)        2.159 (100.0%)
-  Output                                    52        0.012 (0.586%)        0.044 (2.017%)
+Nalu                                         1        2.226 (100.0%)        2.258 (100.0%)
+  Output                                    52        0.027 (1.233%)        0.033 (1.460%)
 
 Took 0.0001 seconds to generate the table above.
