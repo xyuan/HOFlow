@@ -17,7 +17,7 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: tet3square_small.exo
+    mesh: tet3square_verylarge.exo
 
     equation_systems:
       name: theEqSys
@@ -37,7 +37,7 @@ realms:
       - constant: ic_1
         target_name: unspecified-2-triangle
         value:
-          temperature: 500
+          temperature: 10
 
     material_properties:
       target_name: unspecified-2-triangle
@@ -67,7 +67,7 @@ realms:
     - wall_boundary_condition: top
       target_name: top
       wall_user_data:
-        adiabatic: true
+        heat_flux: -30
 
     - wall_boundary_condition: bottom
       target_name: bottom
@@ -75,7 +75,7 @@ realms:
         adiabatic: true
 
     output:
-      output_data_base_name: hf_output.e
+      output_data_base_name: hf_output_large.e
       output_frequency: 1
       output_node_set: yes
       output_variables:

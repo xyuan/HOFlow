@@ -23,15 +23,15 @@ AlgorithmElementInterface::AlgorithmElementInterface(Realm & realm, stk::mesh::P
     meta_data_(realm_.meta_data()),
     nDim_(meta_data_.spatial_dimension())
 {
-    if (nDim_ == 2) {
-        derivSF_ = new cfdVector2();
-        areaNormVec_ = new cfdVector2();
-    } else if (nDim_ == 3) {
-        derivSF_ = new cfdVector3();
-        areaNormVec_ = new cfdVector3();
-    } else {
-        throw std::runtime_error("undefined number of dimensions");
-    }
+//    if (nDim_ == 2) {
+//        derivSF_ = new cfdVector2();
+//        areaNormVec_ = new cfdVector2();
+//    } else if (nDim_ == 3) {
+//        derivSF_ = new cfdVector3();
+//        areaNormVec_ = new cfdVector3();
+//    } else {
+//        throw std::runtime_error("undefined number of dimensions");
+//    }
 }
 
 AlgorithmElementInterface::~AlgorithmElementInterface() {
@@ -194,16 +194,16 @@ void AlgorithmElementInterface::update_global_lhs_rhs() {
 //    apply_coeff(connected_nodes_, scratchIds_, scratchVals_, rhs_, lhs_, __FILE__);
 }
 
-cfdVector * AlgorithmElementInterface::get_area_normal_vector(int ip) {
-    for ( int j = 0; j < nDim_; ++j ) {
-        areaNormVec_[j] = p_scs_areav_[ip * nDim_ + j];
-    }
-    return areaNormVec_;
-}
-
-cfdVector * AlgorithmElementInterface::get_derived_shape_function(int ip, int ic) {
-    for ( int j = 0; j < nDim_; ++j ) {
-        derivSF_[j] = p_dndx_[offSetDnDx_ + j];
-    }
-    return derivSF_;
-}
+//cfdVector * AlgorithmElementInterface::get_area_normal_vector(int ip) {
+//    for ( int j = 0; j < nDim_; ++j ) {
+//        areaNormVec_[j] = p_scs_areav_[ip * nDim_ + j];
+//    }
+//    return areaNormVec_;
+//}
+//
+//cfdVector * AlgorithmElementInterface::get_derived_shape_function(int ip, int ic) {
+//    for ( int j = 0; j < nDim_; ++j ) {
+//        derivSF_[j] = p_dndx_[offSetDnDx_ + j];
+//    }
+//    return derivSF_;
+//}
