@@ -2,7 +2,7 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#include "AssembleScalarFluxBCSolverAlgorithm.h"
+#include "AssembleScalarFluxBCSolverAlgorithmNalu.h"
 
 #include <EquationSystem.h>
 #include <FieldTypeDef.h>
@@ -24,19 +24,21 @@
 //==========================================================================
 // Class Definition
 //==========================================================================
-// AssembleScalarFluxBCSolverAlgoithm - scalar flux bc, Int bcScalarQ*area
+// AssembleScalarFluxBCSolverAlgorithmNalu - scalar flux bc, Int bcScalarQ*area
 //==========================================================================
 //--------------------------------------------------------------------------
 //-------- constructor -----------------------------------------------------
 //--------------------------------------------------------------------------
-AssembleScalarFluxBCSolverAlgorithm::AssembleScalarFluxBCSolverAlgorithm(Realm &realm,
-                                                                         stk::mesh::Part *part,
-                                                                         EquationSystem *eqSystem) : 
-    SolverAlgorithm(realm, part, eqSystem)
+AssembleScalarFluxBCSolverAlgorithmNalu::AssembleScalarFluxBCSolverAlgorithmNalu(
+  Realm &realm,
+  stk::mesh::Part *part,
+  EquationSystem *eqSystem,
+  ScalarFieldType *bcScalarQ)
+  : SolverAlgorithm(realm, part, eqSystem),
+    bcScalarQ_(bcScalarQ)
 {
   // save off fields
   stk::mesh::MetaData & meta_data = realm_.meta_data();
-  bcScalarQ_ = meta_data.get_field<ScalarFieldType>(meta_data.side_rank(), "heat_flux_bc");
   exposedAreaVec_ = meta_data.get_field<GenericFieldType>(meta_data.side_rank(), "exposed_area_vector");
 }
 
@@ -44,7 +46,7 @@ AssembleScalarFluxBCSolverAlgorithm::AssembleScalarFluxBCSolverAlgorithm(Realm &
 //-------- initialize_connectivity -----------------------------------------
 //--------------------------------------------------------------------------
 void
-AssembleScalarFluxBCSolverAlgorithm::initialize_connectivity()
+AssembleScalarFluxBCSolverAlgorithmNalu::initialize_connectivity()
 {
   eqSystem_->linsys_->buildFaceToNodeGraph(partVec_);
 }
@@ -52,7 +54,7 @@ AssembleScalarFluxBCSolverAlgorithm::initialize_connectivity()
 //--------------------------------------------------------------------------
 //-------- execute ---------------------------------------------------------
 //--------------------------------------------------------------------------
-void AssembleScalarFluxBCSolverAlgorithm::execute() {
+void AssembleScalarFluxBCSolverAlgorithmNalu::execute() {
     stk::mesh::BulkData & bulk_data = realm_.bulk_data();
     stk::mesh::MetaData & meta_data = realm_.meta_data();
 
@@ -67,7 +69,7 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
     std::vector<stk::mesh::Entity> connected_nodes;
 
     // nodal fields to gather
-    double ws_bcScalarQ;
+    std::vector<double> ws_bcScalarQ;
 
     // master element
     std::vector<double> ws_face_shape_function;
@@ -99,19 +101,19 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
         connected_nodes.resize(nodesPerFace);
 
         // algorithm related; element
+        ws_bcScalarQ.resize(nodesPerFace);
         ws_face_shape_function.resize(numScsBip*nodesPerFace);
 
         // pointers
         double *p_lhs = &lhs[0];
         double *p_rhs = &rhs[0];
-        double *p_bcScalarQ = &ws_bcScalarQ;
+        double *p_bcScalarQ = &ws_bcScalarQ[0];
         double *p_face_shape_function = &ws_face_shape_function[0];
 
         // shape functions
         meFC->shape_fcn(&p_face_shape_function[0]);
 
         const size_t length   = b.size();
-//        std::cout << "length: " << length << std::endl;
 
         // Iterate though each boundary face in bucket
         for ( size_t k = 0 ; k < length ; ++k ) {
@@ -122,7 +124,7 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
                 p_rhs[p] = 0.0;
 
             // get face
-            stk::mesh::Entity face = b[k];    
+            stk::mesh::Entity face = b[k];
 
             //======================================
             // gather nodal data off of face
@@ -132,27 +134,37 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
             // sanity check on num nodes
             ThrowAssert( num_face_nodes == nodesPerFace );
 
-            // Make list of connected nodes
+            // Make list of connected nodes and get scalar values of the nodes
             for ( int ni = 0; ni < num_face_nodes; ++ni ) {
                 // get the node and form connected_node
                 stk::mesh::Entity node = face_node_rels[ni];
                 connected_nodes[ni] = node;
+                std::cout << std::endl;
+                std::cout << "node: " << node << std::endl;
+
+                // gather scalar
+                p_bcScalarQ[ni] = *stk::mesh::field_data(*bcScalarQ_, node);
+                std::cout << "bcScalarQ = " << p_bcScalarQ[ni] << std::endl;
             }
-            
-            // get definied boundary heat flux
-            p_bcScalarQ = stk::mesh::field_data(*bcScalarQ_, face);
-            std::cout << "bcScalarQ = " << *p_bcScalarQ << std::endl;
-            
+
             // pointer to face data
             double * areaVec = stk::mesh::field_data(*exposedAreaVec_, face);
 
             // Iterate through each integration point
             for ( int ip = 0; ip < numScsBip; ++ip ) {
                 const int localFaceNode = faceIpNodeMap[ip];
+                const int offSetSF_face = ip*nodesPerFace;
 //                std::cout << "localFaceNode = " << localFaceNode << std::endl;
 
                 // interpolate to bip
-                const double fluxBip = *p_bcScalarQ;
+                double fluxBip = 0.0;
+
+                // Iterate through each node of the face
+                for ( int ic = 0; ic < nodesPerFace; ++ic ) {
+                    const double r = p_face_shape_function[offSetSF_face+ic];
+//                    std::cout << "shape function of node " << ic << ": " << r << std::endl;
+                    fluxBip += r*p_bcScalarQ[ic];
+                }
 
                 const int offset = ip*nDim;
                 double areaNorm = 0.0;

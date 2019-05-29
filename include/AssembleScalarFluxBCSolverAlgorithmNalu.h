@@ -2,8 +2,8 @@
 /*  HOFlow - Higher Order Flow                                            */
 /*  CFD Solver based ond CVFEM                                            */
 /*------------------------------------------------------------------------*/
-#ifndef ASSEMBLESCALARDIRICHLETBCSOLVERALGORITHM_H
-#define ASSEMBLESCALARDIRICHLETBCSOLVERALGORITHM_H
+#ifndef ASSEMBLESCALARFLUXBCSOLVERALGORITHMNALU_H
+#define ASSEMBLESCALARFLUXBCSOLVERALGORITHMNALU_H
 
 #include<SolverAlgorithm.h>
 #include<FieldTypeDef.h>
@@ -17,23 +17,20 @@ class Part;
 class LinearSystem;
 class Realm;
 
-class AssembleScalarDirichletBCSolverAlgorithm : public SolverAlgorithm {
+class AssembleScalarFluxBCSolverAlgorithmNalu : public SolverAlgorithm {
 public:
-    AssembleScalarDirichletBCSolverAlgorithm(Realm &realm,
+    AssembleScalarFluxBCSolverAlgorithmNalu(Realm &realm,
                                         stk::mesh::Part *part,
                                         EquationSystem *eqSystem,
-                                        ScalarFieldType *bcScalarQ,
-                                        ScalarFieldType *diffFluxCoeff);
-    virtual ~AssembleScalarDirichletBCSolverAlgorithm() {}
+                                        ScalarFieldType *bcScalarQ);
+    virtual ~AssembleScalarFluxBCSolverAlgorithmNalu() {}
     virtual void initialize_connectivity();
     virtual void execute();
 
 private:
     ScalarFieldType *bcScalarQ_;
     GenericFieldType *exposedAreaVec_;
-    ScalarFieldType *diffFluxCoeff_;
-    VectorFieldType *coordinates_;
 };
 
-#endif /* ASSEMBLESCALARDIRICHLETBCSOLVERALGORITHM_H */
+#endif /* ASSEMBLESCALARFLUXBCSOLVERALGORITHMNALU_H */
 

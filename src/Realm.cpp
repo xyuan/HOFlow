@@ -23,6 +23,7 @@
 #include <EquationSystem.h>
 #include <Algorithm.h>
 #include <AuxFunctionAlgorithm.h>
+#include <ConstantBCAuxFunctionAlgorithm.h>
 #include <ConstantAuxFunction.h>
 #include <Simulation.h>
 #include "LinearSystem.h"
@@ -331,6 +332,7 @@ void Realm::initialize() {
     create_output_mesh();
     
     populate_boundary_data();
+    
     compute_geometry();
     equationSystems_.initialize();
     check_job(false);

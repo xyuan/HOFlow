@@ -99,7 +99,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
             stk::mesh::Entity elem = b[k];
             intf.element_pre_work(elem, diffFluxCoeff_, coordinates_, shiftedGradOp_);
             
-            std::cout << "/////////// NEW Element ///////////" << std::endl;
+//            std::cout << "/////////// NEW Element ///////////" << std::endl;
             
             //----------------------------------------------------
             // Iterate through all integration points
@@ -107,7 +107,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
             {
                 intf.ip_pre_work(ip);
                 
-                std::cout << "######## NEW IP ##########" << std::endl;
+//                std::cout << "######## NEW IP ##########" << std::endl;
                 
                 const double muIp = intf.compute_muIP(ip);
 //                cfdVector areaNormVec = intf.get_area_normal_vector(ip);
@@ -137,10 +137,10 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                         lhsfacDiff += -muIp * dndx * areav;
                     }
                     const double scalarQNP1 = intf.getScalarQNP1(ic);
-                    std::cout << "------- new node --------" << std::endl;
-                    std::cout << "lhsfacDiff " << ic << " = " << lhsfacDiff << std::endl;
-                    std::cout << "scalarQNP1 " << ic << " = " << scalarQNP1 << std::endl;
-                    std::cout << "qDiff " << ic << " = " << lhsfacDiff * scalarQNP1 << std::endl;
+//                    std::cout << "------- new node --------" << std::endl;
+//                    std::cout << "lhsfacDiff " << ic << " = " << lhsfacDiff << std::endl;
+//                    std::cout << "scalarQNP1 " << ic << " = " << scalarQNP1 << std::endl;
+//                    std::cout << "qDiff " << ic << " = " << lhsfacDiff * scalarQNP1 << std::endl;
                     qDiff += lhsfacDiff * scalarQNP1;
                     intf.update_local_lhs(lhsfacDiff, ic);
                 }

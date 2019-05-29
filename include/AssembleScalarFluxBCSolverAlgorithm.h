@@ -21,8 +21,7 @@ class AssembleScalarFluxBCSolverAlgorithm : public SolverAlgorithm {
 public:
     AssembleScalarFluxBCSolverAlgorithm(Realm &realm,
                                         stk::mesh::Part *part,
-                                        EquationSystem *eqSystem,
-                                        ScalarFieldType *bcScalarQ);
+                                        EquationSystem *eqSystem);
     virtual ~AssembleScalarFluxBCSolverAlgorithm() {}
     virtual void initialize_connectivity();
     virtual void execute();

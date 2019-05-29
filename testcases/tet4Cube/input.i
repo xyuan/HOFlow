@@ -2,11 +2,8 @@
 #
 # Example HOFlow input file for a heat conduction problem
 #
-
-Simulations:
-  - name: sim1
-    time_integrator: ti_1
-    optimizer: opt1
+simulation:
+  type: steady
 
 linear_solvers:
   - name: solve_scalar
@@ -17,6 +14,7 @@ linear_solvers:
     max_iterations: 75 
     kspace: 75 
     output_level: 0
+    write_matrix_files: no
 
 realms:
   - name: realm_1
@@ -24,7 +22,7 @@ realms:
 
     equation_systems:
       name: theEqSys
-      max_iterations: 2 
+      max_iterations: 1
   
       solver_system_specification:
         temperature: solve_scalar
@@ -40,32 +38,32 @@ realms:
       - constant: ic_1
         target_name: block_1-TETRA
         value:
-         temperature: 10.0
+          temperature: 10.0
 
     material_properties:
       target_name: block_1-TETRA
       specifications:
         - name: density
           type: constant
-          value: 1.0
+          value: 1000
         - name: thermal_conductivity
           type: constant
           value: 1.0
         - name: specific_heat
           type: constant
-          value: 1.0
+          value: 10
 
     boundary_conditions:
 
     - wall_boundary_condition: bc_1
       target_name: surface_1
       wall_user_data:
-        temperature: 20.0
+        heat_flux: 200
 
     - wall_boundary_condition: bc_2
       target_name: surface_2
       wall_user_data:
-        temperature: 20.0
+        heat_flux: -30
 
     - wall_boundary_condition: bc_3
       target_name: surface_3
@@ -75,31 +73,35 @@ realms:
     - wall_boundary_condition: bc_4
       target_name: surface_4
       wall_user_data:
-        temperature: 40.0
+        temperature: 30
 
     - wall_boundary_condition: bc_5
       target_name: surface_5
       wall_user_data:
-        temperature: 50.0
+        adiabatic: yes
 
     - wall_boundary_condition: bc_6
       target_name: surface_6
       wall_user_data:
-        temperature: 50.0
+        adiabatic: yes
 
     output:
-      output_data_base_name: femHC.e
-      output_frequency: 10
+      output_data_base_name: hf_output.e
+      output_frequency: 1
       output_node_set: no 
       output_variables:
        - dual_nodal_volume
        - temperature
+       
+    solution_options:
+      name: myOptions
+      use_nalu_bc_algorithm: no
 
 Time_Integrators:
   - StandardTimeIntegrator:
       name: ti_1
       start_time: 0
-      termination_step_count: 20
+      termination_step_count: 500
       time_step: 10.0 
       time_stepping_type: fixed
       time_step_count: 0

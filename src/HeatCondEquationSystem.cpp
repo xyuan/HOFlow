@@ -11,6 +11,7 @@
 #include "AssembleScalarElemDiffSolverAlgorithm.h"
 //#include "AssembleScalarDiffNonConformalSolverAlgorithm.h"
 #include "AssembleScalarFluxBCSolverAlgorithm.h"
+#include "AssembleScalarFluxBCSolverAlgorithmNalu.h"
 #include "AssembleNodalGradAlgorithmDriver.h"
 //#include "AssembleNodalGradEdgeAlgorithm.h"
 #include "AssembleNodalGradElemAlgorithm.h"
@@ -18,14 +19,17 @@
 //#include "AssembleNodalGradNonConformalAlgorithm.h"
 #include "AssembleNodeSolverAlgorithm.h"
 #include "AuxFunctionAlgorithm.h"
+#include "ConstantBCAuxFunctionAlgorithm.h"
 #include "ConstantAuxFunction.h"
 #include "CopyFieldAlgorithm.h"
 #include "DirichletBC.h"
+#include <AssembleScalarDirichletBCSolverAlgorithm.h>
 #include "EquationSystem.h"
 #include "EquationSystems.h"
 #include "Enums.h"
 //#include "ErrorIndicatorAlgorithmDriver.h"
 #include <FieldFunctions.h>
+#include <FieldTypeDef.h>
 #include "LinearSolvers.h"
 #include "LinearSolver.h"
 #include "LinearSystem.h"
@@ -65,10 +69,11 @@
 #include <stk_mesh/base/MetaData.hpp>
 #include <stk_mesh/base/SkinMesh.hpp>
 #include <stk_mesh/base/Comm.hpp>
+#include <stk_mesh/base/Part.hpp>
+#include <stk_mesh/base/Selector.hpp>
 
 // stk_io
 #include <stk_io/IossBridge.hpp>
-
 #include <stk_topology/topology.hpp>
 
 // stk_util
@@ -349,6 +354,7 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
     VectorFieldType & dtdxNone = dtdx_->field_of_state(stk::mesh::StateNone);
 
     stk::mesh::MetaData & meta_data = realm_.meta_data();
+    stk::mesh::BulkData & bulk_data = realm_.bulk_data();
 
     // non-solver; dtdx; allow for element-based shifted; all bcs are of generic type "WALL"
     if ( !managePNG_ ) {
@@ -410,68 +416,84 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
         bcDataMapAlg_.push_back(theCopyAlg);
 
         // wall specified temperature solver algorithm
-        if (realm_.solutionOptions_->useConsolidatedBcSolverAlg_) {
-//            // solver for weak wall
-//            auto & solverAlgMap = solverAlgDriver_->solverAlgorithmMap_;
-//
-//            stk::topology elemTopo = get_elem_topo(realm_, *part);
-//
-//            AssembleFaceElemSolverAlgorithm * faceElemSolverAlg = nullptr;
-//            bool solverAlgWasBuilt = false;
-//
-//            std::tie(faceElemSolverAlg, solverAlgWasBuilt) 
-//              = build_or_add_part_to_face_elem_solver_alg(algType, *this, *part, elemTopo, solverAlgMap, "wall");
-//
-//            auto & activeKernels = faceElemSolverAlg->activeKernels_;
-//
-//            if (solverAlgWasBuilt) {
-//              build_face_elem_topo_kernel_automatic<ScalarFluxPenaltyElemKernel>
-//                (partTopo, elemTopo, *this, activeKernels, "heat_cond_weak_wall",
-//                 realm_.meta_data(), *realm_.solutionOptions_,
-//                 temperature_, theBcField, thermalCond_,
-//                 faceElemSolverAlg->faceDataNeeded_, faceElemSolverAlg->elemDataNeeded_);
-//            }
-        }
-        else {
-            // Dirichlet bc
-            std::map<AlgorithmType, SolverAlgorithm *>::iterator itd = solverAlgDriver_->solverDirichAlgMap_.find(algType);
-            
-            // If algorithm is not present, create a new one
-            if ( itd == solverAlgDriver_->solverDirichAlgMap_.end() ) {
+        // Dirichlet bc
+        std::map<AlgorithmType, SolverAlgorithm *>::iterator itd = solverAlgDriver_->solverDirichAlgMap_.find(algType);
+
+        // If algorithm is not present, create a new one
+        if ( itd == solverAlgDriver_->solverDirichAlgMap_.end() ) {
+
+            if (realm_.solutionOptions_->useNaluBC_) {
+                // Use Nalu style Dirichlet BC, fix the nodal value to the specified value
                 DirichletBC * theAlg = new DirichletBC(realm_, this, part, &tempNp1, theBcField, 0, 1);
                 solverAlgDriver_->solverDirichAlgMap_[algType] = theAlg;
             }
             else {
-                itd->second->partVec_.push_back(part);
+                // Use CFX style Dirichlet BC, fix the IP value to the specified value
+                AssembleScalarDirichletBCSolverAlgorithm * theAlg = new AssembleScalarDirichletBCSolverAlgorithm(realm_, part, this, theBcField);
+                solverAlgDriver_->solverDirichAlgMap_[algType] = theAlg;
             }
+
+        }
+        else {
+            itd->second->partVec_.push_back(part);
         }
     }
     // If heat flux is specified (Neumann)
     else if( userData.heatFluxSpec_ ) { // used to contain the following: && !userData.robinParameterSpec_
 
         const AlgorithmType algTypeHF = WALL_HF;
-
-        ScalarFieldType * theBcField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "heat_flux_bc"));
-        stk::mesh::put_field_on_mesh(*theBcField, *part, nullptr);
-
+        
+        ScalarFieldType * theBcNodalField = 0;
+        ScalarFieldType * theBcField = 0;
+        stk::mesh::EntityRank entity_rank;
         NormalHeatFlux heatFlux = userData.q_;
-        std::vector<double> userSpec(1);
-        userSpec[0] = heatFlux.qn_;
+        
+        if (realm_.solutionOptions_->useNaluBC_) {
+            entity_rank = stk::topology::NODE_RANK;
+            
+            theBcNodalField = &(meta_data.declare_field<ScalarFieldType>(entity_rank, "heat_flux_bc"));
+            stk::mesh::put_field_on_mesh(*theBcNodalField, *part, nullptr);
+            
+            std::vector<double> userSpec(1);
+            userSpec[0] = heatFlux.qn_;
 
-        // new it
-        ConstantAuxFunction * theAuxFunc = new ConstantAuxFunction(0, 1, userSpec);
+            // new it
+            ConstantAuxFunction * theAuxFunc = new ConstantAuxFunction(0, 1, userSpec);
 
-        // bc data alg
-        AuxFunctionAlgorithm * auxAlg = new AuxFunctionAlgorithm(realm_, part,
-                                                                theBcField, theAuxFunc,
-                                                                stk::topology::NODE_RANK);
-        bcDataAlg_.push_back(auxAlg);
+            // bc data alg
+            AuxFunctionAlgorithm * auxAlg = new AuxFunctionAlgorithm(realm_, part,
+                                                                    theBcNodalField, theAuxFunc,
+                                                                    entity_rank);
+            bcDataAlg_.push_back(auxAlg); 
+        }
+        else {
+            entity_rank = static_cast<stk::topology::rank_t>(meta_data.side_rank());
+            double bc_value = heatFlux.qn_;
+            
+            theBcField = &(meta_data.declare_field<ScalarFieldType>(entity_rank, "heat_flux_bc"));
+            stk::mesh::put_field_on_mesh(*theBcField, *part, nullptr);
+            
+            // bc data alg
+            ConstantBCAuxFunctionAlgorithm * auxAlg 
+                    = new ConstantBCAuxFunctionAlgorithm(realm_, part, theBcField, entity_rank, bc_value);
+            
+            bcDataAlg_.push_back(auxAlg); 
+        }
 
         // solver; lhs; same for edge and element-based scheme
         std::map<AlgorithmType, SolverAlgorithm *>::iterator itsi = solverAlgDriver_->solverAlgMap_.find(algTypeHF);
         if ( itsi == solverAlgDriver_->solverAlgMap_.end() ) {
-            AssembleScalarFluxBCSolverAlgorithm * theAlg = new AssembleScalarFluxBCSolverAlgorithm(realm_, part, this, theBcField);
-            solverAlgDriver_->solverAlgMap_[algTypeHF] = theAlg;
+            
+            if (realm_.solutionOptions_->useNaluBC_) {
+                // Use Nalu style Neumann BC, apply the boundary values to the nodes
+                AssembleScalarFluxBCSolverAlgorithmNalu * theAlg = new AssembleScalarFluxBCSolverAlgorithmNalu(realm_, part, this, theBcNodalField);
+                solverAlgDriver_->solverAlgMap_[algTypeHF] = theAlg;
+            }
+            else {
+                // Use CFX style Neumann BC, apply the boundary values to the IPs
+                AssembleScalarFluxBCSolverAlgorithm * theAlg = new AssembleScalarFluxBCSolverAlgorithm(realm_, part, this);
+                solverAlgDriver_->solverAlgMap_[algTypeHF] = theAlg;
+            }
         }
         else {
             itsi->second->partVec_.push_back(part);

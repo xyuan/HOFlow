@@ -71,6 +71,7 @@ SolutionOptions::SolutionOptions()
     consistentMMPngDefault_(false),
     useConsolidatedSolverAlg_(false),
     useConsolidatedBcSolverAlg_(false),
+    useNaluBC_(false),
     eigenvaluePerturb_(false),
     eigenvaluePerturbDelta_(0.0),
     eigenvaluePerturbBiasTowards_(3),
@@ -129,6 +130,9 @@ void SolutionOptions::load(const YAML::Node & y_node) {
         // check for consolidated face-elem bc alg
         get_if_present(y_solution_options, "use_consolidated_face_elem_bc_algorithm", useConsolidatedBcSolverAlg_, useConsolidatedBcSolverAlg_);
 
+        // check for Nalu style dirichlet BC
+        get_if_present(y_solution_options, "use_nalu_bc_algorithm", useNaluBC_, useNaluBC_);
+        
         // eigenvalue purturbation; over all dofs...
         get_if_present(y_solution_options, "eigenvalue_perturbation", eigenvaluePerturb_);
         get_if_present(y_solution_options, "eigenvalue_perturbation_delta", eigenvaluePerturbDelta_);
@@ -159,7 +163,7 @@ void SolutionOptions::load(const YAML::Node & y_node) {
           inputVariablesPeriodicTime_, inputVariablesPeriodicTime_);
 
         // first set of options; hybrid, source, etc.
-        const YAML::Node y_options = expect_sequence(y_solution_options, "options", required);
+        const YAML::Node y_options = expect_sequence(y_solution_options, "options", optional); // Nalu set it to required, don't know why
         if (y_options)
         {
             for (size_t ioption = 0; ioption < y_options.size(); ++ioption)

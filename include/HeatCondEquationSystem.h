@@ -11,14 +11,14 @@
 #include <stk_mesh/base/FieldBase.hpp>
 #include <stk_mesh/base/CoordinateSystems.hpp>
 
-struct stk::topology;
-
 class Realm;
 class AssembleNodalGradAlgorithmDriver;
 class AlgorithmDriver;
 class EquationSystems;
 class TpetraLinearSystem;
 class ProjectedNodalGradientEquationSystem;
+
+class stk::mesh::Part;
 
 /** Specific implementation of the heat conduction equation system.
  *

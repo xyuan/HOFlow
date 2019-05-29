@@ -24,6 +24,7 @@ class stk::io::StkMeshIoBroker;
 class Algorithm;
 class AlgorithmDriver;
 class AuxFunctionAlgorithm;
+class ConstantBCAuxFunctionAlgorithm;
 class EquationSystem;
 class EquationSystems;
 class OutputInfo;

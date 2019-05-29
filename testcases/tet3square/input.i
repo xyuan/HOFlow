@@ -14,10 +14,11 @@ linear_solvers:
     max_iterations: 75 
     kspace: 75 
     output_level: 0
+    write_matrix_files: no
 
 realms:
   - name: realm_1
-    mesh: tet3square_verylarge.exo
+    mesh: tet3square_small.exo
 
     equation_systems:
       name: theEqSys
@@ -72,15 +73,19 @@ realms:
     - wall_boundary_condition: bottom
       target_name: bottom
       wall_user_data:
-        adiabatic: true
+        adiabatic: yes
 
     output:
-      output_data_base_name: hf_output_large.e
+      output_data_base_name: hf_output_small_nalu.e
       output_frequency: 1
-      output_node_set: yes
+      output_node_set: no
       output_variables:
        - dual_nodal_volume
        - temperature
+       
+    solution_options:
+      name: myOptions
+      use_nalu_bc_algorithm: no
 
 Time_Integrators:
   - StandardTimeIntegrator:

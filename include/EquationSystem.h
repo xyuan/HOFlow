@@ -14,6 +14,7 @@
 class Algorithm;
 class AlgorithmDriver;
 class AuxFunctionAlgorithm;
+class ConstantBCAuxFunctionAlgorithm;
 class SolverAlgorithmDriver;
 class InitialCondition;
 class EquationSystems;
@@ -88,7 +89,7 @@ public:
     
     virtual void post_converged_work() {}
     
-    std::vector<AuxFunctionAlgorithm *> bcDataAlg_;
+    std::vector<Algorithm *> bcDataAlg_;
     std::vector<Algorithm *> bcDataMapAlg_;
     std::vector<Algorithm *> copyStateAlg_;
     LinearSystem * linsys_;

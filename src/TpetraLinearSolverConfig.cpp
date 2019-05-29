@@ -81,6 +81,8 @@ void TpetraLinearSolverConfig::load(const YAML::Node& node) {
       throw std::runtime_error("invalid linear solver preconditioner specified ");
     }
     
+    get_if_present(node, "write_matrix_files", writeMatrixFiles_, writeMatrixFiles_);
+    
     get_if_present(node, "recompute_preconditioner", recomputePreconditioner_, recomputePreconditioner_);
     get_if_present(node, "reuse_preconditioner",     reusePreconditioner_,     reusePreconditioner_);
     // Deleted the reading parameters for writeMatrixFiles. 
