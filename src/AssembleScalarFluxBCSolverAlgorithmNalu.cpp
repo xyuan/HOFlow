@@ -140,11 +140,11 @@ void AssembleScalarFluxBCSolverAlgorithmNalu::execute() {
                 stk::mesh::Entity node = face_node_rels[ni];
                 connected_nodes[ni] = node;
                 std::cout << std::endl;
-                std::cout << "node: " << node << std::endl;
+//                std::cout << "node: " << node << std::endl;
 
                 // gather scalar
                 p_bcScalarQ[ni] = *stk::mesh::field_data(*bcScalarQ_, node);
-                std::cout << "bcScalarQ = " << p_bcScalarQ[ni] << std::endl;
+//                std::cout << "bcScalarQ = " << p_bcScalarQ[ni] << std::endl;
             }
 
             // pointer to face data

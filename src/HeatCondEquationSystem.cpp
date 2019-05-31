@@ -429,7 +429,7 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
             }
             else {
                 // Use CFX style Dirichlet BC, fix the IP value to the specified value
-                AssembleScalarDirichletBCSolverAlgorithm * theAlg = new AssembleScalarDirichletBCSolverAlgorithm(realm_, part, this, theBcField);
+                AssembleScalarDirichletBCSolverAlgorithm * theAlg = new AssembleScalarDirichletBCSolverAlgorithm(realm_, part, this, theBcField, thermalCond_);
                 solverAlgDriver_->solverDirichAlgMap_[algType] = theAlg;
             }
 
@@ -449,6 +449,8 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
         NormalHeatFlux heatFlux = userData.q_;
         
         if (realm_.solutionOptions_->useNaluBC_) {
+            //Create boundary value field for Nalu style Neumann BC
+            
             entity_rank = stk::topology::NODE_RANK;
             
             theBcNodalField = &(meta_data.declare_field<ScalarFieldType>(entity_rank, "heat_flux_bc"));
@@ -467,13 +469,18 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
             bcDataAlg_.push_back(auxAlg); 
         }
         else {
+            // Create boundary value field for CFX style Neumann BC, field has
+            // side rank
+            
             entity_rank = static_cast<stk::topology::rank_t>(meta_data.side_rank());
             double bc_value = heatFlux.qn_;
             
             theBcField = &(meta_data.declare_field<ScalarFieldType>(entity_rank, "heat_flux_bc"));
             stk::mesh::put_field_on_mesh(*theBcField, *part, nullptr);
             
-            // bc data alg
+            // Create object of AuxFunctionAlgorithm that puts the boundary value
+            // field on side rank
+            
             ConstantBCAuxFunctionAlgorithm * auxAlg 
                     = new ConstantBCAuxFunctionAlgorithm(realm_, part, theBcField, entity_rank, bc_value);
             
@@ -490,7 +497,7 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
                 solverAlgDriver_->solverAlgMap_[algTypeHF] = theAlg;
             }
             else {
-                // Use CFX style Neumann BC, apply the boundary values to the IPs
+                // Use CFX style Neumann BC, apply the boundary values to the side rank
                 AssembleScalarFluxBCSolverAlgorithm * theAlg = new AssembleScalarFluxBCSolverAlgorithm(realm_, part, this);
                 solverAlgDriver_->solverAlgMap_[algTypeHF] = theAlg;
             }
