@@ -14,7 +14,7 @@ linear_solvers:
     max_iterations: 75 
     kspace: 75 
     output_level: 0
-    write_matrix_files: no
+    write_matrix_files: yes
 
 realms:
   - name: realm_1
@@ -68,7 +68,7 @@ realms:
     - wall_boundary_condition: top
       target_name: top
       wall_user_data:
-        heat_flux: -30
+        adiabatic: yes
 
     - wall_boundary_condition: bottom
       target_name: bottom

@@ -22,6 +22,7 @@ public:
     AssembleScalarDirichletBCSolverAlgorithm(Realm &realm,
                                         stk::mesh::Part *part,
                                         EquationSystem *eqSystem,
+                                        ScalarFieldType *scalarQ,
                                         ScalarFieldType *bcScalarQ,
                                         ScalarFieldType *diffFluxCoeff);
     virtual ~AssembleScalarDirichletBCSolverAlgorithm() {}
@@ -29,6 +30,7 @@ public:
     virtual void execute();
 
 private:
+    ScalarFieldType *scalarQ_;
     ScalarFieldType *bcScalarQ_;
     GenericFieldType *exposedAreaVec_;
     ScalarFieldType *diffFluxCoeff_;

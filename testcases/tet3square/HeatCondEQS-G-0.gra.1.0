@@ -1,0 +1,100 @@
+
+
+===============================================================================================
+===============================================================================================
+P[0] writeToFile:: matrix->getGraph()= 
+---------------------------
+ "Tpetra::DistObject": {Packet: long int, LocalOrdinal: int, GlobalOrdinal: long int, Node: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace>}{status = fill complete, global rows = 0, global cols = 5, global num entries = 0}
+ Global number of diagonals = 18446744073709551615
+ Global max number of row entries = 0
+ 
+ Row map: 
+  "Tpetra::Map":
+   Template parameters:
+    LocalOrdinal: int
+    GlobalOrdinal: long int
+    Node: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace>
+   Global number of entries: 0
+   Minimum global index: 9223372036854775807
+   Maximum global index: -9223372036854775808
+   Index base: 1
+   Number of processes: 1
+   Uniform: false
+   Contiguous: false
+   Distributed: false
+   Process 0 of 1:
+    My number of entries: 0
+    My minimum global index: 9223372036854775807
+    My maximum global index: -9223372036854775808
+    My global indices: []
+ 
+ Column map: 
+  "Tpetra::Map":
+   Template parameters:
+    LocalOrdinal: int
+    GlobalOrdinal: long int
+    Node: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace>
+   Global number of entries: 5
+   Minimum global index: 1
+   Maximum global index: 5
+   Index base: 1
+   Number of processes: 1
+   Uniform: false
+   Contiguous: false
+   Distributed: false
+   Process 0 of 1:
+    My number of entries: 5
+    My minimum global index: 1
+    My maximum global index: 5
+    My global indices: [1, 2, 3, 4, 5]
+ 
+ Domain map: 
+  "Tpetra::Map":
+   Template parameters:
+    LocalOrdinal: int
+    GlobalOrdinal: long int
+    Node: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace>
+   Global number of entries: 5
+   Minimum global index: 1
+   Maximum global index: 5
+   Index base: 1
+   Number of processes: 1
+   Uniform: false
+   Contiguous: false
+   Distributed: false
+   Process 0 of 1:
+    My number of entries: 5
+    My minimum global index: 1
+    My maximum global index: 5
+    My global indices: [1, 2, 3, 4, 5]
+ 
+ Range map: 
+  "Tpetra::Map":
+   Template parameters:
+    LocalOrdinal: int
+    GlobalOrdinal: long int
+    Node: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::Serial, Kokkos::HostSpace>
+   Global number of entries: 5
+   Minimum global index: 1
+   Maximum global index: 5
+   Index base: 1
+   Number of processes: 1
+   Uniform: false
+   Contiguous: false
+   Distributed: false
+   Process 0 of 1:
+    My number of entries: 5
+    My minimum global index: 1
+    My maximum global index: 5
+    My global indices: [1, 2, 3, 4, 5]
+ Node ID = 0
+ Node number of entries = 0
+ Node number of diagonals = 18446744073709551615
+ Node max number of entries = 0
+       Node ID   Global Row  Num Entries Entries
+
+===============================================================================================
+===============================================================================================
+
+
+
