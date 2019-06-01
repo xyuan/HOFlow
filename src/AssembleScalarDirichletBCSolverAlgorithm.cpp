@@ -71,6 +71,8 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
     std::vector<double> scratchVals;
     std::vector<stk::mesh::Entity> connected_nodes;
     
+    std::vector<int> boundaryNodeLocation;
+    
     // deal with state
     ScalarFieldType & scalarQNp1   = scalarQ_->field_of_state(stk::mesh::StateNP1);
 
@@ -92,17 +94,24 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
     // define some common selectors
     stk::mesh::Selector s_locally_owned_union = meta_data.locally_owned_part()
         &stk::mesh::selectUnion(partVec_);
+    std::cout << std::endl;
+    std::cout << "Dirichlet BC Assembling" << std::endl;
+    
     
     // Iterate through selected buckets
     stk::mesh::BucketVector const & face_buckets = realm_.get_buckets( meta_data.side_rank(), s_locally_owned_union );
     for ( stk::mesh::BucketVector::const_iterator ib = face_buckets.begin(); ib != face_buckets.end() ; ++ib ) {
         stk::mesh::Bucket & b = **ib;
         const stk::mesh::Bucket::size_type length = b.size();
+        
+        std::cout << "/////////// NEW Boundary ///////////" << std::endl;
 
         // Get the first face just to determine the topology
         stk::mesh::Entity face = b[0];     
         stk::mesh::Entity const temp_elem = *bulk_data.begin_elements(face);
         stk::topology elem_topo = bulk_data.bucket(temp_elem).topology();   
+        
+//        auto tempo = b.getPartition();
 
         // extract master element
         MasterElement * meSCS = MasterElementRepo::get_surface_master_element(elem_topo);
@@ -125,6 +134,8 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
         scratchIds.resize(rhsSize);
         scratchVals.resize(rhsSize);
         connected_nodes.resize(nodesPerElement);
+        
+        boundaryNodeLocation.resize(nodesPerFace);
 
         // algorithm related
         ws_coordinates.resize(nodesPerElement*nDim);
@@ -156,10 +167,11 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
         
         // Iterate through each element in bucket
         for ( size_t k = 0 ; k < length ; ++k ) {
+            std::cout << "new boundary element" << std::endl;
             
             // get element and face
-            stk::mesh::Entity elem = *bulk_data.begin_elements(face);
             stk::mesh::Entity face = b[k];
+            stk::mesh::Entity elem = *bulk_data.begin_elements(face);
             
             // get nodes of the current element
             stk::mesh::Entity const * elem_node_rels = bulk_data.begin_nodes(elem);
@@ -211,6 +223,7 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
             // get boundary value
             p_bcScalarQ = stk::mesh::field_data(*bcScalarQ_, face);
             const double temperatureBip = *p_bcScalarQ;
+            std::cout << "Boundary temperature: " << temperatureBip << std::endl;
 
             // compute geometry
             double scs_error = 0.0;
@@ -221,10 +234,23 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
             
             // pointer to face data
             double * areaVec = stk::mesh::field_data(*exposedAreaVec_, face);
-            
+       
+            // Determin where in the local lhs and rhs the boundary nodes are
+            for (int i=0; i<num_face_nodes; ++i) {
+                const int localFaceNode = faceIpNodeMap[i];
+                stk::mesh::Entity face_node = face_node_rels[localFaceNode];
+                
+                for (int j=0; j<num_nodes; ++j) {
+                    stk::mesh::Entity elem_node = connected_nodes[j];
+                    if (face_node == elem_node) {
+                        boundaryNodeLocation[i] = j;
+                    }
+                }  
+            }
+  
             // Iterate through all integration points
             for ( int ip = 0; ip < numScsBip; ++ip ) {
-                const int localFaceNode = faceIpNodeMap[ip];
+                std::cout << "new IP" << std::endl;
 
                 // save off ip values; offset to Shape Function
                 double muIp = 0.0;
@@ -239,6 +265,8 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
 
                 double qDiff = 0.0;
                 
+                const int pos = boundaryNodeLocation[ip];
+                
                 // Iterate through all nodes of a element to get the face flux coefficient
                 // contribution of each node to the current integration point
                 for ( int ic = 0; ic < nodesPerElement; ++ic ) {
@@ -250,28 +278,44 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
                         lhsfacDiff += -muIp*p_dndx[offSetDnDx+j]*areaVec[ip*nDim+j];
                     }
                     
+                    std::cout << "currently at node " << connected_nodes[ic] << std::endl;
+                    
                     double temperatureValue;
                     if (ws_is_boundary_node[ic]) {
                         temperatureValue = temperatureBip;
-                    }  
-                    else {
-                        p_lhs[(localFaceNode*nodesPerElement)+ic] += lhsfacDiff;
-                        temperatureValue = p_scalarQNp1[ic];
+                        std::cout << "node is a boundary node, temperature: " << temperatureValue << std::endl;
                     }
+                    else {
+                        p_lhs[(pos*nodesPerElement)+ic] += lhsfacDiff;
+                        temperatureValue = p_scalarQNp1[ic];
+                        std::cout << "node is a internal node, temperature: " << temperatureValue << std::endl;
+                    }
+                    
+                    
 
                     qDiff += lhsfacDiff*temperatureValue; 
-                }
-
-                int pos = 0;
-                for (int i=0; i < num_nodes; ++i) {
-                    if (connected_nodes[i] == face_node_rels[localFaceNode]) {
-                        pos = i;
-                    }
                 }
 
                 p_rhs[pos] -= qDiff;
             }
             apply_coeff(connected_nodes, scratchIds, scratchVals, rhs, lhs, __FILE__);
+            std::cout << "printing lhs: " << std::endl;
+            for (int i=0; i<lhsSize; ++i) {
+                std::cout << p_lhs[i] << ", ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "printing rhs: " << std::endl;
+            for (int i=0; i<rhsSize; ++i) {
+                std::cout << p_rhs[i] << ", ";
+            }
+            std::cout << std::endl;
+            
+            std::cout << "printing connected_nodes: " << std::endl;
+            for (int i=0; i<num_nodes; ++i) {
+                std::cout << connected_nodes[i] << ", ";
+            }
+            std::cout << std::endl;
         }
     }
 }

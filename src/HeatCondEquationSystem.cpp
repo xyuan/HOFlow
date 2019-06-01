@@ -299,10 +299,7 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
         std::vector<double> userSpec(1);
         userSpec[0] = theTemp.temperature_;
         
-        if (realm_.solutionOptions_->useNaluBC_) {
-            //Create boundary value field for Nalu style Dirichlet BC
-            
-            // register boundary data; temperature_bc
+        // register boundary data; temperature_bc
             theBcNodalField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "temperature_bc"));
             stk::mesh::put_field_on_mesh(*theBcNodalField, *part, nullptr);
             
@@ -321,6 +318,11 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
                                                                     0, 1,
                                                                     stk::topology::NODE_RANK);
             bcDataMapAlg_.push_back(theCopyAlg);
+        
+        if (realm_.solutionOptions_->useNaluBC_) {
+            //Create boundary value field for Nalu style Dirichlet BC
+            
+            
         }
         else {
             //Create boundary value field for CFX style Dirichlet BC

@@ -18,11 +18,11 @@ linear_solvers:
 
 realms:
   - name: realm_1
-    mesh: tet3square_small.exo
+    mesh: tet3square_large.exo
 
     equation_systems:
       name: theEqSys
-      max_iterations: 1
+      max_iterations: 3
   
       solver_system_specification:
         temperature: solve_scalar
@@ -30,7 +30,7 @@ realms:
       systems:
         - HeatConduction:
             name: myHC
-            max_iterations: 1
+            max_iterations: 3
             convergence_tolerance: 1e-5
 
     initial_conditions:
@@ -68,7 +68,7 @@ realms:
     - wall_boundary_condition: top
       target_name: top
       wall_user_data:
-        adiabatic: yes
+        heat_flux: -30
 
     - wall_boundary_condition: bottom
       target_name: bottom
@@ -76,7 +76,7 @@ realms:
         adiabatic: yes
 
     output:
-      output_data_base_name: hf_output_small_nalu.e
+      output_data_base_name: hf_output_large.e
       output_frequency: 1
       output_node_set: no
       output_variables:

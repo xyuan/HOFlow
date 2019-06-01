@@ -75,11 +75,16 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
     // define some common selectors
     stk::mesh::Selector s_locally_owned_union = meta_data.locally_owned_part()
       &stk::mesh::selectUnion(partVec_);
+    
+    std::cout << std::endl;
+    std::cout << "Flux BC Assembling" << std::endl;
 
     // Iterate through selected buckets
     stk::mesh::BucketVector const & face_buckets = realm_.get_buckets( meta_data.side_rank(), s_locally_owned_union );
     for ( stk::mesh::BucketVector::const_iterator ib = face_buckets.begin(); ib != face_buckets.end() ; ++ib ) {
         stk::mesh::Bucket & b = **ib;
+        
+        std::cout << "/////////// NEW Boundary ///////////" << std::endl;
 
         // face master element
         MasterElement *meFC = MasterElementRepo::get_surface_master_element(b.topology());
@@ -162,10 +167,14 @@ void AssembleScalarFluxBCSolverAlgorithm::execute() {
                 areaNorm = std::sqrt(areaNorm);
 
                 p_rhs[localFaceNode] += fluxBip*areaNorm;
-//                std::cout << "rhs value: " << fluxBip*areaNorm << std::endl;
             }
 
             apply_coeff(connected_nodes, scratchIds, scratchVals, rhs, lhs, __FILE__);
+            std::cout << "printing rhs: " << std::endl;
+            for (int i=0; i<rhsSize; ++i) {
+                std::cout << p_rhs[i] << ", ";
+            }
+            std::cout << std::endl;
         }
     }
 }

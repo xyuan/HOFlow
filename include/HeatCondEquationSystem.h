@@ -73,6 +73,7 @@ public:
      */
     virtual void load(const YAML::Node & node);
     
+    /** Algorithms to handle the specified BC are created*/
     void register_wall_bc(stk::mesh::Part * part, const stk::topology & partTopo, const WallBoundaryConditionData & wallBCData);
     
     /** Outer solving loop for the heat equation

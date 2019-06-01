@@ -74,6 +74,8 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                                                 & !(realm_.get_inactive_selector());
 
     stk::mesh::BucketVector const & elem_buckets = realm_.get_buckets( stk::topology::ELEMENT_RANK, s_locally_owned_union );
+    std::cout << std::endl;
+    std::cout << "Internal Assembling" << std::endl;
     
     // Iterate through all buckets
     for ( stk::mesh::BucketVector::const_iterator ib = elem_buckets.begin(); ib != elem_buckets.end() ; ++ib ) 
@@ -99,7 +101,7 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
             stk::mesh::Entity elem = b[k];
             intf.element_pre_work(elem, diffFluxCoeff_, coordinates_, shiftedGradOp_);
             
-//            std::cout << "/////////// NEW Element ///////////" << std::endl;
+            std::cout << "/////////// NEW Element ///////////" << std::endl;
             
             //----------------------------------------------------
             // Iterate through all integration points
@@ -152,6 +154,11 @@ void AssembleScalarElemDiffSolverAlgorithm::execute() {
                 supplementalAlg_[i]->elem_execute(&intf.lhs_[0], &intf.rhs_[0], elem, meSCS, meSCV);
             
             apply_coeff(intf.connected_nodes_, intf.scratchIds_, intf.scratchVals_, intf.rhs_, intf.lhs_, __FILE__);
+            std::cout << "printing rhs: " << std::endl;
+            for (int i=0; i<3; ++i) {
+                std::cout << intf.rhs_[i] << ", ";
+            }
+            std::cout << std::endl;
         }
     }
 }
