@@ -291,43 +291,38 @@ void HeatCondEquationSystem::register_wall_bc(stk::mesh::Part * part,
     
     // If temperature specified (Dirichlet)
     if ( userData.tempSpec_ ||  FUNCTION_UD == theDataType ) {
-        
-        ScalarFieldType * theBcNodalField = 0;
-        ScalarFieldType * theBcField = 0;
-        stk::mesh::EntityRank entity_rank;
+
         Temperature theTemp = userData.temperature_;
         std::vector<double> userSpec(1);
         userSpec[0] = theTemp.temperature_;
         
         // register boundary data; temperature_bc
-            theBcNodalField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "temperature_bc"));
-            stk::mesh::put_field_on_mesh(*theBcNodalField, *part, nullptr);
-            
-            // new it
-            ConstantAuxFunction * theAuxFunc = new ConstantAuxFunction(0, 1, userSpec);
+        ScalarFieldType * theBcField = 0;
+        ScalarFieldType * theBcNodalField = &(meta_data.declare_field<ScalarFieldType>(stk::topology::NODE_RANK, "temperature_bc"));
+        stk::mesh::put_field_on_mesh(*theBcNodalField, *part, nullptr);
 
-            // bc data alg
-            AuxFunctionAlgorithm * auxAlg = new AuxFunctionAlgorithm(realm_, part,
-                                                                    theBcNodalField, theAuxFunc,
-                                                                    stk::topology::NODE_RANK);
-            bcDataAlg_.push_back(auxAlg);
+        // new it
+        ConstantAuxFunction * theAuxFunc = new ConstantAuxFunction(0, 1, userSpec);
 
-            // copy temperature_bc to temperature np1...
-            CopyFieldAlgorithm * theCopyAlg = new CopyFieldAlgorithm(realm_, part,
-                                                                    theBcNodalField, &tempNp1,
-                                                                    0, 1,
-                                                                    stk::topology::NODE_RANK);
-            bcDataMapAlg_.push_back(theCopyAlg);
+        // bc data alg
+        AuxFunctionAlgorithm * auxAlg = new AuxFunctionAlgorithm(realm_, part,
+                                                                theBcNodalField, theAuxFunc,
+                                                                stk::topology::NODE_RANK);
+        bcDataAlg_.push_back(auxAlg);
+
+        // copy temperature_bc to temperature np1...
+        CopyFieldAlgorithm * theCopyAlg = new CopyFieldAlgorithm(realm_, part,
+                                                                theBcNodalField, &tempNp1,
+                                                                0, 1,
+                                                                stk::topology::NODE_RANK);
+        bcDataMapAlg_.push_back(theCopyAlg);
         
-        if (realm_.solutionOptions_->useNaluBC_) {
-            //Create boundary value field for Nalu style Dirichlet BC
+        
+        if (!realm_.solutionOptions_->useNaluBC_) {
+            //Create boundary value field for CFX style Dirichlet BC, field on
+            // side rank entities
             
-            
-        }
-        else {
-            //Create boundary value field for CFX style Dirichlet BC
-            
-            entity_rank = static_cast<stk::topology::rank_t>(meta_data.side_rank());
+            stk::mesh::EntityRank entity_rank = static_cast<stk::topology::rank_t>(meta_data.side_rank());
             double bc_value = theTemp.temperature_;
             
             theBcField = &(meta_data.declare_field<ScalarFieldType>(entity_rank, "temperature_bc"));

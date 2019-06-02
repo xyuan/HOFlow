@@ -106,12 +106,9 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
         
         std::cout << "/////////// NEW Boundary ///////////" << std::endl;
 
-        // Get the first face just to determine the topology
-        stk::mesh::Entity face = b[0];     
-        stk::mesh::Entity const temp_elem = *bulk_data.begin_elements(face);
+        // Get the first face just to determine the topology   
+        stk::mesh::Entity const temp_elem = *bulk_data.begin_elements(b[0]);
         stk::topology elem_topo = bulk_data.bucket(temp_elem).topology();   
-        
-//        auto tempo = b.getPartition();
 
         // extract master element
         MasterElement * meSCS = MasterElementRepo::get_surface_master_element(elem_topo);
@@ -174,10 +171,10 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
             stk::mesh::Entity elem = *bulk_data.begin_elements(face);
             
             // get nodes of the current element
-            stk::mesh::Entity const * elem_node_rels = bulk_data.begin_nodes(elem);
             stk::mesh::Entity const * face_node_rels = bulk_data.begin_nodes(face);
-            int num_nodes = bulk_data.num_nodes(elem);
+            stk::mesh::Entity const * elem_node_rels = bulk_data.begin_nodes(elem);
             int num_face_nodes = bulk_data.num_nodes(face);
+            int num_nodes = bulk_data.num_nodes(elem);
             
             // sanity check on num nodes
             ThrowAssert( num_nodes == nodesPerElement );
@@ -291,8 +288,6 @@ void AssembleScalarDirichletBCSolverAlgorithm::execute() {
                         std::cout << "node is a internal node, temperature: " << temperatureValue << std::endl;
                     }
                     
-                    
-
                     qDiff += lhsfacDiff*temperatureValue; 
                 }
 

@@ -14,15 +14,15 @@ linear_solvers:
     max_iterations: 75 
     kspace: 75 
     output_level: 0
-    write_matrix_files: yes
+    write_matrix_files: no
 
 realms:
   - name: realm_1
-    mesh: tet3square_large.exo
+    mesh: tet3square_verylarge.exo
 
     equation_systems:
       name: theEqSys
-      max_iterations: 3
+      max_iterations: 1
   
       solver_system_specification:
         temperature: solve_scalar
@@ -30,7 +30,7 @@ realms:
       systems:
         - HeatConduction:
             name: myHC
-            max_iterations: 3
+            max_iterations: 1
             convergence_tolerance: 1e-5
 
     initial_conditions:
@@ -76,12 +76,13 @@ realms:
         adiabatic: yes
 
     output:
-      output_data_base_name: hf_output_large.e
+      output_data_base_name: hf_output_verylarge.e
       output_frequency: 1
       output_node_set: no
       output_variables:
        - dual_nodal_volume
        - temperature
+       - dtdx
        
     solution_options:
       name: myOptions
